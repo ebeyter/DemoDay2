@@ -335,7 +335,12 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "de",
     durationYears: 3,
     requirements: {
+      // Sayfa sayısal eşik vermiyor; seçim iki aşamalı EFV ile yapılıyor.
+      // Katalogdaki 80 teyit edilemedi.
       minGpa: 80,
+      // Teyit edildi: sayfa "Sehr gute Kenntnisse in Deutsch und Englisch"
+      // istiyor — yani Almanca YETERLİ DEĞİL, İngilizce de gerekiyor.
+      // Tip modeli "iki dil birlikte" diyemiyor; Almanca eşikleri yazılı.
       language: [
         { test: "testdaf", min: 4 },
         { test: "goethe", min: 5 },
@@ -344,20 +349,25 @@ export const PROGRAMS: Program[] = [
       requiredSubjects: [{ subject: "math", level: "advanced" }],
       extras: [
         {
+          // Katalogda doğru modellenmişti; sayfadan gelen ayrıntı eklendi.
           key: "entrance-exam",
           mandatory: true,
           note: {
-            tr: "Yetenek tespit sınavı (Eignungsfeststellungsverfahren)",
-            en: "Aptitude assessment (Eignungsfeststellungsverfahren)",
+            tr: "Eignungsfeststellungsverfahren — iki aşamalı: 1) dosya incelemesi, 2) Garching'de yüz yüze test (kış dönemi için 21.08.2026)",
+            en: "Eignungsfeststellungsverfahren — two stages: 1) document review, 2) an in-person test in Garching (21 Aug 2026 for the winter intake)",
           },
         },
       ],
     },
+    // Harç bu sayfada geçmiyor; 4.000 / 300 teyit edilmedi.
     tuitionNonEu: 4000,
     tuitionEu: 300,
     livingCostPerYear: 13800,
     applicationSystem: "direct",
-    deadline: "05-31",
+    // DÜZELTME (2026-08-13): katalogda "05-31" yazıyordu. Sayfa
+    // "Bewerbungsfrist Wintersemester: 15. Mai bis 15. Juli" diyor —
+    // başvuru penceresi 15 Mayıs'ta açılıyor, 15 TEMMUZ'da kapanıyor.
+    deadline: "07-15",
     deadlineNote: {
       tr: "Almanca eğitim — TestDaF 4 veya Goethe C1 zorunlu. Ayrıca YKS yerleşmen olmalı.",
       en: "Taught in German — TestDaF 4 or Goethe C1 required, plus a YKS university placement.",

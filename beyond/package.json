@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "check:data": "tsx scripts/check-data.mts",
+    "test": "vitest run",
     "check-sources": "tsx scripts/check-sources.mts",
     "check-demo": "tsx scripts/check-demo.mts"
   },
@@ -27,6 +28,7 @@
     "eslint-config-next": "16.3.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.12",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }

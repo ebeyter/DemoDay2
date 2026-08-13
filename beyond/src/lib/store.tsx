@@ -17,7 +17,7 @@ import {
   usePersistent,
   writePersistent,
 } from "./persistent-state";
-import type { StudentProfile } from "./types";
+import type { CountryCode, FieldId, StudentProfile } from "./types";
 
 /**
  * Beyond — tek veri katmanı.
@@ -31,10 +31,24 @@ import type { StudentProfile } from "./types";
 const PROFILE_KEY = "beyond.profile";
 const SHORTLIST_KEY = "beyond.shortlist";
 const COMPARE_KEY = "beyond.compare";
+const SCENARIOS_KEY = "beyond.scenarios";
 
 export const MAX_COMPARE = 4;
 
 export type AuthStatus = "loading" | "signed-in" | "signed-out" | "local";
+
+/** Senaryo modunun (bkz. results/page.tsx) geçici olarak ezdiği profil alanları. */
+export interface SavedScenario {
+  id: string;
+  name: string;
+  fields: FieldId[];
+  countries: CountryCode[];
+  /** null = üst sınır yok. */
+  maxTuition: number | null;
+  createdAt: string;
+}
+
+const EMPTY_SCENARIOS: SavedScenario[] = [];
 
 interface StoreValue {
   status: AuthStatus;
@@ -56,6 +70,16 @@ interface StoreValue {
   toggleCompare: (programId: string) => void;
   isComparing: (programId: string) => boolean;
 
+  /** Kaydedilen senaryolar — en yeni önce. Anahtarsız modda localStorage'da kalır. */
+  scenarios: SavedScenario[];
+  saveScenario: (input: {
+    name: string;
+    fields: FieldId[];
+    countries: CountryCode[];
+    maxTuition: number | null;
+  }) => Promise<void>;
+  deleteScenario: (id: string) => Promise<void>;
+
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signUp: (email: string, password: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
@@ -71,6 +95,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const profile = usePersistent<StudentProfile | null>(PROFILE_KEY, null);
   const shortlist = usePersistent<string[]>(SHORTLIST_KEY, EMPTY_STRING_ARRAY);
   const compare = usePersistent<string[]>(COMPARE_KEY, EMPTY_STRING_ARRAY);
+  const scenarios = usePersistent<SavedScenario[]>(SCENARIOS_KEY, EMPTY_SCENARIOS);
 
   const [status, setStatus] = useState<AuthStatus>(localMode ? "local" : "loading");
   const [user, setUser] = useState<User | null>(null);
@@ -118,6 +143,38 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       if (data.profile) writePersistent(PROFILE_KEY, data.profile as StudentProfile);
       if (Array.isArray(data.shortlist)) writePersistent(SHORTLIST_KEY, data.shortlist);
       if (Array.isArray(data.compare_list)) writePersistent(COMPARE_KEY, data.compare_list);
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [supabase, user]);
+
+  // --- Giriş yapılınca kayıtlı senaryoları çek ----------------------------
+  useEffect(() => {
+    if (!supabase || !user) return;
+
+    let active = true;
+    (async () => {
+      const { data, error } = await supabase
+        .from("beyond_scenarios")
+        .select("id, name, fields, countries, max_tuition, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (!active || error || !data) return;
+
+      writePersistent<SavedScenario[]>(
+        SCENARIOS_KEY,
+        data.map((row) => ({
+          id: row.id,
+          name: row.name,
+          fields: row.fields as FieldId[],
+          countries: row.countries as CountryCode[],
+          maxTuition: row.max_tuition,
+          createdAt: row.created_at,
+        }))
+      );
     })();
 
     return () => {
@@ -173,6 +230,56 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       await supabase.from("beyond_profiles").delete().eq("user_id", user.id);
     }
   }, [supabase, user]);
+
+  const saveScenario = useCallback(
+    async (input: {
+      name: string;
+      fields: FieldId[];
+      countries: CountryCode[];
+      maxTuition: number | null;
+    }) => {
+      const scenario: SavedScenario = {
+        id: crypto.randomUUID(),
+        name: input.name,
+        fields: input.fields,
+        countries: input.countries,
+        maxTuition: input.maxTuition,
+        createdAt: new Date().toISOString(),
+      };
+
+      // Anahtarsız modda burada durur — localStorage tek kaynak.
+      const current = readPersistent<SavedScenario[]>(SCENARIOS_KEY, EMPTY_SCENARIOS);
+      writePersistent(SCENARIOS_KEY, [scenario, ...current]);
+
+      if (supabase && user) {
+        await supabase.from("beyond_scenarios").insert({
+          id: scenario.id,
+          user_id: user.id,
+          name: scenario.name,
+          fields: scenario.fields,
+          countries: scenario.countries,
+          max_tuition: scenario.maxTuition,
+          created_at: scenario.createdAt,
+        });
+      }
+    },
+    [supabase, user]
+  );
+
+  const deleteScenario = useCallback(
+    async (id: string) => {
+      const current = readPersistent<SavedScenario[]>(SCENARIOS_KEY, EMPTY_SCENARIOS);
+      writePersistent(
+        SCENARIOS_KEY,
+        current.filter((s) => s.id !== id)
+      );
+
+      if (supabase && user) {
+        await supabase.from("beyond_scenarios").delete().eq("id", id).eq("user_id", user.id);
+      }
+    },
+    [supabase, user]
+  );
 
   const toggleShortlist = useCallback(
     (programId: string) => {
@@ -249,6 +356,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       compare,
       toggleCompare,
       isComparing: (id) => compare.includes(id),
+      scenarios,
+      saveScenario,
+      deleteScenario,
       signIn,
       signUp,
       signOut,
@@ -264,6 +374,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       toggleShortlist,
       compare,
       toggleCompare,
+      scenarios,
+      saveScenario,
+      deleteScenario,
       signIn,
       signUp,
       signOut,

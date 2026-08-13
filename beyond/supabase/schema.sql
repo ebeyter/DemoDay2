@@ -200,3 +200,75 @@ $$;
 -- yazamaz.
 
 select 'beyond_source_checks hazır' as durum;
+
+
+-- ===========================================================================
+-- 7. Kaydedilen senaryolar
+--
+-- Senaryo modu ("ya Almanya deseydim?") oturum içinde çalışıyordu, kaydedilmiyordu.
+-- Bu tablo kullanıcının birden fazla senaryo kaydedip geri çağırabilmesini
+-- sağlıyor. `beyond_profiles`'ın aksine kullanıcı başına TEK satır değil —
+-- her senaryo kendi satırı, bu yüzden ayrı bir tablo.
+--
+-- Bu bölüm de sadece EKLEME yapar; yukarıdaki hiçbir şeye dokunmaz.
+-- ===========================================================================
+create table if not exists public.beyond_scenarios (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null references auth.users (id) on delete cascade,
+
+  name         text not null,
+
+  -- Senaryonun geçici olarak ezdiği profil alanları — bkz. matching.ts
+  -- MatchOptions. Boş dizi = kısıt yok (profildeki değeri kullan).
+  fields       text[] not null default '{}',
+  countries    text[] not null default '{}',
+  -- null = üst sınır yok (bütçe kısıtı kaldırılmış senaryo).
+  max_tuition  numeric,
+
+  created_at   timestamptz not null default now()
+);
+
+create index if not exists beyond_scenarios_user_id_idx
+  on public.beyond_scenarios (user_id, created_at desc);
+
+alter table public.beyond_scenarios enable row level security;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'beyond_scenarios'
+      and policyname = 'beyond_scenarios_select_own'
+  ) then
+    create policy beyond_scenarios_select_own on public.beyond_scenarios
+      for select using (auth.uid() = user_id);
+  end if;
+
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'beyond_scenarios'
+      and policyname = 'beyond_scenarios_insert_own'
+  ) then
+    create policy beyond_scenarios_insert_own on public.beyond_scenarios
+      for insert with check (auth.uid() = user_id);
+  end if;
+
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'beyond_scenarios'
+      and policyname = 'beyond_scenarios_delete_own'
+  ) then
+    create policy beyond_scenarios_delete_own on public.beyond_scenarios
+      for delete using (auth.uid() = user_id);
+  end if;
+end
+$$;
+
+-- Update politikası bilinçli olarak yok — bir senaryo değiştirilmek yerine
+-- silinip yeniden kaydediliyor (arayüz bunu böyle kullanıyor); UPDATE izni
+-- olmayan bir tablonun RLS yüzeyi daha küçük ve denetlenmesi daha kolay.
+
+select policyname, cmd
+from pg_policies
+where schemaname = 'public' and tablename = 'beyond_scenarios'
+order by policyname;

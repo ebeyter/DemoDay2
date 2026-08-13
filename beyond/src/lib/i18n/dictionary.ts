@@ -198,6 +198,13 @@ const tr = {
     addToCompare: "Karşılaştırmaya ekle",
     inCompare: "Karşılaştırmada",
     overBudget: "Bütçeni aşıyor",
+    scenarioSaveLabel: "Bu senaryoyu kaydet",
+    scenarioNamePlaceholder: "Senaryo adı — örn. \"Almanya + düşük bütçe\"",
+    scenarioSaveButton: "Kaydet",
+    savedScenariosTitle: "Kayıtlı senaryolar",
+    scenarioApply: "Uygula",
+    scenarioDelete: "Sil",
+    scenarioNone: "Henüz kayıtlı senaryo yok.",
   },
 
   program: {
@@ -262,6 +269,14 @@ const tr = {
     daysLeft: "{days} gün kaldı",
     passed: "Tarih geçti",
     today: "Bugün",
+    visaTitle: "Vize ve oturum izni adımları",
+    visaSubtitle:
+      "Kabul mektubu son adım değil. Süreler resmi göç makamlarının kendi sayfalarından — kesin tarih değil, aralık: gerçek süre başvuru yoğunluğuna ve konsolosluğa göre değişir.",
+    visaWeeksRange: "{min}-{max} hafta",
+    visaWeeksMax: "en fazla {max} hafta",
+    visaWeeksUnknown: "süre bilinmiyor",
+    visaDisclaimer:
+      "Bu adımlar ve süreler kaynak sayfalarından araştırıldı ama resmi makamlar bile kesin bir süre garanti etmiyor. Başvurmadan önce güncel bilgiyi mutlaka kaynak linkinden teyit et.",
   },
 
   countries: {
@@ -523,6 +538,13 @@ const en: Dictionary = {
     addToCompare: "Add to compare",
     inCompare: "In comparison",
     overBudget: "Over your budget",
+    scenarioSaveLabel: "Save this scenario",
+    scenarioNamePlaceholder: "Scenario name — e.g. \"Germany + lower budget\"",
+    scenarioSaveButton: "Save",
+    savedScenariosTitle: "Saved scenarios",
+    scenarioApply: "Apply",
+    scenarioDelete: "Delete",
+    scenarioNone: "No saved scenarios yet.",
   },
 
   program: {
@@ -587,6 +609,14 @@ const en: Dictionary = {
     daysLeft: "{days} days left",
     passed: "Deadline passed",
     today: "Today",
+    visaTitle: "Visa & residence permit steps",
+    visaSubtitle:
+      "The acceptance letter isn't the last step. Timings come from each country's official immigration site — not exact dates, ranges: the real time depends on how busy the consulate is.",
+    visaWeeksRange: "{min}-{max} weeks",
+    visaWeeksMax: "up to {max} weeks",
+    visaWeeksUnknown: "timing unknown",
+    visaDisclaimer:
+      "These steps and timings were researched from official sources, but even the authorities don't guarantee an exact time. Always confirm current details via the source link before applying.",
   },
 
   countries: {

@@ -10,7 +10,8 @@ import { useStore } from "@/lib/store";
 import { getProgramById } from "@/data/programs";
 import { APPLICATION_SYSTEMS, COUNTRIES } from "@/data/taxonomy";
 import { daysUntilDeadline, formatDeadline } from "@/lib/format";
-import type { ApplicationSystem, Program } from "@/lib/types";
+import { VISA_STEPS, type VisaStep } from "@/lib/visa-steps";
+import type { ApplicationSystem, CountryCode, Program } from "@/lib/types";
 
 interface TimelineItem {
   program: Program;
@@ -50,6 +51,25 @@ export default function TimelinePage() {
 
   const allItems = groups.flatMap((g) => g.items);
   const nearest = allItems.length > 0 ? Math.min(...allItems.map((i) => i.days)) : null;
+
+  /**
+   * Vize/oturum izni adımları — başvuru takviminden AYRI ve görsel olarak
+   * ayrışan bir grup (brief'in isteği). Sadece takvimdeki ülkeler için, ve
+   * sadece o ülke için araştırılmış, kaynaklı bir adım varsa gösterilir.
+   */
+  const visaGroups = useMemo(() => {
+    const countries = new Set<CountryCode>();
+    for (const id of shortlist) {
+      const program = getProgramById(id);
+      if (program) countries.add(program.country);
+    }
+    return [...countries]
+      .map((country) => ({ country, steps: VISA_STEPS[country] }))
+      .filter(
+        (g): g is { country: CountryCode; steps: VisaStep[] } =>
+          Array.isArray(g.steps) && g.steps.length > 0
+      );
+  }, [shortlist]);
 
   return (
     <>
@@ -169,6 +189,90 @@ export default function TimelinePage() {
                 );
               })}
             </div>
+
+            {/* -----------------------------------------------------------
+                Vize / oturum izni adımları — başvuru takviminden ayrı,
+                görsel olarak ayrışan bir grup.
+                ----------------------------------------------------------- */}
+            {visaGroups.length > 0 && (
+              <div className="mt-10 pt-8 border-t-2 border-dashed border-line-strong">
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="text-lg" aria-hidden>
+                    🛂
+                  </span>
+                  <h2 className="text-[17px] font-semibold text-ink">{t.timeline.visaTitle}</h2>
+                </div>
+                <p className="text-[13px] text-ink-soft mb-6 leading-relaxed max-w-2xl">
+                  {t.timeline.visaSubtitle}
+                </p>
+
+                <div className="space-y-8">
+                  {visaGroups.map(({ country, steps }) => (
+                    <section key={country}>
+                      <h3 className="text-[15px] font-semibold text-ink mb-3">
+                        <span className="mr-1.5" aria-hidden>
+                          {COUNTRIES[country].flag}
+                        </span>
+                        {pick(COUNTRIES[country].name)}
+                      </h3>
+
+                      <ol className="space-y-3">
+                        {steps.map((step, index) => (
+                          <li key={step.id}>
+                            <Card className="p-4 border-band-safety-soft bg-band-safety-soft/30">
+                              <div className="flex items-start gap-3">
+                                <span className="shrink-0 w-6 h-6 rounded-full bg-band-safety text-white grid place-items-center text-[12px] font-semibold mt-0.5">
+                                  {index + 1}
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <h4 className="text-[14px] font-semibold text-ink">
+                                      {pick(step.label)}
+                                    </h4>
+                                    <span className="text-[11px] px-2 py-0.5 rounded-pill font-medium bg-band-safety-soft text-band-safety">
+                                      {step.timing
+                                        ? step.timing.minWeeks !== undefined
+                                          ? fill(t.timeline.visaWeeksRange, {
+                                              min: step.timing.minWeeks,
+                                              max: step.timing.maxWeeks,
+                                            })
+                                          : fill(t.timeline.visaWeeksMax, {
+                                              max: step.timing.maxWeeks,
+                                            })
+                                        : t.timeline.visaWeeksUnknown}
+                                    </span>
+                                  </div>
+                                  <p className="text-[13px] text-ink-soft mt-1 leading-relaxed">
+                                    {pick(step.description)}
+                                  </p>
+                                  {step.caveat && (
+                                    <p className="text-[12px] text-ink-faint mt-1.5 leading-relaxed">
+                                      ⚠ {pick(step.caveat)}
+                                    </p>
+                                  )}
+                                  <a
+                                    href={step.sourceUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-block text-[12px] text-accent hover:underline mt-1.5"
+                                  >
+                                    {t.common.source} ↗
+                                  </a>
+                                </div>
+                              </div>
+                            </Card>
+                          </li>
+                        ))}
+                      </ol>
+                    </section>
+                  ))}
+                </div>
+
+                <p className="text-[12px] text-ink-faint mt-5 leading-relaxed max-w-2xl">
+                  {t.timeline.visaDisclaimer}
+                </p>
+              </div>
+            )}
 
             <p className="text-[13px] text-ink-faint mt-8 leading-relaxed">
               {locale === "tr"

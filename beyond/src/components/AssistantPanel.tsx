@@ -6,14 +6,17 @@ import { useStore } from "@/lib/store";
 import { matchAll, toHundredScale } from "@/lib/matching";
 import { PROGRAMS } from "@/data/programs";
 import { COUNTRIES, FIELDS } from "@/data/taxonomy";
-import { Button, Card, Input, cx } from "./ui";
+import { Button, Input, cx } from "./ui";
 
 /**
- * Beyond — AI paneli.
+ * Beyond — "Sor AI'a" paneli.
  *
- * İki sekme: profil-bilir sohbet ve canlı program çıkarımı.
- * Her ikisi de çift modlu — API anahtarı yoksa "demo modu" etiketiyle
- * hazır sonuç gösterilir. Bu etiket bilinçli olarak gizlenmiyor.
+ * Öğrencinin profilini ve motorun hesapladığı eşleşmeleri bağlam olarak
+ * gönderir. Asistan bu sonuçları YORUMLAR, yeniden hesaplamaz — eşleştirme
+ * kararları deterministik motorda kalıyor.
+ *
+ * Çift modlu: Bedrock ayarları yoksa "demo modu" rozetiyle hazır bir cevap
+ * gösterilir. Rozet bilinçli olarak gizlenmiyor.
  */
 
 interface ChatMessage {
@@ -21,45 +24,16 @@ interface ChatMessage {
   content: string;
 }
 
-interface ExtractedProgram {
-  found: boolean;
-  university?: string;
-  city?: string;
-  country?: string;
-  programName?: string;
-  degree?: string;
-  field?: string;
-  teachingLanguage?: string;
-  durationYears?: number;
-  minGpaNote?: string;
-  languageRequirements?: { test: string; min: string }[];
-  otherRequirements?: string[];
-  tuitionNonEuNote?: string;
-  deadlineNote?: string;
-  applicationSystem?: string;
-  notes?: string;
-}
-
 export function AssistantPanel() {
-  const { t, locale, pick } = useLocale();
+  const { t, locale } = useLocale();
   const { profile } = useStore();
 
   const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState<"chat" | "extract">("chat");
-
-  // --- Sohbet durumu -------------------------------------------------------
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [demoMode, setDemoMode] = useState<boolean | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  // --- Çıkarım durumu ------------------------------------------------------
-  const [url, setUrl] = useState("");
-  const [extracting, setExtracting] = useState(false);
-  const [extracted, setExtracted] = useState<ExtractedProgram | null>(null);
-  const [extractSource, setExtractSource] = useState<string | null>(null);
-  const [extractError, setExtractError] = useState<string | null>(null);
 
   /**
    * Asistana verilen bağlam. Deterministik motorun çıktısını metne çeviriyoruz —
@@ -159,9 +133,7 @@ export function AssistantPanel() {
 
       setDemoMode(response.headers.get("X-Beyond-Demo-Mode") === "true");
 
-      if (!response.ok || !response.body) {
-        throw new Error("stream unavailable");
-      }
+      if (!response.ok || !response.body) throw new Error("stream unavailable");
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -186,35 +158,6 @@ export function AssistantPanel() {
       ]);
     } finally {
       setStreaming(false);
-    }
-  }
-
-  async function runExtract() {
-    if (!url.trim() || extracting) return;
-    setExtracting(true);
-    setExtractError(null);
-    setExtracted(null);
-
-    try {
-      const response = await fetch("/api/extract", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        setExtractError(data.error ?? t.auth.errorGeneric);
-        return;
-      }
-
-      setDemoMode(Boolean(data.demoMode));
-      setExtracted(data.program);
-      setExtractSource(data.sourceUrl ?? url);
-    } catch {
-      setExtractError(t.auth.errorGeneric);
-    } finally {
-      setExtracting(false);
     }
   }
 
@@ -252,7 +195,6 @@ export function AssistantPanel() {
         )}
         aria-hidden={!open}
       >
-        {/* Başlık */}
         <div className="flex items-center justify-between gap-3 px-5 h-16 border-b border-line shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             <h2 className="text-[15px] font-semibold text-ink truncate">
@@ -273,248 +215,72 @@ export function AssistantPanel() {
           </button>
         </div>
 
-        {/* Sekmeler */}
-        <div className="flex gap-1 px-4 pt-3 shrink-0">
-          {(["chat", "extract"] as const).map((id) => (
-            <button
-              key={id}
-              onClick={() => setTab(id)}
-              className={cx(
-                "px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors",
-                tab === id
-                  ? "bg-accent-soft text-accent"
-                  : "text-ink-faint hover:text-ink hover:bg-surface-soft"
-              )}
-            >
-              {id === "chat" ? t.assistant.tabChat : t.assistant.tabExtract}
-            </button>
-          ))}
-        </div>
-
         {demoMode && (
           <p className="mx-4 mt-3 text-[12px] leading-relaxed text-band-reach bg-band-reach-soft rounded-lg px-3 py-2 shrink-0">
             {t.assistant.demoNote}
           </p>
         )}
 
-        {/* ---------------------------------------------------------------
-            Sohbet sekmesi
-            --------------------------------------------------------------- */}
-        {tab === "chat" && (
-          <>
-            <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4 thin-scroll">
-              {!profile ? (
-                <p className="text-sm text-ink-soft">{t.assistant.needProfile}</p>
-              ) : messages.length === 0 ? (
-                <div>
-                  <p className="text-sm text-ink-soft mb-4">{t.assistant.chatEmpty}</p>
-                  <div className="space-y-2">
-                    {t.assistant.chatSuggestions.map((suggestion) => (
-                      <button
-                        key={suggestion}
-                        onClick={() => void sendMessage(suggestion)}
-                        className="block w-full text-left text-[13px] px-3 py-2.5 rounded-xl border border-line text-ink-soft hover:border-accent hover:text-accent transition-colors"
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                messages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={cx(
-                      "text-sm leading-relaxed",
-                      message.role === "user"
-                        ? "bg-accent-soft text-ink rounded-xl px-3.5 py-2.5 ml-8"
-                        : "text-ink"
-                    )}
+        <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4 thin-scroll">
+          {!profile ? (
+            <p className="text-sm text-ink-soft">{t.assistant.needProfile}</p>
+          ) : messages.length === 0 ? (
+            <div>
+              <p className="text-sm text-ink-soft mb-4">{t.assistant.chatEmpty}</p>
+              <div className="space-y-2">
+                {t.assistant.chatSuggestions.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    onClick={() => void sendMessage(suggestion)}
+                    className="block w-full text-left text-[13px] px-3 py-2.5 rounded-xl border border-line text-ink-soft hover:border-accent hover:text-accent transition-colors"
                   >
-                    {message.content === "" && streaming ? (
-                      <span className="text-ink-faint">{t.assistant.thinking}</span>
-                    ) : (
-                      <Markdownish text={message.content} />
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-
-            {profile && (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void sendMessage(input);
-                }}
-                className="flex items-center gap-2 p-4 border-t border-line shrink-0"
-              >
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder={t.assistant.chatPlaceholder}
-                  disabled={streaming}
-                />
-                <Button type="submit" size="sm" disabled={streaming || !input.trim()}>
-                  →
-                </Button>
-              </form>
-            )}
-          </>
-        )}
-
-        {/* ---------------------------------------------------------------
-            Çıkarım sekmesi
-            --------------------------------------------------------------- */}
-        {tab === "extract" && (
-          <div className="flex-1 overflow-y-auto px-4 py-4 thin-scroll">
-            <h3 className="text-[15px] font-semibold text-ink mb-1.5">
-              {t.assistant.extractTitle}
-            </h3>
-            <p className="text-[13px] text-ink-soft leading-relaxed mb-4">
-              {t.assistant.extractBody}
-            </p>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                void runExtract();
-              }}
-              className="space-y-2 mb-5"
-            >
-              <Input
-                type="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder={t.assistant.extractPlaceholder}
-                disabled={extracting}
-              />
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={extracting || !url.trim()}
-              >
-                {extracting ? t.assistant.extractLoading : t.assistant.extractButton}
-              </Button>
-            </form>
-
-            {extractError && (
-              <p className="text-[13px] text-danger bg-danger-soft rounded-lg px-3 py-2 mb-4">
-                {extractError}
-              </p>
-            )}
-
-            {extracting && (
-              <div className="space-y-2 animate-fade">
-                {[0, 1, 2].map((index) => (
-                  <div
-                    key={index}
-                    className="h-3 rounded bg-surface-soft animate-pulse"
-                    style={{ width: `${90 - index * 18}%` }}
-                  />
+                    {suggestion}
+                  </button>
                 ))}
               </div>
-            )}
-
-            {extracted && !extracting && (
-              <Card className="p-5 animate-rise">
-                {!extracted.found ? (
-                  <p className="text-sm text-ink-soft">{t.assistant.extractEmptyResult}</p>
+            </div>
+          ) : (
+            messages.map((message, index) => (
+              <div
+                key={index}
+                className={cx(
+                  "text-sm leading-relaxed",
+                  message.role === "user"
+                    ? "bg-accent-soft text-ink rounded-xl px-3.5 py-2.5 ml-8"
+                    : "text-ink"
+                )}
+              >
+                {message.content === "" && streaming ? (
+                  <span className="text-ink-faint">{t.assistant.thinking}</span>
                 ) : (
-                  <>
-                    <p className="text-[13px] text-ink-faint mb-1">
-                      {extracted.city}
-                      {extracted.city && extracted.country ? " · " : ""}
-                      {extracted.country}
-                    </p>
-                    <h4 className="text-[15px] font-semibold text-ink leading-snug">
-                      {extracted.programName}
-                    </h4>
-                    <p className="text-sm text-ink-soft mb-4">{extracted.university}</p>
-
-                    <dl className="space-y-2.5 text-[13px]">
-                      {extracted.minGpaNote && (
-                        <ExtractRow label={pick({ tr: "Not şartı", en: "Grade requirement" })}>
-                          {extracted.minGpaNote}
-                        </ExtractRow>
-                      )}
-                      {extracted.languageRequirements &&
-                        extracted.languageRequirements.length > 0 && (
-                          <ExtractRow label={t.program.teachingLanguage}>
-                            {extracted.languageRequirements
-                              .map((requirement) => `${requirement.test} ${requirement.min}`)
-                              .join(" · ")}
-                          </ExtractRow>
-                        )}
-                      {extracted.tuitionNonEuNote && (
-                        <ExtractRow label={t.program.tuitionNonEu}>
-                          {extracted.tuitionNonEuNote}
-                        </ExtractRow>
-                      )}
-                      {extracted.deadlineNote && (
-                        <ExtractRow label={t.program.deadline}>
-                          {extracted.deadlineNote}
-                        </ExtractRow>
-                      )}
-                      {extracted.applicationSystem && (
-                        <ExtractRow label={t.program.system}>
-                          {extracted.applicationSystem}
-                        </ExtractRow>
-                      )}
-                      {extracted.otherRequirements &&
-                        extracted.otherRequirements.length > 0 && (
-                          <ExtractRow label={t.program.requirements}>
-                            <ul className="list-disc list-inside space-y-0.5">
-                              {extracted.otherRequirements.map((requirement) => (
-                                <li key={requirement}>{requirement}</li>
-                              ))}
-                            </ul>
-                          </ExtractRow>
-                        )}
-                    </dl>
-
-                    {extracted.notes && (
-                      <div className="mt-4 pt-4 border-t border-line">
-                        <p className="text-[12px] font-medium text-ink mb-1">
-                          {t.assistant.extractNotesLabel}
-                        </p>
-                        <p className="text-[12px] text-ink-soft leading-relaxed">
-                          {extracted.notes}
-                        </p>
-                      </div>
-                    )}
-                  </>
+                  <Markdownish text={message.content} />
                 )}
+              </div>
+            ))
+          )}
+        </div>
 
-                {extractSource && (
-                  <a
-                    href={extractSource}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block mt-4 text-[12px] text-accent hover:underline truncate"
-                  >
-                    {t.assistant.extractSourceLabel}: {extractSource} ↗
-                  </a>
-                )}
-
-                <p className="mt-3 text-[11px] text-ink-faint leading-relaxed">
-                  ~ {t.assistant.extractDisclaimer}
-                </p>
-              </Card>
-            )}
-          </div>
+        {profile && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void sendMessage(input);
+            }}
+            className="flex items-center gap-2 p-4 border-t border-line shrink-0"
+          >
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={t.assistant.chatPlaceholder}
+              disabled={streaming}
+            />
+            <Button type="submit" size="sm" disabled={streaming || !input.trim()}>
+              →
+            </Button>
+          </form>
         )}
       </aside>
     </>
-  );
-}
-
-function ExtractRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <dt className="text-ink-faint">{label}</dt>
-      <dd className="text-ink mt-0.5">{children}</dd>
-    </div>
   );
 }
 

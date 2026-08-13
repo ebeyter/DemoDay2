@@ -288,8 +288,6 @@ const tr = {
   assistant: {
     open: "Asistan",
     title: "Beyond Asistan",
-    tabChat: "Sor",
-    tabExtract: "Üniversite ekle",
     demoBadge: "demo modu",
     demoNote:
       "API anahtarı tanımlı değil — bu panel hazır bir örnek gösteriyor, canlı AI değil.",
@@ -302,17 +300,6 @@ const tr = {
     ],
     send: "Gönder",
     thinking: "Düşünüyor…",
-    extractTitle: "Listede olmayan bir program mı var?",
-    extractBody:
-      "Programın kendi sayfasının bağlantısını yapıştır; şartları okuyup yapılandırılmış hale getirelim.",
-    extractPlaceholder: "https://universite.edu/program-sayfasi",
-    extractButton: "Şartları çıkar",
-    extractLoading: "Sayfa okunuyor…",
-    extractEmptyResult: "Bu sayfada bir program bulunamadı.",
-    extractSourceLabel: "Okunan sayfa",
-    extractNotesLabel: "Dikkat edilmesi gerekenler",
-    extractDisclaimer:
-      "Bu çıkarım otomatiktir ve doğrulanmamıştır. Başvurmadan önce kaynak sayfadan teyit et.",
     needProfile: "Önce profilini oluştur, sonra buradan sorularını sorabilirsin.",
   },
 };
@@ -601,8 +588,6 @@ const en: Dictionary = {
   assistant: {
     open: "Assistant",
     title: "Beyond Assistant",
-    tabChat: "Ask",
-    tabExtract: "Add a university",
     demoBadge: "demo mode",
     demoNote:
       "No API key configured — this panel shows a prepared example, not live AI.",
@@ -615,17 +600,6 @@ const en: Dictionary = {
     ],
     send: "Send",
     thinking: "Thinking…",
-    extractTitle: "A program that is not on the list?",
-    extractBody:
-      "Paste the link to the program's own page and we will read its requirements into structured data.",
-    extractPlaceholder: "https://university.edu/program-page",
-    extractButton: "Extract requirements",
-    extractLoading: "Reading the page…",
-    extractEmptyResult: "No program was found on that page.",
-    extractSourceLabel: "Page read",
-    extractNotesLabel: "Things to watch",
-    extractDisclaimer:
-      "This extraction is automatic and unverified. Confirm at the source before applying.",
     needProfile: "Create your profile first, then you can ask questions here.",
   },
 };

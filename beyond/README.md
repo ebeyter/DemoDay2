@@ -66,19 +66,23 @@ Her programın kaynak sayfasını indirir, iki şey çıkarır ve `src/data/sour
 
 ### "Sor AI'a" paneli — Amazon Bedrock
 
-Sohbet paneli Bedrock'un **Converse API**'si üzerinden çalışıyor. Converse model bağımsız, yani hesabında erişimin olan **herhangi bir** model iş görür — Claude olması gerekmiyor.
+Sohbet paneli Bedrock Mantle'ın **OpenAI-uyumlu** uç noktasına düz `fetch` ile konuşuyor (`src/lib/bedrock-chat.ts`). Araya SDK koymadık: yol zaten OpenAI sözleşmesini konuşuyor, SDK sadece bağımlılık eklerdi. Hesabında erişimin olan **herhangi bir** model iş görür — Claude olması gerekmiyor.
 
 | Gereken değişken | Not |
 |---|---|
-| `BEDROCK_URL` | Bedrock uç noktası — bölge adresten otomatik çıkarılıyor |
+| `BEDROCK_URL` | Tam uç nokta adresi, ör. `https://bedrock-mantle.us-east-1.api.aws/openai/v1/chat/completions` |
 | `BEDROCK_API_KEY` | Bedrock API anahtarın |
-| `BEDROCK_MODEL_ID` | İsteğe bağlı. Yazılmazsa varsayılan kullanılır; hesabında farklı bir modele erişimin varsa burayı doldur. |
+| `BEDROCK_MODEL_ID` | İsteğe bağlı. Varsayılan `google.gemma-4-31b`. |
 
-Bölgeyi ayrıca yazmıyorsun: `https://bedrock-runtime.eu-central-1.amazonaws.com` adresinden `eu-central-1` otomatik çıkarılıyor. Aynı bilgiyi iki yerde tutmak tutarsızlık kaynağı olurdu.
+**Uç noktanın iki tuzağı var, ikisi de canlı testte yakalandı ve koda işlendi:**
+- `max_tokens` reddediliyor — doğru alan `max_completion_tokens`
+- `temperature` yalnızca varsayılan değeri kabul ediyor — hiç göndermiyoruz
 
 Boş bırakılırsa panel "demo modu" rozetiyle hazır bir cevap gösterir; uygulamanın geri kalanı etkilenmez.
 
 **Neden sohbet AI gerektiriyor ama katalog senkronu gerektirmiyor:** sohbet serbest metin yorumu yapıyor, senkron ise kalıplı sayı karşılaştırması. İkincisi düzenli ifadeyle daha güvenilir *ve* ücretsiz.
+
+Bu yüzden AI'sız çalışan bir ürün elde ettik: Bedrock ayarları hiç girilmese bile eşleştirme, eksik planı, kaynak takibi, senaryo modu, karşılaştırma ve takvim tam çalışıyor — sadece soru-cevap paneli demo moduna düşüyor.
 
 ### Supabase kurulumu
 

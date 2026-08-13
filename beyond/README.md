@@ -194,23 +194,35 @@ Her şart dört durumdan birini alır: `met` / `close` (az kaldı) / `unmet` / `
 - **5. adım** — öğrenciyi "olamazsın"dan "şunu yaparsan olursun"a taşıyan yer.
 - **7. adım** — kaynak takibi. Jüriye "verimiz güncel kalıyor" demek yerine gösteriyorsun, üstelik tıklayıp doğrulanabiliyor.
 
-Test edilmiş örnek: **IELTS 6.0 → 7.0** tek değişikliği **Uygun bandı 2'den 5 programa** çıkarıyor, Zorlayıcı 10'dan 6'ya iniyor.
+Test edilmiş örnek: **IELTS 6.0 → 7.0** tek değişikliği **Uygun bandı 2'den 5 programa** çıkarıyor, Zorlayıcı 10'dan 7'ye iniyor.
 
 Bu sayılar `npm run check-demo` ile ölçülüyor; profil `src/data/demo-profile.ts`
 içinde sabit. Katalog değişince sayılar da değişir — **sahnede söylemeden önce
 betiği çalıştır.**
 
-### Güvenli bandı neden neredeyse boş
+### Güvenli bandı boş — ve bu bir hata değil, bulgumuz
 
-Önceki sürümde bu cümle *"Güvenli bandı 0'dan 4'e çıkarıyor"* diyordu. Doğrulama
-turunda o dört programın üçünde seçme kapısı olduğu ortaya çıktı — KTH 2024'te
-şartları karşılayan 684 adaydan 71'ini almış (%10), TU/e ve Groningen seçme
-prosedürü uyguluyor. Eşiği geçmek bu programlarda kabul anlamına gelmiyor, o
-yüzden artık `safety` bandına çıkmıyorlar.
+İlk sürümde bu cümle *"Güvenli bandı 0'dan 4'e çıkarıyor"* diyordu. Doğrulama
+turunda o dört programın **dördünde de** seçme kapısı olduğu ortaya çıktı:
 
-Bu bir gerileme değil, ürünün asıl iddiası: **Avrupa'da "garanti" yok ve biz
-bunu saklamıyoruz.** Sahnede kullanılacak cümle bu — rakip araçlar burada bir
-yüzde gösterir, biz kontenjan gerçeğini gösteriyoruz.
+| Program | Katalogda | Kaynak sayfada |
+|---|---|---|
+| KTH ICT | seçme şartı yok | 2024'te şartları karşılayan 684 adaydan 71'i alınmış (%10) |
+| TU/e Makine | seçme şartı yok | *"Admission requires passing a selection procedure"* |
+| UvA Ekonomi | seçme şartı yok | numerus fixus, **850 kontenjan**, zorunlu seçme sınavı |
+| Groningen Psikoloji | `mandatory: false` | 250 kontenjan, seçme sınavı sıralaması |
+
+Dördü de "Güvenli" olarak gösteriliyordu. **%10 kabul oranı olan bir programa
+"rahatça aşıyorsun" demek**, bu ürünün vermemeye söz verdiği yanlış güvenin ta
+kendisi. Kapıları ekleyince Güvenli bandı sıfırlandı.
+
+Bunun ürün açısından anlamı şu: **Reach/Match/Safety üçlemesi ABD kabul
+sistemine ait ve Avrupa'ya birebir oturmuyor.** Avrupa'da rekabetçi
+İngilizce-öğretimli programların çoğu kontenjan sınırlı; eşiği geçmek sıraya
+girmek demek, kabul demek değil.
+
+Sahnede kullanılacak cümle bu — rakip araçlar burada bir yüzde gösterir, biz
+kontenjan gerçeğini gösteriyoruz.
 
 ---
 

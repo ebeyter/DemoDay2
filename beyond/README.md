@@ -64,6 +64,21 @@ Her programın kaynak sayfasını indirir, iki şey çıkarır ve `src/data/sour
 
 `src/lib/fetch-page.ts` sayfa indirmeyi yapıyor ve **SSRF koruması** içeriyor: iç ağ ve bulut metadata adresleri (`localhost`, `169.254.169.254`, özel IP blokları) reddediliyor.
 
+### Katalog bekçisi — 36 kayıt elle sürdürülüyor
+
+```bash
+npm run check:data
+```
+
+`check-sources` **kaynak sayfayı** katalogla karşılaştırır (ağ ister). Bu betik **katalogun kendi içini** kontrol eder: ağ yok, yorum yok, sadece değişmezler. İhlal varsa listeyi yazıp sıfırdan farklı çıkar.
+
+Kontroller: `id` tekrarı · `lastChecked` biçimi ve gelecek tarih · `deadline` `AA-GG` · ülke/alan/başvuru sistemi taksonomide tanımlı mı · dil ve standart sınav puanı o sınavın ölçeğinde mi (IELTS'e 90 yazmayı yakalar) · burs kaydının kaynağı var mı · TR/EN metinlerin ikisi de dolu mu.
+
+İki kural özellikle bu projenin yaşadığı hatalardan çıktı:
+
+- **`sourceUrl` en az iki yol segmenti içermeli.** Üniversite ana sayfası ya da "tüm lisans programları" liste sayfası 200 döner, link çalışıyor görünür — ama o sayfada bu programın not eşiği, dil barajı ve harcı yazmaz. Doğrulama iddiası boşa düşer, dedektör de sayfadaki başka programların sayılarını fark sanır.
+- **Eksik veri `undefined` kalır, `0` yazılmaz.** `tuitionNonEu: 0` "Türk öğrenci harç ödemiyor" demektir; bunu hiçbir kaynak söylemiyor. `tuitionEu: 0` ise serbest, çünkü İsveç ve Danimarka'da gerçekten öyle — aynı sayı iki alanda iki farklı şey.
+
 ### "Sor AI'a" paneli — Amazon Bedrock
 
 Sohbet paneli Bedrock Mantle'ın **OpenAI-uyumlu** uç noktasına düz `fetch` ile konuşuyor (`src/lib/bedrock-chat.ts`). Araya SDK koymadık: yol zaten OpenAI sözleşmesini konuşuyor, SDK sadece bağımlılık eklerdi. Hesabında erişimin olan **herhangi bir** model iş görür — Claude olması gerekmiyor.
@@ -165,7 +180,9 @@ src/
     taxonomy.ts           Ülke, alan, başvuru sistemi tanımları
     options.ts            Sınav ölçekleri (IELTS, TestDaF, CEFR…)
 scripts/
-  check-sources.mts       Kaynak sayfa tarayıcısı
+  check-sources.mts       Kaynak sayfa tarayıcısı (ağ ister)
+  check-data.mts          Katalog bekçisi — iç tutarlılık (npm run check:data)
+  check-demo.mts          Demoda söylenen sayıları katalogdan ölçer
 ```
 
 ### Eşleştirme motoru nasıl çalışıyor
@@ -231,7 +248,7 @@ kontenjan gerçeğini gösteriyoruz.
 - **Bağlantılar doğrulandı, şartlar doğrulanmadı.** 36 kaydın kaynak bağlantıları tek tek kontrol edildi (35'i 200 dönüyor; Pavia bota 403 veriyor ama tarayıcıda açılıyor). Ancak not eşikleri, dil barajları, harçlar ve son tarihler kaynağından teyit edilmedi — hepsi `ai-extracted` rozetiyle görünüyor. Demo öncesi kullanacağın 5-6 programın **şartlarını** elle doğrulayıp `verification: "verified"` yapmak ürünü ciddi biçimde güçlendirir.
 - **Not çevrimi yaklaşıktır.** 4'lük ve IB dönüşümleri genel kabul gören tablolara dayanıyor; üniversiteler kendi tablolarını kullanabilir. Arayüz bunu kullanıcıya söylüyor.
 - **Kaydedilen senaryo yok.** Senaryo modu oturum içinde çalışıyor, kaydedilmiyor.
-- **Katalog statik.** Yeni program eklemek `src/data/programs.ts` düzenlemeyi gerektiriyor; AI çıkarımı sonucu şu an oturuma kaydedilmiyor, sadece gösteriliyor.
+- **Katalog statik.** Yeni program eklemek `src/data/programs.ts` düzenlemeyi gerektiriyor. Bir üniversite linkinden şartları canlı çıkaran `/api/extract` yolu kaldırıldı (bkz. `3f8105b`) — hesapta Anthropic modeline erişim olmadığı için üründe her zaman "demo modu" gösterecekti. Yerini kaynak takibi doldurdu: AI'sız, katalogla sayfa arasındaki farkı gösteriyor.
 
 ## Sonraki adımlar
 

@@ -262,6 +262,29 @@ const tr = {
     noteTitle: "AB-dışı öğrenci olarak dikkat",
   },
 
+  freshness: {
+    changedBadge: "Kaynak sayfa değişti",
+    diffBadge: "Katalogla fark var",
+    unreachableBadge: "Kaynak sayfaya ulaşılamadı",
+    panelTitle: "Kaynak takibi",
+    catalogLabel: "Katalogda",
+    pageLabel: "Sayfada geçen",
+    lastScan: "Son tarama",
+    daysAgo: "{days} gün önce",
+    today: "bugün",
+    scanNote:
+      "Bu kontrol kaynak sayfayı otomatik tarar ve katalogla karşılaştırır. Katalogu kendiliğinden DEĞİŞTİRMEZ — sadece \"burada bir fark var\" der. Kararı kaynak sayfadan teyit ederek sen ver.",
+    fields: {
+      ielts: "IELTS eşiği",
+      toefl: "TOEFL eşiği",
+      tuition: "Harç",
+      deadline: "Son başvuru",
+    },
+    summaryTitle: "Katalog tazeliği",
+    summaryLine: "{total} programın {changed} tanesinde kaynak sayfa değişti, {diff} tanesinde sayısal fark var.",
+    allClear: "Son taramada hiçbir kaynak sayfada değişiklik bulunmadı.",
+  },
+
   assistant: {
     open: "Asistan",
     title: "Beyond Asistan",
@@ -550,6 +573,29 @@ const en: Dictionary = {
 
   countries: {
     noteTitle: "As a non-EU student, note",
+  },
+
+  freshness: {
+    changedBadge: "Source page changed",
+    diffBadge: "Differs from catalogue",
+    unreachableBadge: "Source page unreachable",
+    panelTitle: "Source tracking",
+    catalogLabel: "In our catalogue",
+    pageLabel: "Found on the page",
+    lastScan: "Last scan",
+    daysAgo: "{days} days ago",
+    today: "today",
+    scanNote:
+      "This check scans the source page automatically and compares it with our catalogue. It never CHANGES the catalogue — it only says \"something differs here.\" Confirm at the source and decide yourself.",
+    fields: {
+      ielts: "IELTS threshold",
+      toefl: "TOEFL threshold",
+      tuition: "Tuition",
+      deadline: "Deadline",
+    },
+    summaryTitle: "Catalogue freshness",
+    summaryLine: "Of {total} programs, {changed} source pages changed and {diff} show a numeric difference.",
+    allClear: "The last scan found no changes on any source page.",
   },
 
   assistant: {

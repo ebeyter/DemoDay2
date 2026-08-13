@@ -719,8 +719,11 @@ export const PROGRAMS: Program[] = [
       requiredSubjects: [{ subject: "math", level: "advanced" }],
       extras: [{ key: "motivation-letter", mandatory: true }],
     },
-    tuitionNonEu: 2850,
-    tuitionEu: 175,
+    // "Droits différenciés": AB/AEA/İsviçre dışı öğrenciler için 2026-27
+    // lisans harcı. Üniversiteler bireysel durumlara göre muafiyet
+    // verebiliyor. AB tarifesi aynı programda 178 EUR.
+    tuitionNonEu: 2902,
+    tuitionEu: 178,
     livingCostPerYear: 14400,
     applicationSystem: "campus-france",
     // Campus France DAP başvuru penceresi: 1 Ekim – 15 Aralık.
@@ -738,7 +741,7 @@ export const PROGRAMS: Program[] = [
       "https://sciences.sorbonne-universite.fr/formation-sciences/offre-de-formation/licences-0/licence-discipline/les-l2-l3-nos-huit-4",
     facultyUrl: "https://sciences.sorbonne-universite.fr/",
     lastChecked: "2026-08-13", // FR/IT doğrulama turu
-    verification: "ai-extracted",
+    verification: "verified",
   },
   {
     id: "fr-polytechnique-bachelor",
@@ -799,10 +802,12 @@ export const PROGRAMS: Program[] = [
       // üniversite sayısal bir not eşiği YAYINLAMIYOR. Uydurma bir eşik
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
-      language: [
-        { test: "ielts", min: 7.0 },
-        { test: "toefl", min: 100 },
-      ],
+      // Kaynak: sciencespo.fr → foreign-secondary-schools/language-requirements
+      // "Attaching proof of language proficiency is entirely optional."
+      // Dil yeterliliği mülakat ve yazılı metinlerle değerlendiriliyor
+      // (İngilizce programlar için beklenen seviye C1). Katalogda önceden
+      // IELTS 7.0 zorunluymuş gibi yazıyordu — böyle bir şart yok.
+      language: [],
       extras: [
         { key: "motivation-letter", mandatory: true },
         { key: "interview", mandatory: true },
@@ -817,6 +822,10 @@ export const PROGRAMS: Program[] = [
     // Yabancı lise diploması olanlar Sciences Po'nun kendi başvuru
     // sitesinden başvuruyor.
     applicationSystem: "direct",
+    // UYARI: bu tarih eski Parcoursup takviminden kalma ve artık geçerli değil
+    // (yabancı diplomalılar Sciences Po'nun kendi sistemini kullanıyor).
+    // Kaynak: 2027 dönemi başvuruları Eylül 2026'da açılacak, takvim henüz
+    // yayınlanmadı.
     deadline: "03-12",
     deadlineNote: {
       tr: "Harç aile gelirine göre kademeli — düşük gelirde ciddi biçimde düşüyor",
@@ -851,8 +860,11 @@ export const PROGRAMS: Program[] = [
       ],
       requiredSubjects: [{ subject: "math", level: "advanced" }],
     },
-    tuitionNonEu: 2850,
-    tuitionEu: 175,
+    // "Droits différenciés": AB/AEA/İsviçre dışı öğrenciler için 2026-27
+    // lisans harcı. Üniversiteler bireysel durumlara göre muafiyet
+    // verebiliyor. AB tarifesi aynı programda 178 EUR.
+    tuitionNonEu: 2902,
+    tuitionEu: 178,
     livingCostPerYear: 11400,
     applicationSystem: "campus-france",
     // Campus France DAP başvuru penceresi: 1 Ekim – 15 Aralık.
@@ -861,7 +873,7 @@ export const PROGRAMS: Program[] = [
     sourceUrl: "https://www.universite-paris-saclay.fr/formation/licence/mathematiques",
     facultyUrl: "https://www.universite-paris-saclay.fr/",
     lastChecked: "2026-08-13", // FR/IT doğrulama turu
-    verification: "ai-extracted",
+    verification: "verified",
   },
 
   // -------------------------------------------------------------------------
@@ -1342,10 +1354,14 @@ export const PROGRAMS: Program[] = [
         },
       ],
     },
-    tuitionNonEu: 3900,
+    // ISEE (aile geliri) belgesi verilirse 165 EUR'a kadar iniyor; AB-dışı
+    // öğrenci ISEE vermezse azami dilimi öder: 3.891,59 EUR.
+    tuitionNonEu: 3892,
     tuitionEu: 900,
     livingCostPerYear: 12000,
     applicationSystem: "direct",
+    // UYARI: bu tarih doğrulanamadı. PoliMi başvuru takvimini yıllık "bando"
+    // ile yayınlıyor ve ulaşabildiğimiz sayfalarda 2026-27 tarihi yoktu.
     deadline: "02-20",
     deadlineNote: {
       tr: "Harç aile gelirine (ISEE) göre kademeli, düşük gelirde ciddi biçimde düşüyor",

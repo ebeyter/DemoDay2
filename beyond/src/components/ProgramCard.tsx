@@ -79,8 +79,14 @@ export function ProgramCard({ result, index = 0 }: { result: MatchResult; index?
               result.overBudget ? "text-danger" : "text-ink"
             )}
           >
-            {formatMoney(program.tuitionNonEu, locale)}
-            <span className="text-ink-faint font-normal">{t.common.perYear}</span>
+            {program.tuitionNonEu === undefined ? (
+              <span className="text-ink-faint font-normal">{t.program.notStated}</span>
+            ) : (
+              <>
+                {formatMoney(program.tuitionNonEu, locale)}
+                <span className="text-ink-faint font-normal">{t.common.perYear}</span>
+              </>
+            )}
           </dd>
         </div>
         <div>

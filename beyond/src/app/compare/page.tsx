@@ -83,8 +83,12 @@ export default function ComparePage() {
     },
     {
       label: t.program.tuitionNonEu,
-      render: ({ program }) => formatMoney(program.tuitionNonEu, locale),
-      raw: ({ program }) => String(program.tuitionNonEu),
+      render: ({ program }) =>
+        program.tuitionNonEu === undefined
+          ? t.program.notStated
+          : formatMoney(program.tuitionNonEu, locale),
+      raw: ({ program }) =>
+        program.tuitionNonEu === undefined ? t.program.notStated : String(program.tuitionNonEu),
       emphasis: true,
     },
     {
@@ -93,13 +97,21 @@ export default function ComparePage() {
       raw: ({ program }) => String(program.livingCostPerYear),
     },
     {
+      // Harç bilinmiyorsa toplam da bilinmiyor — eksik veriyi yaşam maliyetiyle
+      // toplayıp gerçekten daha ucuz bir programmış gibi göstermek, tam olarak
+      // karşılaştırma tahtasının yanıltmaması gereken yer.
       label: t.program.totalCost,
       render: ({ program }) => (
         <span className="font-semibold">
-          {formatMoney(program.tuitionNonEu + program.livingCostPerYear, locale)}
+          {program.tuitionNonEu === undefined
+            ? t.program.notStated
+            : formatMoney(program.tuitionNonEu + program.livingCostPerYear, locale)}
         </span>
       ),
-      raw: ({ program }) => String(program.tuitionNonEu + program.livingCostPerYear),
+      raw: ({ program }) =>
+        program.tuitionNonEu === undefined
+          ? t.program.notStated
+          : String(program.tuitionNonEu + program.livingCostPerYear),
       emphasis: true,
     },
     {

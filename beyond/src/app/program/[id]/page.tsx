@@ -230,12 +230,20 @@ export default function ProgramDetailPage() {
               <dl className="space-y-3 text-sm">
                 <Row
                   label={t.program.tuitionNonEu}
-                  value={formatMoney(program.tuitionNonEu, locale)}
+                  value={
+                    program.tuitionNonEu === undefined
+                      ? t.program.notStated
+                      : formatMoney(program.tuitionNonEu, locale)
+                  }
                   emphasis
                 />
                 <Row
                   label={t.program.tuitionEu}
-                  value={formatMoney(program.tuitionEu, locale)}
+                  value={
+                    program.tuitionEu === undefined
+                      ? t.program.notStated
+                      : formatMoney(program.tuitionEu, locale)
+                  }
                   muted
                 />
                 <Row
@@ -243,18 +251,27 @@ export default function ProgramDetailPage() {
                   value={formatMoney(program.livingCostPerYear, locale)}
                 />
                 <div className="pt-3 border-t border-line">
+                  {/* Harç bilinmiyorsa toplam da bilinmiyor. Yaşam maliyetini
+                      tek başına "toplam yıllık" diye göstermek, öğrenciye
+                      gerçek maliyetin çok altında bir sayı vermek olur. */}
                   <Row
                     label={t.program.totalCost}
-                    value={formatMoney(
-                      program.tuitionNonEu + program.livingCostPerYear,
-                      locale
-                    )}
+                    value={
+                      program.tuitionNonEu === undefined
+                        ? t.program.notStated
+                        : formatMoney(
+                            program.tuitionNonEu + program.livingCostPerYear,
+                            locale
+                          )
+                    }
                     emphasis
                   />
                 </div>
               </dl>
               <p className="text-[12px] text-ink-faint mt-4 leading-relaxed">
-                {t.program.tuitionEuNote}
+                {program.tuitionNonEu === undefined
+                  ? t.program.notStatedNote
+                  : t.program.tuitionEuNote}
               </p>
             </Card>
 

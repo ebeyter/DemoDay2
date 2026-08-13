@@ -592,11 +592,17 @@ export const PROGRAMS: Program[] = [
     country: "GB",
     city: "Cambridge",
     name: "Engineering",
-    degree: "BEng",
+    // DÜZELTME (2026-08-13): katalogda BEng yazıyordu. Sayfanın başlığı
+    // "Engineering, BA (Hons) and MEng" — Cambridge BEng vermiyor.
+    // Üç yıllık varyant BA (Hons), dört yıllık MEng. durationYears 4 olarak
+    // bırakıldı çünkü kayıt MEng varyantını temsil ediyor.
+    degree: "BA",
     field: "engineering",
     teachingLanguage: "en",
     durationYears: 4,
     requirements: {
+      // Sayfa sayısal eşik vermiyor; belirleyici olan sıralama ve mülakat.
+      // (Katalogdaki 95 teyit edilemedi.)
       minGpa: 95,
       language: [
         { test: "ielts", min: 7.5 },
@@ -619,18 +625,33 @@ export const PROGRAMS: Program[] = [
         { key: "interview", mandatory: true },
         { key: "motivation-letter", mandatory: true },
         { key: "recommendation-letter", mandatory: true },
+        {
+          // EKLENDİ: sayfa 2025 döngüsü için "Applications per place: 10,
+          // Accepted: 335" diyor. Kontenjan gerçeği katalogda hiç yoktu.
+          key: "numerus-fixus",
+          mandatory: true,
+          note: {
+            tr: "2025 döngüsünde her kontenjan için 10 başvuru; 335 kişi kabul edildi",
+            en: "In the 2025 cycle there were 10 applications per place; 335 were accepted",
+          },
+        },
       ],
     },
+    // Harç bu sayfada geçmiyor; 46.000 teyit edilmedi ve GBP mi EUR mu belirsiz.
+    // Diğer UK kayıtlarında harç GBP çıktı (Imperial £45.500), bu kayıt da
+    // muhtemelen GBP — ama teyit etmeden para birimi atamıyorum.
     tuitionNonEu: 46000,
     tuitionEu: 46000,
     livingCostPerYear: 16800,
     applicationSystem: "ucas",
+    // Son tarih bu sayfada geçmiyor; UCAS'ın Oxbridge tarihi 15 Ekim.
     deadline: "10-15",
     deadlineNote: {
       tr: "Oxford/Cambridge son tarihi diğerlerinden 3 ay önce — 15 Ekim",
       en: "Oxford/Cambridge close three months earlier than everyone else — 15 October",
     },
-    sourceUrl: "https://www.undergraduate.study.cam.ac.uk/courses/engineering",
+    // Eski link kanonik adrese yönlendiriyordu; yönlendirme hedefi yazıldı.
+    sourceUrl: "https://www.undergraduate.study.cam.ac.uk/courses/engineering-ba-hons-meng",
     facultyUrl: "https://www.eng.cam.ac.uk/",
     lastChecked: CHECKED,
     verification: "ai-extracted",

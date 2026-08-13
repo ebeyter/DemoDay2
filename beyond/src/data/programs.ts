@@ -743,6 +743,76 @@ export const PROGRAMS: Program[] = [
     verification: "ai-extracted",
   },
   {
+    // EKLENDİ (2026-08-14). Oxford katalogda HİÇ YOKTU — QS'te dünyada ilk üçte
+    // ve mühendislik arayan bir öğrencinin listesinde bulunmaması büyük boşluk.
+    // Şartlar mühendislik fakültesinin kendi sayfasından okundu.
+    id: "gb-oxford-engineering",
+    university: "University of Oxford",
+    country: "GB",
+    city: "Oxford",
+    name: "Engineering Science",
+    // MODEL EKSİĞİ: Oxford bu programda MEng veriyor ama tipte MEng yok
+    // (BSc/BA/BEng/LLB/MD/Diplôme). En yakını olarak BEng yazıldı.
+    degree: "BEng",
+    field: "engineering",
+    teachingLanguage: "en",
+    durationYears: 4,
+    requirements: {
+      // Sayfa 100'lük eşik vermiyor. Teklif A-level A*A*A şartına bağlı.
+      minGpa: undefined,
+      // Sayfa dil şartı için sayı vermiyor, ayrı bir sayfaya yönlendiriyor.
+      language: undefined,
+      // A-level ve IB bölümleri katlanmış; ders şartlarını (matematik, fizik)
+      // sayfada GÖREMEDİM, o yüzden yazılmadı. Doldurmak için sayfadaki
+      // "A-Level (or equivalent)" ve "International Baccalaureate" bölümlerini aç.
+      requiredSubjects: undefined,
+      extras: [
+        {
+          // Teyit edildi: "All candidates must also take the Engineering and
+          // Science Admissions Test (ESAT) as part of their application."
+          key: "entrance-exam",
+          mandatory: true,
+          note: {
+            tr: "ESAT (Engineering and Science Admissions Test) — istisnasız tüm adaylar için zorunlu",
+            en: "ESAT (Engineering and Science Admissions Test) — mandatory for all candidates without exception",
+          },
+        },
+        {
+          // Teyit edildi: kısa listeye girenler mülakata çağrılıyor ve mülakat
+          // performansı değerlendirmeye giriyor.
+          key: "interview",
+          mandatory: true,
+          note: {
+            tr: "Kısa listeye girersen mülakata çağrılıyorsun; performansın değerlendirmeye giriyor",
+            en: "If shortlisted you are interviewed, and your performance counts towards the decision",
+          },
+        },
+        // Teyit edildi: sayfa UCAS niyet mektubuna ve akademik referansa
+        // açıkça atıf yapıyor.
+        { key: "motivation-letter", mandatory: true },
+        { key: "recommendation-letter", mandatory: true },
+      ],
+    },
+    // Harç bu sayfada geçmiyor.
+    tuitionNonEu: undefined,
+    tuitionEu: undefined,
+    tuitionCurrency: "GBP",
+    livingCostPerYear: 18000,
+    applicationSystem: "ucas",
+    // UCAS'ın Oxbridge son tarihi — programa değil sisteme ait bir tarih,
+    // bu sayfada geçmiyor. Oxford ve Cambridge diğer üniversitelerden üç ay
+    // önce kapanıyor.
+    deadline: "10-15",
+    deadlineNote: {
+      tr: "Oxford/Cambridge son tarihi diğerlerinden üç ay önce — 15 Ekim. Ayrıca ikisine birden başvuramazsın.",
+      en: "Oxford/Cambridge close three months before everyone else — 15 October. You also cannot apply to both.",
+    },
+    sourceUrl: "https://eng.ox.ac.uk/study/undergraduate/applications/entry-requirements",
+    facultyUrl: "https://eng.ox.ac.uk/",
+    lastChecked: "2026-08-14",
+    verification: "verified",
+  },
+  {
     id: "gb-lse-economics",
     university: "London School of Economics",
     country: "GB",
@@ -853,6 +923,54 @@ export const PROGRAMS: Program[] = [
     facultyUrl: "https://www.alliancembs.manchester.ac.uk/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
+  },
+  {
+    // EKLENDİ (2026-08-14). Katalogda İskoçya hiç yoktu ve Edinburgh QS'te
+    // İngiltere'nin ilk beşinde. Şartlar sayfasından okundu.
+    id: "gb-edinburgh-cs",
+    university: "University of Edinburgh",
+    country: "GB",
+    city: "Edinburgh",
+    name: "Computer Science",
+    degree: "BSc",
+    field: "cs",
+    teachingLanguage: "en",
+    durationYears: 4,
+    requirements: {
+      // Sayfa 100'lük ölçekte eşik vermiyor; teklifler A-level ve IB
+      // aralıkları olarak veriliyor.
+      minGpa: undefined,
+      // Teyit edildi: IELTS Academic toplam 6.5, her bölümde en az 5.5.
+      // TOEFL yeni ölçekte toplam 4.5 (her bölüm en az 4.0) — tip modeli
+      // iki farklı TOEFL ölçeğini ayırt edemediği için TOEFL yazılmadı.
+      language: [{ test: "ielts", min: 6.5 }],
+      standardizedTests: [
+        // Sayfa: "from 43 points with 777 at HL to 34 points with 665 at HL".
+        // Alt sınır olan 34 yazıldı — teklif aralığının tabanı.
+        { test: "ib", min: 34, mandatory: false },
+      ],
+      // Teyit edildi: matematik zorunlu (A-level'da A, IB'de HL 6 ve yalnızca
+      // Analysis & Approaches kabul ediliyor).
+      requiredSubjects: [{ subject: "math", level: "advanced" }],
+      extras: [{ key: "motivation-letter", mandatory: true }],
+    },
+    // Harç şartlar sayfasında geçmiyor; uydurulmadı.
+    tuitionNonEu: undefined,
+    tuitionEu: undefined,
+    tuitionCurrency: "GBP",
+    // Üniversitenin kendi tahmini: bekâr lisans öğrencisi için ayda £1.546,
+    // tam yıl £18.552. Bu alan EUR beklediği için o rakam doğrudan yazılamaz;
+    // aşağıdaki değer bizim EUR tahminimiz, üniversitenin beyanı değil.
+    livingCostPerYear: 21000,
+    applicationSystem: "ucas",
+    // UCAS'ın 2027 girişi için ortak son tarihi. Bu tarih programa değil
+    // SİSTEME ait ve Imperial ile UCL'in kendi sayfalarından teyit edildi
+    // (ikisi de "13 January 2027" diyor).
+    deadline: "01-13",
+    sourceUrl: "https://study.ed.ac.uk/programmes/undergraduate/57-computer-science/entry-requirements",
+    facultyUrl: "https://informatics.ed.ac.uk/",
+    lastChecked: "2026-08-14",
+    verification: "verified",
   },
 
   // -------------------------------------------------------------------------

@@ -226,6 +226,17 @@ export interface SourceCheck {
   status: CheckStatus;
   /** Sayfa parmak izi — bir sonraki taramada bununla karşılaştırılıyor. */
   fingerprint: string;
+  /**
+   * Parmak izinin ALINDIĞI adres.
+   *
+   * Parmak izi tek başına anlamlı değil: katalogdaki sourceUrl değişirse yeni
+   * sayfanın parmak izi eskisinden zorunlu olarak farklı çıkar ve dedektör
+   * bunu "üniversite sayfasını güncelledi" sanır. Oysa değişen şey bizim
+   * linkimiz. Adresi de saklayıp karşılaştırma yaparak bu yalancı alarmı
+   * kesiyoruz — link düzeltme turunda 21 kayıt birden "Kaynak sayfa değişti"
+   * rozeti göstermesin.
+   */
+  sourceUrl?: string;
   /** Parmak izinin en son değiştiği tarih (ISO). */
   changedAt: string | null;
   /** Son tarama tarihi (ISO). */

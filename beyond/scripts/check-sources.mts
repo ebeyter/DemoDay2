@@ -47,13 +47,24 @@ async function checkOne(
 
     // İlk taramada "değişti" demek yanlış olur — referans noktası oluşuyor.
     const isFirstScan = !previous || previous.status === "unreachable";
-    const changed = !isFirstScan && previous.fingerprint !== fp;
+
+    // Linki biz değiştirdiysek karşılaştıracak bir geçmiş yok: yeni sayfanın
+    // parmak izi eskisinden farklı çıkacak ama bu "üniversite şartları
+    // güncelledi" demek DEĞİL. Yeni adres için referans noktası sıfırlanır.
+    // (Eski kayıtlarda sourceUrl alanı yoktu; undefined ise karşılaştırmayı
+    // atlayıp bu taramayı yeni referans sayıyoruz.)
+    const urlChanged = previous?.sourceUrl !== undefined && previous.sourceUrl !== program.sourceUrl;
+    const noBaseline = previous?.sourceUrl === undefined;
+
+    const changed = !isFirstScan && !urlChanged && !noBaseline && previous.fingerprint !== fp;
 
     return {
       programId: program.id,
       status: changed ? "changed" : "ok",
       fingerprint: fp,
-      changedAt: changed ? now : (previous?.changedAt ?? null),
+      sourceUrl: program.sourceUrl,
+      // Link değiştiyse eski "şu tarihte değişmişti" bilgisi de geçersiz.
+      changedAt: changed ? now : urlChanged ? null : (previous?.changedAt ?? null),
       checkedAt: now,
       discrepancies,
     };
@@ -62,6 +73,7 @@ async function checkOne(
       programId: program.id,
       status: "unreachable",
       fingerprint: previous?.fingerprint ?? "",
+      sourceUrl: previous?.sourceUrl,
       changedAt: previous?.changedAt ?? null,
       checkedAt: now,
       discrepancies: previous?.discrepancies ?? [],

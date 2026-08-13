@@ -439,16 +439,30 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "de",
     durationYears: 3.5,
     requirements: {
-      // Program sayfası "open admission (no NC)" diyor — yani sayısal bir not
-      // eşiği yok. Katalogdaki 72 kaynakta desteklenmiyordu.
-      // (RWTH'nin genel uluslararası başvuru sayfası "ortalama 2,5 veya daha
-      // iyi" diyor ama bu Alman not ölçeği ve ayrı bir sayfa; bu programın
-      // kaynağında eşik geçmiyor.)
+      // Programın kendi sayfası "open admission (no NC)" diyor. Uluslararası
+      // başvuru sayfası ise SOMUT bir eşik veriyor: "The overall average grade
+      // of your HZB must be at least equivalent to the German grade 2.5."
+      //
+      // Yine de undefined bırakıldı, çünkü bu eşik ALMAN 1-6 ÖLÇEĞİNDE ve bu
+      // alan 100'lük Türk ölçeği bekliyor. 2,5'i 100'lüğe çevirmenin tek bir
+      // doğru yolu yok (Bavyera formülü, ANABIN tabloları farklı sonuç verir).
+      // Uydurma bir sayı yazmak yerine bilinmiyor bırakıldı.
+      //
+      // ÖNEMLİ TELAFİ: ortalama 2,5'ten kötüyse TestAS ile kapatılabiliyor.
+      // Bu, öğrenciye "olamazsın" demek yerine yol gösteren bir bilgi ama
+      // modelde TestAS diye bir sınav yok (StandardizedTest: sat/ib/ap/yks).
       minGpa: undefined,
+      // Teyit edildi: "RWTH currently only offers Bachelor and Staatsexamen
+      // courses of study in German. You must therefore provide proof of German
+      // language skills at C1 level when you enroll." TestDaF 4 ve Goethe C1
+      // bu seviyeye karşılık geliyor — katalog doğruydu.
+      // (Not: bazı bölümlerde ek olarak İngilizce B2 isteniyor, örnek olarak
+      // bilgisayar bilimleri veriliyor; makine mühendisliği sayılmamış.)
       language: [
         { test: "testdaf", min: 4 },
         { test: "goethe", min: 5 },
       ],
+      // YKS 250 bu sayfada geçmiyor, teyit edilmedi.
       standardizedTests: [{ test: "yks", min: 250, mandatory: true }],
       requiredSubjects: [
         { subject: "math", level: "advanced" },

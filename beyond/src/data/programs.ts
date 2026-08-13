@@ -605,6 +605,15 @@ export const PROGRAMS: Program[] = [
     durationYears: 3,
     requirements: {
       minGpa: 90,
+      // Program sayfası dil şartı için sayı vermiyor, "standard university
+      // requirement" diyor ve Imperial'in dil sayfasına yönlendiriyor. O sayfa
+      // iki seviye tanımlıyor (Standard / Higher) ama puanlar açılmayan bir
+      // akordeonda; sayıyı SAYFADAN OKUYAMADIM.
+      //
+      // ROZETİ ÇEVİRMEK İÇİN KALAN TEK İŞ: imperial.ac.uk/study/apply/
+      // english-language/ → "Tests we accept" → "Expand all" → IELTS satırı.
+      // Standard seviyedeki toplam ve alt puanı buraya yaz. Kaydın diğer TÜM
+      // alanları teyit edildi (son tarih, TMUA, mülakat, harç, IB 41).
       language: [
         { test: "ielts", min: 7.0 },
         { test: "toefl", min: 100 },

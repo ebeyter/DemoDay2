@@ -149,9 +149,96 @@ lastChecked: "2026-08-13",     // gerçekten baktığın gün
 verification: "verified",
 ```
 
-**Altın kural:** yedi alandan birini sayfada bulamadıysan `ai-extracted`
-bırak. Yarım doğrulanmış kaydı `verified` yapmak, hiç doğrulamamaktan kötü —
-rozet artık yalan söylüyor ve ürünün tek değeri o rozetin dürüstlüğü.
+**Altın kural — düzeltildi.** Bu dosyanın ilk halinde *"yedi alandan birini
+bulamadıysan `ai-extracted` bırak"* yazıyordu. **Yanlıştı**, çünkü üniversite
+sayfalarının çoğu yedi alanın hepsini yazmıyor; o kuralla neredeyse hiçbir kayıt
+`verified` olamazdı. Doğrusu:
+
+> `verification: "verified"` demek **"bu alanların hepsini biliyorum"** değil,
+> **"kaynak sayfayı açtım ve buradaki her değer sayfada yazanla birebir"**
+> demektir. Sayfanın sessiz kaldığı alan `undefined` bırakılır — ve bu da
+> doğrulanmış bir sonuçtur.
+
+Yani:
+
+| Durum | `verification` |
+|---|---|
+| Sayfayı açtım, yazan her şeyi işledim, yazmayanı `undefined` bıraktım | ✅ `verified` |
+| Sayfayı açtım ama sayfanın desteklemediği bir değeri katalogda tuttum | ❌ `ai-extracted` |
+| Sayfayı açmadım | ❌ `ai-extracted` |
+| Sayfada olmayan bir değeri uydurdum / makul tahmin yazdım | ❌ **hiçbir zaman** |
+
+Bunun çalışması için tip modelinin "bilinmiyor" diyebilmesi gerekiyor — aşağıya bak.
+
+---
+
+## Eksik veri nasıl temsil edilir — **önce bu konuşulmalı** ⚠️
+
+Her üniversite için her alanı bulamayacağız; bu normal ve ürünün buna dürüst bir
+cevabı olmalı. Ama **şu an tip modeli bunu ifade edemiyor:**
+
+```ts
+// src/lib/types.ts — mevcut hal
+minGpa: number;                    // zorunlu → bilmiyorsan sayı UYDURMAK zorundasın
+language: LanguageRequirement[];   // boş dizi = "dil belgesi istenmiyor" İDDİASI
+```
+
+`matching.ts:127` `minGpa`'yı her zaman bilinen sayı kabul ediyor; `unknown`
+durumu yalnızca *öğrencinin* verisi eksikken üretiliyor (satır 195, 257).
+Program tarafındaki boşluk için bir yol yok.
+
+Sonuç: not eşiğini bulamadığın bir programı kataloğa eklemek için sayı uydurman
+gerekiyor — ürünün *asla yapmayacağını* söylediği şey. Ve `language: []`
+yazdığında sessizce "bu program dil belgesi istemiyor" iddiasında bulunuyorsun,
+ki yanlış olabilir.
+
+### Önerilen çözüm
+
+**1. Tip — "yok" ile "bilinmiyor"u ayır** (`types.ts`, ortak dosya):
+
+```ts
+export interface ProgramRequirements {
+  /** undefined = kaynak sayfada belirtilmemiş. 0 yazma, tahmin yazma. */
+  minGpa?: number;
+  /** undefined = bilinmiyor · [] = sayfa açıkça "dil belgesi istenmiyor" diyor */
+  language?: LanguageRequirement[];
+  // ...
+}
+```
+
+Aynı ayrım harç için de gerekli: `tuitionNonEu?: number`.
+
+**2. Motor — `unknown` üret** (`matching.ts` → **Alp'in dosyası**, brief'ine
+`S2-5` olarak eklendi):
+
+- `minGpa === undefined` → `checkGpa` `status: "unknown"` döndürür, `unmet`
+  değil. Öğrenci cezalandırılmaz.
+- `language === undefined` → `unknown` · `language: []` → şart üretilmez (bugünkü
+  davranış)
+- **Kritik bant kuralı:** zorunlu bir şart program tarafından `unknown` ise o
+  program **`safety` olamaz.** "Rahatça aşıyorsun" demek, eşiği bilmediğin
+  yerde yanlış olur. En fazla `match` ya da ayrı bir "veri eksik" işareti.
+
+**3. Arayüz:** o satırda *"Kaynak sayfa bu şartı belirtmiyor — üniversiteye
+sormalısın"*. Bu bir kusur değil, **ürünün en dürüst cümlesi**; öğrenciyi
+uydurma bir eşiğe göre "olamazsın" demekten kurtarıyor.
+
+**4. `check-data`:** `minGpa`'yı zorunlu tutma. Bunun yerine *"eksik alan
+`undefined` olmalı, `0` veya uydurma değer olmamalı"* kuralını koy.
+
+### Neden bu, ürünü zayıflatmıyor — güçlendiriyor
+
+Demo'da şu cümleyi söyleyebilir hale geliyorsun:
+
+> *"Bu programın not eşiğini üniversite yayınlamıyor. Biz de uydurmuyoruz —
+> bilmediğimizi söylüyoruz. Rakip araçlar burada bir yüzde gösterir."*
+
+Bu, README'nin *"kabul olasılığı vermiyoruz"* ilkesinin aynısının veri
+tarafındaki karşılığı. Aynı duruş.
+
+**Karar Alp'le birlikte verilmeli** — `types.ts` ortak, `matching.ts` onun.
+Adım 2b'ye başlamadan konuşun, çünkü doğrulama sırasında bulacağın ilk eksik
+alanda bu soruyla karşılaşacaksın.
 
 ### 2b bitti mi?
 
@@ -269,8 +356,9 @@ console.log(`✓ ${PROGRAMS.length} kayıt, ihlal yok`);
 | `lastChecked` gelecekte değil | Kopyala-yapıştır hatasını yakalar |
 | `sourceUrl` `http(s)://` ile başlıyor | Bozuk link demoda tıklanınca patlar |
 | **`sourceUrl` en az 2 yol segmenti içeriyor** | 2a'da düzelttiğin genel-sayfa sorununun tekrarını engeller ⭐ |
-| `minGpa` 0-100 arası | Ölçek karışmasını yakalar |
-| `tuitionNonEu >= 0`, `livingCostPerYear >= 0` | — |
+| `minGpa` **varsa** 0-100 arası | Ölçek karışmasını yakalar. Yokluğu ihlal değil — bkz. "Eksik veri" bölümü |
+| Eksik alan `undefined`, `0` değil | ⭐ `0` yazmak "eşik yok" demek olur; eksik veriyi sıfır gibi göstermek sessiz yalan |
+| `tuitionNonEu` **varsa** `>= 0`, `livingCostPerYear >= 0` | — |
 | `deadline` `AA-GG` formatında | `matching`/`timeline` bu formatı varsayıyor |
 | `country`/`field`/`applicationSystem` taksonomide var | Tanımsız değer arayüzde boş hücre bırakır |
 | Dil puanı o sınavın ölçeğinde (`options.ts`) | IELTS'e 90 yazmayı yakalar |

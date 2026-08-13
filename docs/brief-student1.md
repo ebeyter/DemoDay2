@@ -65,8 +65,11 @@ Her kayıt için `sourceUrl`'deki sayfayı aç ve şunları tek tek teyit et:
 
 Sonra: `verification: "verified"`, `lastChecked: "2026-08-13"` (gerçek tarih).
 
-Kural: **bir alanı teyit edemiyorsan kaydı `ai-extracted` bırak.** Yarım
-doğrulanmış kaydı `verified` yapmak, hiç doğrulamamaktan daha kötü.
+Kural (**düzeltildi** — bkz. [worklist-student1.md](worklist-student1.md)):
+`verified` demek *"her alanı biliyorum"* değil, *"sayfayı açtım ve buradaki her
+değer sayfada yazanla birebir"* demektir. Sayfanın söylemediği alan `undefined`
+kalır ve bu da doğrulanmış bir sonuçtur. Uydurma değer ise **hiçbir zaman**
+`verified` olmaz.
 
 Bitti ölçütü:
 - [ ] ≥10 kayıt `verified`, her birinin `lastChecked`'i güncel

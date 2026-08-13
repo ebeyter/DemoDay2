@@ -89,7 +89,12 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 75,
+      // Sayfa sayısal eşik vermiyor; şart "pre-university certificate,
+      // including mathematics B and physics".
+      minGpa: undefined,
+      // Dil şartı bu sayfada geçmiyor. Katalogdaki IELTS 6.0 / TOEFL 80
+      // teyit edilemedi — bilerek bırakıldı, doğrulama turunda TU/e'nin
+      // dil şartları sayfasından teyit edilmeli.
       language: [
         { test: "ielts", min: 6.0 },
         { test: "toefl", min: 80 },
@@ -98,8 +103,24 @@ export const PROGRAMS: Program[] = [
         { subject: "math", level: "advanced" },
         { subject: "physics", level: "advanced" },
       ],
-      extras: [{ key: "motivation-letter", mandatory: false }],
+      extras: [
+        { key: "motivation-letter", mandatory: false },
+        {
+          // EKLENDİ: katalogda seçme şartı hiç yoktu ve bu program demoda
+          // GÜVENLİ bandında çıkıyor. Sayfa "Program with selection" ve
+          // "Admission to the program also requires passing a selection
+          // procedure" diyor. Seçme kapısı olan bir programa "rahatça
+          // aşıyorsun" demek, ürünün vermemeye söz verdiği yanlış güven.
+          key: "numerus-fixus",
+          mandatory: true,
+          note: {
+            tr: "Seçme prosedürünü geçmek zorunlu — şartları karşılamak tek başına yeterli değil",
+            en: "Passing the selection procedure is required — meeting the requirements alone is not enough",
+          },
+        },
+      ],
     },
+    // Harç bu sayfada geçmiyor; 11.900 teyit edilmedi.
     tuitionNonEu: 11900,
     tuitionEu: 2601,
     livingCostPerYear: 12000,
@@ -1022,29 +1043,57 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 75,
+      // Sayfa sayısal eşik vermiyor: "Selection is based on upper secondary
+      // education grade point average" — yani eşik değil, SIRALAMA.
+      minGpa: undefined,
+      // Sayfa: IELTS toplam 6.5, hiçbir bölüm 5.5 altında olmayacak.
+      // TOEFL toplam 90, yazma bölümü 20. Alt puan şartları tip modelinde
+      // taşınamıyor; toplam eşikler yazıldı.
       language: [
         { test: "ielts", min: 6.5 },
         { test: "toefl", min: 90 },
       ],
       requiredSubjects: [
+        // Sayfa: "Mathematics 4 (advanced level of mathematics)"
         { subject: "math", level: "advanced" },
-        { subject: "physics", level: "basic" },
+        // DÜZELTME: katalogda "basic" yazıyordu. Sayfa "Physics 2 (advanced
+        // level of physics)" diyor.
+        { subject: "physics", level: "advanced" },
+      ],
+      extras: [
+        {
+          // EKLENDİ: katalogda hiç seçme şartı yoktu ve bu program demoda
+          // GÜVENLİ bandında görünüyor. Sayfa 2024 için 684 uygun adaydan
+          // 71'inin alındığını yazıyor — %10. Şartları karşılamak burada
+          // kabul anlamına gelmiyor; "rahatça aşıyorsun" demek yanıltıcı olur.
+          key: "numerus-fixus",
+          mandatory: true,
+          note: {
+            tr: "Kontenjan sıralamayla dağıtılıyor — 2024'te şartları karşılayan 684 adaydan 71'i alındı (%10)",
+            en: "Places are allocated by ranking — in 2024, 71 of 684 eligible applicants were admitted (10%)",
+          },
+        },
       ],
     },
-    tuitionNonEu: 15600,
+    // DÜZELTME: katalogda 15.600 EUR yazıyordu. KTH harç sayfası programın
+    // tamamı için SEK 423.000 diyor → 3 yıl, yılda SEK 141.000.
+    // Ayrıca SEK 900 başvuru ücreti var (modelde karşılığı yok).
+    tuitionNonEu: 141000,
     tuitionEu: 0,
+    tuitionCurrency: "SEK",
     livingCostPerYear: 12000,
     applicationSystem: "direct",
+    // Son tarih bu sayfada geçmiyor; İsveç ulusal turu ortak tarih kullanıyor.
     deadline: "01-15",
     deadlineNote: {
       tr: "Tüm İsveç başvuruları universityadmissions.se üzerinden, tek son tarih",
       en: "All Swedish applications go through universityadmissions.se with a single deadline",
     },
-    sourceUrl: "https://www.kth.se/en/studies/bachelor",
+    sourceUrl:
+      "https://www.kth.se/en/studies/bachelor/information-communication-technology/entry-requirements-for-information-and-communication-technology-1.450313",
     facultyUrl: "https://www.kth.se/en/eecs",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-13",
+    verification: "verified",
   },
   {
     id: "se-lund-ib",
@@ -1231,23 +1280,39 @@ export const PROGRAMS: Program[] = [
     country: "DK",
     city: "Kongens Lyngby",
     name: "General Engineering",
-    degree: "BEng",
+    // DÜZELTME: katalogda BEng yazıyordu. Sayfa "BSc in General Engineering"
+    // diyor — DTU'nun BEng programları Danca veriliyor, bu İngilizce olan BSc.
+    degree: "BSc",
     field: "engineering",
     teachingLanguage: "en",
     durationYears: 3.5,
     requirements: {
-      minGpa: 74,
+      // Sayfa not ortalaması eşiği vermiyor; seviye değerlendirmesini
+      // başvuruda DTU'nun kabul ekibi yapıyor.
+      minGpa: undefined,
+      // Sayfa: IELTS Academic minimum 6.5 · TOEFL iBT minimum 88 · Cambridge 180.
+      // İkisi de katalogdakiyle birebir uyuşuyor.
       language: [
         { test: "ielts", min: 6.5 },
         { test: "toefl", min: 88 },
       ],
       requiredSubjects: [
+        // Sayfa: "Mathematics A-level, English B-level, Physics B-level,
+        // Chemistry B-level".
         { subject: "math", level: "advanced" },
-        { subject: "physics", level: "advanced" },
+        // DÜZELTME: physics "advanced" değil B seviyesi.
+        { subject: "physics", level: "basic" },
+        // EKLENDİ: kimya B seviyesi katalogda hiç yoktu.
+        { subject: "chemistry", level: "basic" },
       ],
     },
+    // Sayfa: yılda € 15.000, dönemlik iki taksitte € 7.500. Katalogdaki değer
+    // doğruydu ve gerçekten EUR. AB/AEA vatandaşı harç ödemiyor.
+    // (Ayrıca € 100 başvuru ücreti ve lisans düzeyinde burs YOK — burs
+    // özelliği eklendiğinde bu kayıt "burs yok" olarak işaretlenebilir.)
     tuitionNonEu: 15000,
     tuitionEu: 0,
+    tuitionCurrency: "EUR",
     livingCostPerYear: 14400,
     applicationSystem: "direct",
     deadline: "01-15",
@@ -1255,10 +1320,11 @@ export const PROGRAMS: Program[] = [
       tr: "AB-dışı son tarih 15 Ocak — AB'lilerin 15 Mart tarihine bakma, seni bağlamıyor",
       en: "Non-EU deadline is 15 January — the 15 March EU date does not apply to you",
     },
-    sourceUrl: "https://www.dtu.dk/english/education",
-    facultyUrl: "https://www.dtu.dk/english",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    sourceUrl:
+      "https://www.dtu.dk/english/education/undergraduate/general-engineering/admission-and-deadlines/admission-requirements",
+    facultyUrl: "https://www.dtu.dk/english/education/undergraduate/general-engineering",
+    lastChecked: "2026-08-13",
+    verification: "verified",
   },
   {
     id: "dk-cbs-ib",

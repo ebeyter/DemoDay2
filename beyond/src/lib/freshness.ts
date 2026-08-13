@@ -150,7 +150,12 @@ export interface Discrepancy {
 export function findDiscrepancies(program: Program, signals: PageSignals): Discrepancy[] {
   const out: Discrepancy[] = [];
 
-  const ieltsReq = program.requirements.language.find((l) => l.test === "ielts");
+  // Katalogda değer yoksa karşılaştırılacak bir iddia da yok. Bilinmeyen alan
+  // için "sayfada farklı yazıyor" demek anlamsız — neyden farklı olduğunu
+  // bilmiyoruz. Bu alanlar dedektörün değil, doğrulama turunun işi.
+  const langReqs = program.requirements.language ?? [];
+
+  const ieltsReq = langReqs.find((l) => l.test === "ielts");
   if (ieltsReq && signals.ielts.length > 0 && !signals.ielts.includes(ieltsReq.min)) {
     out.push({
       field: "ielts",
@@ -159,7 +164,7 @@ export function findDiscrepancies(program: Program, signals: PageSignals): Discr
     });
   }
 
-  const toeflReq = program.requirements.language.find((l) => l.test === "toefl");
+  const toeflReq = langReqs.find((l) => l.test === "toefl");
   if (toeflReq && signals.toefl.length > 0 && !signals.toefl.includes(toeflReq.min)) {
     out.push({
       field: "toefl",
@@ -170,8 +175,8 @@ export function findDiscrepancies(program: Program, signals: PageSignals): Discr
 
   // Harçta tam eşleşme aramak gerçekçi değil (yuvarlama, farklı yıl tarifeleri).
   // %10 tolerans içinde bir tutar varsa sorun yok sayıyoruz.
-  if (signals.amounts.length > 0) {
-    const target = program.tuitionNonEu;
+  const target = program.tuitionNonEu;
+  if (signals.amounts.length > 0 && target !== undefined) {
     const close = signals.amounts.some((a) => Math.abs(a - target) <= target * 0.1);
     if (!close) {
       // Sadece harca benzer büyüklükteki tutarları göster; 100 EUR'luk

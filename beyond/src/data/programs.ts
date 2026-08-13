@@ -977,7 +977,7 @@ export const PROGRAMS: Program[] = [
         },
       },
       {
-        name: "Sosyal kriterli mali destek",
+        name: "Aide financière sur critères sociaux",
         kind: "need-based",
         openToNonEu: true,
         sourceUrl:
@@ -988,7 +988,7 @@ export const PROGRAMS: Program[] = [
         },
       },
       {
-        name: "Uluslararası Olimpiyat madalyalıları için tam burs",
+        name: "Full Scholarship — International Olympiad medallists",
         amountPerYear: 87900,
         kind: "merit",
         openToNonEu: true,
@@ -1787,7 +1787,7 @@ export const PROGRAMS: Program[] = [
     verification: "verified",
     scholarships: [
       {
-        name: "MAECI — İtalyan Dışişleri Bakanlığı bursu",
+        name: "MAECI scholarship (Italian Ministry of Foreign Affairs)",
         kind: "grant",
         openToNonEu: true,
         sourceUrl: "https://www.unibo.it/en/study/study-grants-and-subsidies",
@@ -1797,7 +1797,7 @@ export const PROGRAMS: Program[] = [
         },
       },
       {
-        name: "AB/OECD dışı vatandaşlar için indirimli sabit harç",
+        name: "Reduced flat fee — non-EU/non-OECD citizens",
         kind: "tuition-waiver",
         openToNonEu: true,
         sourceUrl: "https://www.unibo.it/en/study/study-grants-and-subsidies",

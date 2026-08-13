@@ -945,10 +945,17 @@ export const PROGRAMS: Program[] = [
     name: "Computer Science (Informatik)",
     degree: "BSc",
     field: "cs",
+    // Teyit edildi (inf.ethz.ch/studies/bachelor.html): "The language of
+    // instruction at the beginning of the study programme is German. Starting
+    // from the second year, courses are increasingly taught in English."
+    // Yani birinci yıl Almanca — Türk öğrenci için belirleyici bilgi.
     teachingLanguage: "de",
     durationYears: 3,
     requirements: {
-      minGpa: 85,
+      // Sayfa sayısal eşik vermiyor; Türk diploması tek başına yetmiyor ve
+      // giriş sınavı belirleyici.
+      minGpa: undefined,
+      // Goethe C1 seviyesi bu sayfada geçmiyor, teyit edilmedi.
       language: [{ test: "goethe", min: 5 }],
       requiredSubjects: [
         { subject: "math", level: "advanced" },
@@ -965,14 +972,28 @@ export const PROGRAMS: Program[] = [
         },
       ],
     },
-    tuitionNonEu: 1800,
-    tuitionEu: 1500,
+    // DÜZELTME (2026-08-13): katalogda 1.800 / 1.500 yazıyordu, para birimi de
+    // yoktu (yani EUR sayılıyordu). İkisi de yanlış.
+    //
+    // ETH 2025 güz döneminden itibaren İKİ HARÇ GRUBU uyguluyor ve İsviçre
+    // dışı diplomayla gelenler "threefold tuition fee (Group 2)" grubunda —
+    // yani üç kat ödüyor. Kesin tutarlar sayfada değil, indirilen bir PDF'te;
+    // okuyamadım. Uydurmak yerine bilinmiyor bırakıldı.
+    //
+    // Doğrulama turunda yapılacak: ethz.ch/students/en/studies/financial/
+    // tuition-fees.html sayfasındaki "Tuition fees (PDF)" dosyasından Group 2
+    // dönemlik tutarını al, yıllığa çevir, tuitionCurrency CHF olarak yaz.
+    tuitionNonEu: undefined,
+    tuitionEu: undefined,
+    tuitionCurrency: "CHF",
     livingCostPerYear: 26400,
     applicationSystem: "direct",
     deadline: "03-15",
     deadlineNote: {
-      tr: "Harç çok düşük ama Zürih'te yaşam maliyeti listedeki en yüksek kalem — asıl bütçe orada",
-      en: "Tuition is very low, but Zürich living costs are the highest on this list — that is the real budget",
+      // ESKİ NOT "harç çok düşük" diyordu — üç kat harç kuralı yüzünden bu
+      // iddia artık dayanaksız. Sahnede söylenmemesi için değiştirildi.
+      tr: "Zürih'te yaşam maliyeti listedeki en yüksek kalem. Harç için dikkat: İsviçre dışı diplomayla gelenler 2025'ten beri üç kat harç grubunda.",
+      en: "Zürich living costs are the highest on this list. Note on tuition: since 2025, students with a non-Swiss certificate fall into the threefold fee group.",
     },
     sourceUrl: "https://inf.ethz.ch/studies/bachelor.html",
     facultyUrl: "https://inf.ethz.ch/",

@@ -92,6 +92,16 @@ describe("Not ortalaması şartı — bant sınırları", () => {
     const gpaCheck = result.checks.find((c) => c.id === "gpa")!;
     expect(gpaCheck.status).toBe("unmet");
   });
+
+  it("üniversite eşik yayınlamıyorsa (minGpa undefined) unknown/source döner, uydurma eşiğe göre elenmez", () => {
+    const result = evaluateProgram(
+      makeProgram({ requirements: { minGpa: undefined } }),
+      makeProfile({ gpa: 40 }) // çok düşük bir not bile unmet üretmemeli
+    );
+    const gpaCheck = result.checks.find((c) => c.id === "gpa")!;
+    expect(gpaCheck.status).toBe("unknown");
+    expect(gpaCheck.unknownReason).toBe("source");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -117,13 +127,14 @@ describe("Dil şartı — close vs unknown ayrımı", () => {
     expect(langCheck.status).toBe("unmet");
   });
 
-  it("öğrenci hiç dil sınavı girmemişse unknown döner (unmet değil)", () => {
+  it("öğrenci hiç dil sınavı girmemişse unknown döner (unmet değil), unknownReason 'student' olur", () => {
     const result = evaluateProgram(
       makeProgram({ requirements: { language: [{ test: "ielts", min: 6.5 }] } }),
       makeProfile({ languageTests: [] })
     );
     const langCheck = result.checks.find((c) => c.id === "language")!;
     expect(langCheck.status).toBe("unknown");
+    expect(langCheck.unknownReason).toBe("student");
   });
 
   it("anyOf: kabul edilen sınavlardan biri (TOEFL) eşiği geçerse IELTS'e sahip olmasa da met döner", () => {
@@ -149,6 +160,17 @@ describe("Dil şartı — close vs unknown ayrımı", () => {
       makeProfile({ languageTests: [] })
     );
     expect(result.checks.find((c) => c.id === "language")).toBeUndefined();
+  });
+
+  it("undefined (kaynak sayfa sessiz) [] ile AYNI DEĞİL: unknown/source üretir, şartı yok saymaz", () => {
+    const result = evaluateProgram(
+      makeProgram({ requirements: { language: undefined } }),
+      makeProfile({ languageTests: [] })
+    );
+    const langCheck = result.checks.find((c) => c.id === "language")!;
+    expect(langCheck).toBeDefined();
+    expect(langCheck.status).toBe("unknown");
+    expect(langCheck.unknownReason).toBe("source");
   });
 });
 
@@ -205,6 +227,7 @@ describe("Standart sınav şartları — marj sınırları", () => {
     const check = result.checks.find((c) => c.id === "test-yks")!;
     expect(check.status).toBe("unknown");
     expect(check.mandatory).toBe(true);
+    expect(check.unknownReason).toBe("student");
   });
 });
 
@@ -383,6 +406,44 @@ describe("Bant kararı — unknown cezalandırılmıyor ama safety'e de düşmü
   });
 });
 
+describe("Bant kararı — kaynak veri boşluğu (unknownReason: source)", () => {
+  it("tek eksik veri kaynağı bir eşik olsa da bandı 'match' ile sınırlar, asla 'safety' vermez", () => {
+    const result = evaluateProgram(
+      makeProgram({ requirements: { minGpa: undefined, language: [] } }),
+      makeProfile({ gpa: 99 }) // notu ne kadar yüksek olursa olsun eşik bilinmiyor
+    );
+    expect(result.band).toBe("match");
+  });
+
+  it("aynı senaryoda eşik biliniyor ve rahatça aşılıyorsa (data gap yok) safety döner — karşılaştırma", () => {
+    const result = evaluateProgram(
+      makeProgram({ requirements: { minGpa: 50, language: [] } }),
+      makeProfile({ gpa: 99 })
+    );
+    expect(result.band).toBe("safety");
+  });
+
+  it("kaynak boşluğu 'misses' sayacına girmez: aynı anda kapatılabilir 2 açık olsa bile out-of-reach'e değil reach'e düşer", () => {
+    // minGpa undefined (source, misses'e girmiyor) + dil close + SAT close = 2 gerçek "miss".
+    // Kaynak boşluğu unknown'a sayılsaydı toplam 3 miss olur ve out-of-reach'e düşerdi.
+    const result = evaluateProgram(
+      makeProgram({
+        requirements: {
+          minGpa: undefined,
+          language: [{ test: "ielts", min: 6.5 }],
+          standardizedTests: [{ test: "sat", min: 1200, mandatory: true }],
+        },
+      }),
+      makeProfile({
+        gpa: 50,
+        languageTests: [{ test: "ielts", score: 6.0 }], // close
+        standardizedTests: [{ test: "sat", score: 1150 }], // close
+      })
+    );
+    expect(result.band).toBe("reach");
+  });
+});
+
 // ---------------------------------------------------------------------------
 // fitScore — unknown, close, unmet farklı ağırlıklandırılır
 // ---------------------------------------------------------------------------
@@ -443,6 +504,14 @@ describe("Bütçe şartı", () => {
     );
     expect(result.overBudget).toBe(true);
     expect(result.band).toBe("safety");
+  });
+
+  it("kaynak sayfa harcı belirtmiyorsa (tuitionNonEu undefined) overBudget iddia edilmez", () => {
+    const result = evaluateProgram(
+      makeProgram({ tuitionNonEu: undefined }),
+      makeProfile({ gpa: 70, maxTuition: 10000 })
+    );
+    expect(result.overBudget).toBe(false);
   });
 });
 

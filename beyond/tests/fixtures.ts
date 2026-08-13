@@ -23,7 +23,9 @@ export function makeProgram(overrides: {
       language: [],
       ...overrides.requirements,
     },
-    tuitionNonEu: overrides.tuitionNonEu ?? 10000,
+    // "tuitionNonEu" in overrides: undefined'ı da açıkça geçirebilmek için
+    // (kaynak sayfa harcı belirtmiyor durumunu test edebilmek adına) ?? yerine.
+    tuitionNonEu: "tuitionNonEu" in overrides ? overrides.tuitionNonEu : 10000,
     tuitionEu: 2000,
     livingCostPerYear: 10000,
     applicationSystem: "direct",

@@ -186,28 +186,46 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 72,
-      language: [
-        { test: "ielts", min: 6.5 },
-        { test: "toefl", min: 90 },
-      ],
+      // Sayfa yurt dışı diploması için sayısal eşik vermiyor; diplomanın VWO'ya
+      // denk olması ve seçme sınavındaki sıralaman belirleyici.
+      minGpa: undefined,
+      // IELTS 6.5 şartı programın seçme prosedürü sayfasında geçiyor
+      // (rug.nl/gmw/bachelors/psychology/selectieprocedure-bachelor-psychology-en)
+      // ve konuşma + yazma ALT puanı olarak isteniyor. Tip modeli alt puan
+      // ayrımını taşıyamıyor; genel eşik olarak yazıldı.
+      language: [{ test: "ielts", min: 6.5 }],
       extras: [
         {
+          // DÜZELTME: mandatory false idi. Kontenjan 250 ve yerler seçme
+          // prosedürüyle dağıtılıyor — bu isteğe bağlı bir durum değil.
           key: "numerus-fixus",
-          mandatory: false,
+          mandatory: true,
           note: {
-            tr: "Kontenjan sınırlı — şartları karşılamak kabul garantisi değil",
-            en: "Capped intake — meeting requirements does not guarantee a place",
+            tr: "Yılda 250 kontenjan, yerler seçme sınavı sıralamasıyla dağıtılıyor — şartları karşılamak kabul garantisi değil",
+            en: "250 places a year, assigned by selection-test ranking — meeting requirements does not guarantee a place",
+          },
+        },
+        {
+          key: "entrance-exam",
+          mandatory: true,
+          note: {
+            tr: "Seçme sınavı zorunlu; sıralaman diğer adaylarla karşılaştırılıyor",
+            en: "Selection test is mandatory; your ranking is compared with other applicants",
           },
         },
       ],
     },
-    tuitionNonEu: 11400,
-    tuitionEu: 2601,
+    // DÜZELTME (2026-08-13): katalogda 11.400 / 2.601 yazıyordu.
+    // Sayfa 2026-2027 için AB-dışı € 14.000, AB € 2.694 diyor.
+    // Dedektörün işaretlediği fark gerçekti.
+    tuitionNonEu: 14000,
+    tuitionEu: 2694,
     livingCostPerYear: 11400,
     applicationSystem: "studielink",
     deadline: "01-15",
-    sourceUrl: "https://www.rug.nl/bachelors/psychology/",
+    // DÜZELTME: eski link Hollandaca track'in sayfasıydı (NT2-II şartı, 365
+    // kontenjan). Bu kayıt İngilizce track; sayfası ve kontenjanı farklı.
+    sourceUrl: "https://www.rug.nl/bachelors/psychology-en/?lang=en",
     facultyUrl: "https://www.rug.nl/gmw/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -656,6 +674,8 @@ export const PROGRAMS: Program[] = [
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
+        // Kaynak: campusfrance.org → DAP prosedürü, en az B2 (DELF B2 /
+        // DELF Junior / TCF TP).
         { test: "delf", min: 4 },
         { test: "tcf", min: 400 },
       ],
@@ -666,7 +686,9 @@ export const PROGRAMS: Program[] = [
     tuitionEu: 175,
     livingCostPerYear: 14400,
     applicationSystem: "campus-france",
-    deadline: "12-05",
+    // Campus France DAP başvuru penceresi: 1 Ekim – 15 Aralık.
+    // Üniversite cevapları 30 Nisan'a, öğrencinin yanıtı 31 Mayıs'a kadar.
+    deadline: "12-15",
     deadlineNote: {
       tr: "Campus France prosedürü Ekim'de açılır, Aralık başında kapanır. Bu adımı atlarsan vize alamazsın.",
       en: "The Campus France procedure opens in October and closes in early December. Skip it and you cannot get a visa.",
@@ -678,7 +700,7 @@ export const PROGRAMS: Program[] = [
     sourceUrl:
       "https://sciences.sorbonne-universite.fr/formation-sciences/offre-de-formation/licences-0/licence-discipline/les-l2-l3-nos-huit-4",
     facultyUrl: "https://sciences.sorbonne-universite.fr/",
-    lastChecked: CHECKED,
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
     verification: "ai-extracted",
   },
   {
@@ -697,7 +719,8 @@ export const PROGRAMS: Program[] = [
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
-        { test: "ielts", min: 6.5 },
+        // Kaynak: programmes.polytechnique.edu → admissions-criteria-and-procedure
+        { test: "ielts", min: 6.5 }, // her beceriden en az 6.0
         { test: "toefl", min: 90 },
       ],
       standardizedTests: [
@@ -714,15 +737,15 @@ export const PROGRAMS: Program[] = [
         { key: "recommendation-letter", mandatory: true },
       ],
     },
-    tuitionNonEu: 15000,
-    tuitionEu: 12000,
+    tuitionNonEu: 19200,
+    tuitionEu: 15900,
     livingCostPerYear: 12000,
     applicationSystem: "direct",
-    deadline: "01-10",
-    sourceUrl: "https://programmes.polytechnique.edu/en/bachelor/bachelor-of-science",
+    deadline: "02-09",
+    sourceUrl: "https://programmes.polytechnique.edu/en/bachelor/admissions/admissions-criteria-and-procedure",
     facultyUrl: "https://www.polytechnique.edu/en",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
+    verification: "verified",
   },
   {
     id: "fr-sciencespo-economics",
@@ -749,18 +772,22 @@ export const PROGRAMS: Program[] = [
         { key: "recommendation-letter", mandatory: true },
       ],
     },
-    tuitionNonEu: 14500,
-    tuitionEu: 14500,
+    // AEA dışında ikamet edenler sabit 10.250 EUR öder. AEA içinde ise
+    // hane gelirine göre 0–10.250 arası kayan tarife, tek rakam yok.
+    tuitionNonEu: 10250,
     livingCostPerYear: 10800,
-    applicationSystem: "parcoursup",
+    // Parcoursup DEĞİL: Parcoursup Fransız bakalorya adayları için.
+    // Yabancı lise diploması olanlar Sciences Po'nun kendi başvuru
+    // sitesinden başvuruyor.
+    applicationSystem: "direct",
     deadline: "03-12",
     deadlineNote: {
       tr: "Harç aile gelirine göre kademeli — düşük gelirde ciddi biçimde düşüyor",
       en: "Tuition is income-scaled and drops substantially for lower incomes",
     },
-    sourceUrl: "https://www.sciencespo.fr/college/en/",
+    sourceUrl: "https://www.sciencespo.fr/admissions/en/undergraduate/undergraduate-admissions/",
     facultyUrl: "https://www.sciencespo.fr/college/en/",
-    lastChecked: CHECKED,
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
     verification: "ai-extracted",
   },
   {
@@ -780,6 +807,8 @@ export const PROGRAMS: Program[] = [
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
+        // Kaynak: campusfrance.org → DAP prosedürü, en az B2 (DELF B2 /
+        // DELF Junior / TCF TP).
         { test: "delf", min: 4 },
         { test: "tcf", min: 400 },
       ],
@@ -789,10 +818,12 @@ export const PROGRAMS: Program[] = [
     tuitionEu: 175,
     livingCostPerYear: 11400,
     applicationSystem: "campus-france",
-    deadline: "12-05",
+    // Campus France DAP başvuru penceresi: 1 Ekim – 15 Aralık.
+    // Üniversite cevapları 30 Nisan'a, öğrencinin yanıtı 31 Mayıs'a kadar.
+    deadline: "12-15",
     sourceUrl: "https://www.universite-paris-saclay.fr/formation/licence/mathematiques",
     facultyUrl: "https://www.universite-paris-saclay.fr/",
-    lastChecked: CHECKED,
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
     verification: "ai-extracted",
   },
 
@@ -1255,8 +1286,11 @@ export const PROGRAMS: Program[] = [
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
-        { test: "ielts", min: 6.0 },
-        { test: "toefl", min: 78 },
+        // Kaynak: polimi.it → language-requirements → "Students of an
+        // English-Language Laurea Study Programme". Katalogda önceden 6.0/78
+        // yazıyordu; o değerler LAUREA MAGISTRALE (yüksek lisans) şartı.
+        { test: "ielts", min: 5.0 },
+        { test: "toefl", min: 59 },
       ],
       requiredSubjects: [{ subject: "math", level: "advanced" }],
       extras: [
@@ -1281,7 +1315,7 @@ export const PROGRAMS: Program[] = [
     },
     sourceUrl: "https://www.polimi.it/en/programmes",
     facultyUrl: "https://www.deib.polimi.it/eng/home-page",
-    lastChecked: CHECKED,
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
     verification: "ai-extracted",
   },
   {
@@ -1301,8 +1335,10 @@ export const PROGRAMS: Program[] = [
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
-        { test: "ielts", min: 6.5 },
+        // Kaynak: unibocconi.it → english-certificates-accepted-enrollment
+        { test: "ielts", min: 6.5 }, // her bölümden en az 6.0
         { test: "toefl", min: 88 },
+        { test: "duolingo", min: 110 },
       ],
       standardizedTests: [
         { test: "sat", min: 1350, mandatory: false },
@@ -1325,15 +1361,15 @@ export const PROGRAMS: Program[] = [
     tuitionEu: 17000,
     livingCostPerYear: 14400,
     applicationSystem: "direct",
-    deadline: "01-15",
+    deadline: "01-23",
     deadlineNote: {
       tr: "Turlu başvuru — erken turlarda kabul şansı ve burs olasılığı daha yüksek",
       en: "Rolling rounds — earlier rounds carry better odds and scholarship chances",
     },
     sourceUrl: "https://www.unibocconi.it/en/programs/bachelor-science/international-economics-and-finance",
     facultyUrl: "https://www.unibocconi.it/en",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
+    verification: "verified",
   },
   {
     id: "it-bologna-medicine",
@@ -1351,10 +1387,11 @@ export const PROGRAMS: Program[] = [
       // üniversite sayısal bir not eşiği YAYINLAMIYOR. Uydurma bir eşik
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
-      language: [
-        { test: "ielts", min: 6.0 },
-        { test: "toefl", min: 80 },
-      ],
+      // Kaynak açıkça söylüyor: "English language qualifications are not a
+      // mandatory requirement" — İngilizce yeterliliği giriş sınavının
+      // kendisiyle ölçülüyor, sertifika yalnızca eşitlik bozucu.
+      // Boş dizi = "şart yok" (undefined = "bilinmiyor" ile aynı şey değil).
+      language: [],
       requiredSubjects: [
         { subject: "biology", level: "advanced" },
         { subject: "chemistry", level: "advanced" },
@@ -1378,19 +1415,19 @@ export const PROGRAMS: Program[] = [
         },
       ],
     },
-    tuitionNonEu: 3000,
-    tuitionEu: 3000,
+    // Harç ISEE (aile geliri) belgesine göre hesaplanıyor; düşük gelirde tam
+    // muafiyet var. Sabit bir rakam yayınlanmıyor, o yüzden uydurmuyoruz.
     livingCostPerYear: 10800,
     applicationSystem: "direct",
-    deadline: "07-25",
+    deadline: "09-29",
     deadlineNote: {
       tr: "IMAT kaydı son tarihi — sınavın kendisi Eylül'de",
       en: "IMAT registration deadline — the exam itself is in September",
     },
-    sourceUrl: "https://corsi.unibo.it/singlecycle/MedicineSurgery",
+    sourceUrl: "https://corsi.unibo.it/singlecycle/MedicineAndSurgery/how-to-enrol",
     facultyUrl: "https://www.unibo.it/en",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
+    verification: "verified",
   },
   {
     id: "it-pavia-medicine",
@@ -1408,10 +1445,9 @@ export const PROGRAMS: Program[] = [
       // üniversite sayısal bir not eşiği YAYINLAMIYOR. Uydurma bir eşik
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
-      language: [
-        { test: "ielts", min: 6.0 },
-        { test: "toefl", min: 80 },
-      ],
+      // Bologna ile aynı ulusal sınav sistemi: İngilizce yeterliliği sınavla
+      // ölçülüyor, ayrı sertifika zorunlu değil.
+      language: [],
       requiredSubjects: [
         { subject: "biology", level: "advanced" },
         { subject: "chemistry", level: "basic" },
@@ -1432,17 +1468,17 @@ export const PROGRAMS: Program[] = [
         },
       ],
     },
-    tuitionNonEu: 3500,
-    tuitionEu: 3500,
+    // AB-dışı öğrenciler sabit tarife ödüyor ama tek bir rakam yok:
+    // vatandaşlık ve alana göre 390–4.550 EUR/yıl arasında değişiyor.
     livingCostPerYear: 9600,
     applicationSystem: "direct",
-    deadline: "07-25",
+    deadline: "09-29",
     // Programın kendi sitesi. Eski link (portale.unipv.it/en) üniversite ana
     // sayfasıydı ve Cloudflare otomatik isteklere 403 veriyordu.
-    sourceUrl: "https://medicineandsurgeryharvey.cdl.unipv.it/en",
+    sourceUrl: "https://medicineandsurgeryharvey.cdl.unipv.it/en/enroll/access-requirements",
     facultyUrl: "https://portale.unipv.it/en",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
+    verification: "verified",
   },
 ];
 

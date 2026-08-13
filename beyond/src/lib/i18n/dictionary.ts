@@ -229,7 +229,8 @@ const tr = {
   verification: {
     verified: "Kaynağından doğrulandı",
     "ai-extracted": "AI ile çıkarıldı, doğrulanmadı",
-    verifiedTip: "Bu kayıt üniversitenin resmi sayfasından elle teyit edildi.",
+    verifiedTip:
+      "Bu kaydın her alanı üniversitenin resmi program sayfasıyla tek tek karşılaştırıldı. Sayfanın belirtmediği alanlar tahminle doldurulmadı, boş bırakıldı.",
     "ai-extractedTip":
       "Bu kayıt otomatik derlendi ama tek tek doğrulanmadı. Başvurmadan önce kaynak bağlantısından kontrol et.",
   },
@@ -534,7 +535,8 @@ const en: Dictionary = {
   verification: {
     verified: "Verified at source",
     "ai-extracted": "AI-extracted, not verified",
-    verifiedTip: "This record was manually confirmed against the university's official page.",
+    verifiedTip:
+      "Every field in this record was compared against the university's official programme page. Fields the page does not state were left empty rather than estimated.",
     "ai-extractedTip":
       "This record was compiled automatically and not individually verified. Check the source link before applying.",
   },

@@ -222,6 +222,8 @@ const tr = {
     notStated: "Kaynakta belirtilmemiş",
     notStatedNote:
       "Üniversite bu bilgiyi kaynak sayfasında yayınlamıyor. Tahmin üretmiyoruz — başvuru ofisine sorman gerekiyor.",
+    currencyNote:
+      "Harç, üniversitenin yayınladığı para biriminde gösteriliyor. Kur her gün değiştiği için EUR'a çevirmiyoruz; bu yüzden toplam yıllık maliyet ve bütçe karşılaştırması bu programda hesaplanmıyor.",
   },
 
   verification: {
@@ -525,6 +527,8 @@ const en: Dictionary = {
     notStated: "Not stated at source",
     notStatedNote:
       "The university does not publish this on its source page. We do not generate an estimate — you need to ask the admissions office.",
+    currencyNote:
+      "Tuition is shown in the currency the university publishes. We do not convert to EUR because rates change daily, so the annual total and budget comparison are not calculated for this program.",
   },
 
   verification: {

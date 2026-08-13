@@ -90,6 +90,12 @@ export type ExtraRequirementKey =
  */
 export type VerificationStatus = "verified" | "ai-extracted";
 
+/**
+ * Harçların yayınlandığı para birimleri. Kaynak sayfa hangi birimde
+ * yazıyorsa o birimde saklıyoruz — çevirmiyoruz. Bkz. `Program.tuitionCurrency`.
+ */
+export type Currency = "EUR" | "GBP" | "SEK" | "DKK" | "CHF";
+
 /** Eşleştirme sonucu bandı. */
 export type Band = "safety" | "match" | "reach" | "out-of-reach";
 
@@ -180,14 +186,30 @@ export interface Program {
   requirements: ProgramRequirements;
 
   /**
-   * AB DIŞI öğrenci için yıllık harç (EUR). Hedef kitlemiz Türk öğrenci.
+   * AB DIŞI öğrenci için yıllık harç. Hedef kitlemiz Türk öğrenci.
+   * Para birimi `tuitionCurrency` ile belirtilir (yoksa EUR).
    * undefined = sayfa AB-dışı harcı belirtmiyor. Bütçe kontrolü bu durumda
    * hesap yapmaz; "bilinmiyor" gösterir. 0 yazmak "harç yok" demek olur.
    */
   tuitionNonEu?: number;
-  /** AB vatandaşı için yıllık harç (EUR) — karşılaştırma amaçlı referans. */
+  /** AB vatandaşı için yıllık harç — karşılaştırma amaçlı referans. */
   tuitionEu?: number;
-  /** Tahmini yıllık yaşam maliyeti (EUR). */
+  /**
+   * Harç alanlarının para birimi. Belirtilmezse EUR.
+   *
+   * NEDEN VAR: üniversitelerin çoğu harcı kendi para biriminde yayınlıyor —
+   * Imperial £, Lund SEK. Bunları EUR'a çevirip yazmak, sayfada olmayan bir
+   * sayıyı kaynağa mal etmek olur; kur da her gün değişir. Kaynağın söylediği
+   * sayı, kaynağın para biriminde duruyor.
+   *
+   * BEDELİ: farklı para birimindeki tutarlar toplanamaz ve
+   * karşılaştırılamaz. `livingCostPerYear` her zaman EUR olduğu için "toplam
+   * yıllık maliyet" yalnızca harç da EUR ise hesaplanır; bütçe kontrolü de
+   * aynı şekilde yalnızca EUR kayıtlarda çalışır. Uydurma çevrim yerine
+   * "hesaplanamıyor" demeyi seçtik.
+   */
+  tuitionCurrency?: Currency;
+  /** Tahmini yıllık yaşam maliyeti — HER ZAMAN EUR. */
   livingCostPerYear: number;
 
   applicationSystem: ApplicationSystem;

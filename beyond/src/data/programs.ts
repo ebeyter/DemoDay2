@@ -250,6 +250,20 @@ export const PROGRAMS: Program[] = [
     facultyUrl: "https://www.uva.nl/en/education",
     lastChecked: CHECKED,
     verification: "ai-extracted",
+    scholarships: [
+      {
+        name: "Amsterdam Merit Scholarship",
+        amountPerYear: 6000,
+        kind: "merit",
+        openToNonEu: true,
+        sourceUrl:
+          "https://www.uva.nl/en/education/fees-and-funding/bachelors-scholarships-and-loans/amsterdam-merit-scholarship/amsterdam-merit-scholarship.html",
+        note: {
+          tr: "Lisansta yılda 6.000 EUR, üç yıl boyunca (toplam 18.000). AB/AEA dışı pasaport ŞARTI var ve Hollanda öğrenim desteğinden (Studiefinanciering) yararlanamıyor olmak gerekiyor. Kontenjan sınırlı.",
+          en: "EUR 6,000 per year at bachelor level for three years (EUR 18,000 total). Requires a non-EU/EEA passport and ineligibility for Dutch study finance (Studiefinanciering). Limited number available.",
+        },
+      },
+    ],
   },
   {
     id: "nl-groningen-psychology",
@@ -947,6 +961,56 @@ export const PROGRAMS: Program[] = [
     facultyUrl: "https://www.polytechnique.edu/en",
     lastChecked: "2026-08-13", // FR/IT doğrulama turu
     verification: "verified",
+    // Fransızca burs sayfasından; İngilizce sürümü bu kalemleri listelemiyor.
+    scholarships: [
+      {
+        name: "Bourse d'Excellence",
+        amountPerYear: 4800,
+        kind: "merit",
+        openToNonEu: true,
+        sourceUrl:
+          "https://programmes.polytechnique.edu/bachelor/frais-et-financement/bourses-et-aides-financieres",
+        note: {
+          tr: "Üç yıl boyunca yılda 4.800 EUR. Programa \"honours\" ile kabul edilen ve akademik olarak üstün adaylara veriliyor.",
+          en: "EUR 4,800 per year for three years, for candidates admitted with honours on academic excellence.",
+        },
+      },
+      {
+        name: "Women in Science",
+        amountPerYear: 4800,
+        kind: "merit",
+        openToNonEu: true,
+        sourceUrl:
+          "https://programmes.polytechnique.edu/bachelor/frais-et-financement/bourses-et-aides-financieres",
+        note: {
+          tr: "Üç yıl boyunca yılda 4.800 EUR; programa kabul edilen kadın adaylara açık.",
+          en: "EUR 4,800 per year for three years, open to admitted women candidates.",
+        },
+      },
+      {
+        name: "Sosyal kriterli mali destek",
+        kind: "need-based",
+        openToNonEu: true,
+        sourceUrl:
+          "https://programmes.polytechnique.edu/bachelor/frais-et-financement/bourses-et-aides-financieres",
+        note: {
+          tr: "Aile gelirine göre kısmi harç muafiyeti ve/veya %0 faizli kredi. Açıkça CROUS'tan yararlanamayan uluslararası öğrencilere yönelik — yani Türk öğrenciyi kapsıyor. Tutar aileye göre değişiyor, kaynakta sabit rakam yok.",
+          en: "Partial tuition exemption and/or 0% interest loans, scaled to family income. Explicitly aimed at international students not eligible for CROUS, which includes Turkish students. The amount varies by household; no fixed figure is published.",
+        },
+      },
+      {
+        name: "Uluslararası Olimpiyat madalyalıları için tam burs",
+        amountPerYear: 87900,
+        kind: "merit",
+        openToNonEu: true,
+        sourceUrl:
+          "https://programmes.polytechnique.edu/bachelor/frais-et-financement/bourses-et-aides-financieres",
+        note: {
+          tr: "Harç VE yaşam giderlerini kapsıyor; AB/AEA dışı için yılda 87.900 EUR'a kadar. Çok dar bir kapı: kayıttan önceki iki yıl içinde uluslararası bir olimpiyatta madalya almış olmak gerekiyor, altın madalyalılara öncelik veriliyor.",
+          en: "Covers tuition AND living costs, up to EUR 87,900 per year for non-EU/EEA students. A very narrow door: requires a medal at an international Olympiad within the two years before enrolment, with priority to gold medallists.",
+        },
+      },
+    ],
   },
   {
     id: "fr-sciencespo-economics",

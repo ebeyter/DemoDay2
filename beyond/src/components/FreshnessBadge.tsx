@@ -2,7 +2,8 @@
 
 import { useLocale } from "@/lib/i18n/context";
 import { fill } from "@/lib/i18n/dictionary";
-import { daysSince, getSourceCheck } from "@/lib/freshness-data";
+import { daysSince } from "@/lib/freshness-data";
+import { useSourceCheck } from "@/lib/freshness-context";
 import type { Discrepancy } from "@/lib/freshness";
 import { cx } from "./ui";
 
@@ -18,7 +19,7 @@ import { cx } from "./ui";
  */
 
 function useCheck(programId: string) {
-  return getSourceCheck(programId);
+  return useSourceCheck(programId);
 }
 
 // ---------------------------------------------------------------------------

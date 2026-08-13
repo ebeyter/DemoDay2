@@ -146,3 +146,57 @@ select policyname, cmd
 from pg_policies
 where schemaname = 'public' and tablename = 'beyond_profiles'
 order by policyname;
+
+
+-- ===========================================================================
+-- 6. Kaynak takibi sonuçları
+--
+-- Otomatik tarama (Vercel Cron → /api/cron/check-sources) buraya yazar,
+-- arayüz buradan okur. Kişisel veri içermez: hangi üniversite sayfasının
+-- ne zaman değiştiği bilgisi herkese açık olabilir.
+--
+-- Bu bölüm de sadece EKLEME yapar; yukarıdaki hiçbir şeye dokunmaz.
+-- ===========================================================================
+create table if not exists public.beyond_source_checks (
+  program_id    text primary key,
+
+  -- 'ok' | 'changed' | 'unreachable'
+  status        text not null,
+
+  -- Sayfanın şartlarla ilgili metninin kararlı özeti.
+  fingerprint   text not null default '',
+
+  -- Katalog ile sayfa arasında bulunan sayısal farklar.
+  discrepancies jsonb not null default '[]'::jsonb,
+
+  -- Sayfaya ulaşılamadıysa sebebi.
+  error         text,
+
+  -- Parmak izinin en son değiştiği an.
+  changed_at    timestamptz,
+  checked_at    timestamptz not null default now()
+);
+
+alter table public.beyond_source_checks enable row level security;
+
+do $$
+begin
+  -- Okuma herkese açık: bu veri kişisel değil ve arayüz giriş yapmadan da
+  -- rozetleri gösterebilmeli.
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'beyond_source_checks'
+      and policyname = 'beyond_source_checks_public_read'
+  ) then
+    create policy beyond_source_checks_public_read on public.beyond_source_checks
+      for select using (true);
+  end if;
+end
+$$;
+
+-- Yazma politikası BİLİNÇLİ OLARAK YOK. Tabloya yalnızca service_role
+-- anahtarıyla çalışan sunucu tarafı cron yazabilir; service_role RLS'i
+-- baypas eder. Böylece anon anahtarı olan kimse sahte tazelik verisi
+-- yazamaz.
+
+select 'beyond_source_checks hazır' as durum;

@@ -96,6 +96,43 @@ Bu yüzden AI'sız çalışan bir ürün elde ettik: Bedrock ayarları hiç giri
 
 ---
 
+## Deploy (Vercel)
+
+1. **Supabase şemasını çalıştır** — `supabase/schema.sql` içeriğini SQL Editor'e yapıştır. Betiğin 6. bölümü `beyond_source_checks` tablosunu ekler; sadece ekleme yapar, mevcut hiçbir şeye dokunmaz.
+
+2. **Ortam değişkenlerini Vercel'e gir** (Settings → Environment Variables). `.env.local` deploy edilmez.
+
+   | Değişken | Zorunlu mu |
+   |---|---|
+   | `NEXT_PUBLIC_SUPABASE_URL` | evet |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | evet |
+   | `SUPABASE_SERVICE_ROLE_KEY` | otomatik tarama için |
+   | `CRON_SECRET` | otomatik tarama için — `openssl rand -hex 32` |
+   | `BEDROCK_URL` · `BEDROCK_API_KEY` | "Sor AI'a" paneli için |
+
+3. **Deploy et.** `vercel.json` cron'u tanımlıyor: her gün 04:00 UTC'de `/api/cron/check-sources` çalışır.
+
+İlk tarama referans noktası oluşturur (hiçbir şey "değişti" görünmez). İkinci taramadan itibaren gerçek değişiklikler yakalanmaya başlar.
+
+### Tarama nasıl korunuyor
+
+`/api/cron/check-sources` üç katmanlı: `CRON_SECRET` tanımlı değilse uç nokta tamamen kapalı (503), tanımlıysa `Authorization: Bearer` başlığı zorunlu (401), geçtikten sonra `SUPABASE_SERVICE_ROLE_KEY` aranıyor. Vercel Cron bu başlığı kendiliğinden gönderiyor.
+
+Açık bırakılsaydı herkes 36 üniversite sitesine bizim adımıza istek yağdırabilirdi.
+
+### Tazelik verisi nereden geliyor
+
+İki katman, bu sırayla:
+
+1. **Pakete gömülü JSON** (`npm run check-sources` üretir) — ilk render'da anında hazır, ağ gerektirmiyor
+2. **`/api/freshness`** (Supabase) — cron'un yazdığı güncel sonuçlar, yüklenince gömülü veriyi eziyor
+
+Bu sıra bilinçli: Supabase erişilemese, cron hiç kurulmasa veya tablo boş olsa bile rozetler kaybolmuyor — sadece tazeliğini yitiriyor. Tazelik göstergesinin kendisi tek bir servise bağımlı olmamalı.
+
+Yerelde çalışırken cron'a gerek yok; `npm run check-sources` çalıştırıp sonucu commit etmen yeterli.
+
+---
+
 ## Proje yapısı
 
 ```
@@ -109,11 +146,14 @@ src/
     compare/              Yan yana karşılaştırma
     timeline/             Başvuru sistemine göre gruplu takvim
     sign-in/              E-posta + şifre
-    api/chat/             "Sor AI'a" — Bedrock Converse, akışlı
+    api/chat/             "Sor AI'a" — Bedrock, akışlı
+    api/freshness/        Tarama sonuçlarını arayüze verir
+    api/cron/             Günlük otomatik tarama (CRON_SECRET korumalı)
   lib/
     matching.ts           ⭐ Eşleştirme motoru — AI yok, tamamen açıklanabilir
     freshness.ts          ⭐ Kaynak takibi — parmak izi + sayısal fark, AI yok
-    freshness-data.ts     Tarama sonuçlarına arayüz erişimi
+    freshness-data.ts     Gömülü tarama sonuçlarına erişim
+    freshness-context.tsx İki katmanlı tazelik kaynağı (Supabase → JSON yedek)
     fetch-page.ts         Sayfa indirme + metne çevirme (SSRF korumalı)
     bedrock-chat.ts       Bedrock Converse sohbeti (model bağımsız)
     types.ts              Çekirdek tip modeli
@@ -167,7 +207,6 @@ Test edilmiş örnek: **IELTS 6.0 → 7.0** tek değişikliği Güvenli bandı *
 
 ## Sonraki adımlar
 
-- **Taramanın otomatikleşmesi.** Şu an `npm run check-sources` elle çalıştırılıp sonuç commit ediliyor. Vercel'de dosya sistemi salt-okunur olduğu için otomatik tarama sonucu Supabase'e yazmalı: `beyond_source_checks` tablosu + günlük Vercel Cron.
 - Dedektörün fark bulduğu kayıtları kaynağından doğrulama turu (`verification: "verified"`)
 - Burs verisi (özellikle AB-dışı öğrencilere açık olanlar)
 - Vize ve oturum izni adımlarının takvime eklenmesi

@@ -4,6 +4,7 @@ import "./globals.css";
 import { LocaleProvider } from "@/lib/i18n/context";
 import { StoreProvider } from "@/lib/store";
 import { AssistantPanel } from "@/components/AssistantPanel";
+import { FreshnessProvider } from "@/lib/freshness-context";
 
 const inter = Inter({
   subsets: ["latin", "latin-ext"], // latin-ext: Türkçe ğ, ş, ı, İ karakterleri
@@ -25,8 +26,10 @@ export default function RootLayout({
       <body className="min-h-screen antialiased">
         <LocaleProvider>
           <StoreProvider>
-            {children}
-            <AssistantPanel />
+            <FreshnessProvider>
+              {children}
+              <AssistantPanel />
+            </FreshnessProvider>
           </StoreProvider>
         </LocaleProvider>
       </body>

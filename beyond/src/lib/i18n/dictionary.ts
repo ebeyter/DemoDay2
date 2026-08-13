@@ -219,6 +219,9 @@ const tr = {
     gapTitle: "Eksiklerini kapatmak için",
     gapEmpty: "Bu program için kapatman gereken bir eksik yok.",
     countryNote: "Bu ülke hakkında bilmen gereken",
+    notStated: "Kaynakta belirtilmemiş",
+    notStatedNote:
+      "Üniversite bu bilgiyi kaynak sayfasında yayınlamıyor. Tahmin üretmiyoruz — başvuru ofisine sorman gerekiyor.",
   },
 
   verification: {
@@ -519,6 +522,9 @@ const en: Dictionary = {
     gapTitle: "To close your gaps",
     gapEmpty: "Nothing to close for this program.",
     countryNote: "What to know about this country",
+    notStated: "Not stated at source",
+    notStatedNote:
+      "The university does not publish this on its source page. We do not generate an estimate — you need to ask the admissions office.",
   },
 
   verification: {

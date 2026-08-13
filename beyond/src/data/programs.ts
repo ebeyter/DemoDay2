@@ -972,6 +972,52 @@ export const PROGRAMS: Program[] = [
     lastChecked: "2026-08-14",
     verification: "verified",
   },
+  {
+    // EKLENDİ (2026-08-14). KCL katalogda yoktu; QS'te dünya ilk 40'ında ve
+    // Londra'da Imperial/UCL dışında üçüncü bir seçenek sunuyor.
+    id: "gb-kcl-cs",
+    university: "King's College London",
+    country: "GB",
+    city: "London",
+    name: "Computer Science",
+    degree: "BSc",
+    field: "cs",
+    teachingLanguage: "en",
+    // Teyit edildi: sayfa "Three years" diyor.
+    durationYears: 3,
+    requirements: {
+      // Sayfa 100'lük eşik vermiyor; şart A-level A*A*A ve IB 39.
+      minGpa: undefined,
+      // Sayfa dil şartını "English language band: D" olarak veriyor ve SAYI
+      // yazmıyor. Bandın karşılığı ayrı bir tabloda — uydurmadım.
+      language: undefined,
+      standardizedTests: [
+        // Teyit edildi: "39 points overall or an aggregate score of 20 from
+        // three Higher Levels", HL matematikte 6.
+        { test: "ib", min: 39, mandatory: false },
+      ],
+      // Teyit edildi: A-level'da matematik veya ileri matematikte A,
+      // IB'de HL matematikte 6.
+      requiredSubjects: [{ subject: "math", level: "advanced" }],
+      // Sayfa niyet mektubunu değerlendirmeye kattığını söylüyor; giriş sınavı
+      // ya da mülakattan söz etmiyor.
+      extras: [{ key: "motivation-letter", mandatory: true }],
+    },
+    // Harç sayfası (.../fees) fiyat göstermiyor, boş bırakıldı.
+    tuitionNonEu: undefined,
+    tuitionEu: undefined,
+    tuitionCurrency: "GBP",
+    livingCostPerYear: 20400,
+    applicationSystem: "ucas",
+    // UCAS'ın sistem tarihi; bu sayfada geçmiyor.
+    deadline: "01-13",
+    sourceUrl: "https://www.kcl.ac.uk/study/undergraduate/courses/computer-science-bsc/requirements",
+    facultyUrl: "https://www.kcl.ac.uk/nmes/departments/informatics",
+    lastChecked: "2026-08-14",
+    // Şartlar sayfasından teyit edildi; son tarih sayfada olmadığı için
+    // rozet çevrilmedi.
+    verification: "ai-extracted",
+  },
 
   // -------------------------------------------------------------------------
   // 🇫🇷 FRANSA
@@ -1206,6 +1252,63 @@ export const PROGRAMS: Program[] = [
     facultyUrl: "https://www.universite-paris-saclay.fr/",
     lastChecked: "2026-08-13", // FR/IT doğrulama turu
     verification: "verified",
+  },
+  {
+    // EKLENDİ (2026-08-14). NEDEN BU KAYIT VAR: katalogdaki Fransız
+    // programlarının çoğu Fransızca (Sorbonne, Paris-Saclay). Fransa'da
+    // İngilizce öğretim yapan lisanslar ağırlıkla işletme okullarında —
+    // Türk öğrenci için Fransızcasız girilebilecek gerçek yol bu.
+    id: "fr-edhec-bba",
+    university: "EDHEC Business School",
+    country: "FR",
+    city: "Lille",
+    name: "International BBA — Business Management Track",
+    degree: "BA",
+    field: "business",
+    // İki track de İngilizce veriliyor (Lille veya Nice kampüsü).
+    teachingLanguage: "en",
+    durationYears: 4,
+    requirements: {
+      minGpa: undefined,
+      // Şart "bir dil testi sonucu" olarak geçiyor ama hangi sınav ve kaç puan
+      // yazılı değil. Global Business track ek olarak akıcı İngilizce istiyor.
+      language: undefined,
+      extras: [
+        { key: "motivation-letter", mandatory: true },
+        {
+          key: "entrance-exam",
+          mandatory: true,
+          note: {
+            tr: "Kişilik testi ve dil testi zorunlu; lise transkriptiyle birlikte değerlendiriliyor",
+            en: "A personality test and a language test are required, assessed together with your high school transcript",
+          },
+        },
+      ],
+    },
+    // EDHEC harcı iki track için ayrı yayınlıyor: Business Management
+    // 15.900 EUR/yıl, Global Business 23.900 EUR/yıl. Bu kayıt Business
+    // Management track'i. Ayrıca kayıt öncesi 5.000 EUR depozito ve 100 EUR
+    // başvuru ücreti var.
+    //
+    // DİKKAT: bu rakamı EDHEC'in yayınladığı bilgiden aldım ama harç sayfası
+    // otomatik isteğe 403 döndüğü için SAYFAYI KENDİM GÖREMEDİM. Rozet bu
+    // yüzden çevrilmedi — tarayıcıda açıp teyit edilmeli.
+    tuitionNonEu: 15900,
+    tuitionEu: 15900,
+    tuitionCurrency: "EUR",
+    livingCostPerYear: 11400,
+    applicationSystem: "direct",
+    // Dört başvuru dönemi var, ekimden marta kadar. Son dönemin kapanışı
+    // mart; kesin gün yayınlanan takvimde.
+    deadline: "03-31",
+    deadlineNote: {
+      tr: "Dört ayrı başvuru dönemi var (ekim-mart). Erken dönemde başvurmak burs şansını artırıyor — EDHEC uluslararası öğrencilere özel burslar veriyor.",
+      en: "There are four application rounds (October to March). Applying early improves your scholarship chances — EDHEC offers scholarships reserved for international students.",
+    },
+    sourceUrl: "https://www.edhec.edu/en/programmes/bba/admissions-and-tuition-fees/international-admissions",
+    facultyUrl: "https://www.edhec.edu/en/programmes/bba",
+    lastChecked: "2026-08-14",
+    verification: "ai-extracted",
   },
 
   // -------------------------------------------------------------------------
@@ -1855,6 +1958,61 @@ export const PROGRAMS: Program[] = [
     // Program sayfası dili, süreyi ve sınav şartını teyit ediyor ama harcı ve
     // son tarihi vermiyor — o ikisi başka sayfalardan geldiği için rozet
     // çevrilmedi.
+    verification: "ai-extracted",
+  },
+  {
+    // EKLENDİ (2026-08-14). Torino katalogda yoktu. Program hem İtalyanca hem
+    // TAMAMEN İNGİLİZCE veriliyor; İngilizce track için B2 belgesi şart.
+    id: "it-polito-computer-engineering",
+    university: "Politecnico di Torino",
+    country: "IT",
+    city: "Torino",
+    name: "Computer Engineering",
+    degree: "BSc",
+    field: "cs",
+    // İngilizce track kaydediliyor. Program aynı zamanda İtalyanca da veriliyor.
+    teachingLanguage: "en",
+    durationYears: 3,
+    requirements: {
+      minGpa: undefined,
+      // MODEL EKSİĞİ: şart "İngilizce B2 veya üstü" — bir CEFR SEVİYESİ.
+      // Tip modeli yalnızca sınav+puan taşıyabiliyor (ielts/toefl/...), seviye
+      // taşıyamıyor. B2'yi IELTS 5.5'e çevirip yazmak kaynağın söylemediği bir
+      // sayı üretmek olurdu, o yüzden boş bırakıldı.
+      // Muafiyet: öğretim dilinin İngilizce olduğunu belgeleyen okul yazısı.
+      language: undefined,
+      extras: [
+        {
+          key: "entrance-exam",
+          mandatory: true,
+          note: {
+            tr: "TIL online giriş sınavı zorunlu (Mimarlık dışında SAT puanı da kabul ediliyor). TIL-A temmuzun ikinci yarısında.",
+            en: "The online TIL admission test is required (a SAT score is also accepted except for Architecture). TIL-A takes place in the second half of July.",
+          },
+        },
+      ],
+    },
+    // İTALYA'DA HARÇ VATANDAŞLIĞA GÖRE DEĞİŞİYOR ve Torino bunu formülle
+    // yapıyor: yıllık harç, öğrencinin vatandaşı olduğu ülkenin satın alma
+    // gücü paritesine göre ölçekleniyor (IMF verisi), taban 600 EUR.
+    // Yani Türk öğrenci ile Alman öğrenci aynı programa farklı harç ödüyor.
+    // Modelimiz tek sayı tutuyor; formülü temsil edemediği için boş bırakıldı.
+    tuitionNonEu: undefined,
+    tuitionEu: undefined,
+    livingCostPerYear: 10200,
+    applicationSystem: "direct",
+    // 2026/27 çağrısından: vize gerektiren AB-dışı aday için DİL ŞARTI
+    // 22 Mayıs 2026'ya kadar karşılanmalı. Başvurunun kendisi 30 Haziran'a
+    // kadar. Bağlayıcı olan erken tarih yazıldı — 22 Mayıs'ı kaçıran öğrenci
+    // 30 Haziran'a yetişse bile başvuramaz.
+    deadline: "05-22",
+    deadlineNote: {
+      tr: "İki tarih var: dil belgesi 22 Mayıs'a kadar hazır olmalı, başvuru 30 Haziran'a kadar yapılır. Sıralama listeleri 28 Mayıs'ta açıklanıyor.",
+      en: "Two dates apply: your language certificate must be ready by 22 May, and the application itself is due by 30 June. Ranking lists are published on 28 May.",
+    },
+    sourceUrl: "https://www.polito.it/en/education/bachelor-s-degree-programmes/computer-engineering",
+    facultyUrl: "https://www.polito.it/en/education/applying-studying-graduating/admissions-and-enrolment/bachelor-s-degree-programmes/applicants-with-a-non-italian-qualification",
+    lastChecked: "2026-08-14",
     verification: "ai-extracted",
   },
   {

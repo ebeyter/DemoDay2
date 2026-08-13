@@ -304,7 +304,12 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "de",
     durationYears: 3.5,
     requirements: {
-      minGpa: 72,
+      // Program sayfası "open admission (no NC)" diyor — yani sayısal bir not
+      // eşiği yok. Katalogdaki 72 kaynakta desteklenmiyordu.
+      // (RWTH'nin genel uluslararası başvuru sayfası "ortalama 2,5 veya daha
+      // iyi" diyor ama bu Alman not ölçeği ve ayrı bir sayfa; bu programın
+      // kaynağında eşik geçmiyor.)
+      minGpa: undefined,
       language: [
         { test: "testdaf", min: 4 },
         { test: "goethe", min: 5 },
@@ -315,8 +320,9 @@ export const PROGRAMS: Program[] = [
         { subject: "physics", level: "advanced" },
       ],
     },
-    tuitionNonEu: 700,
-    tuitionEu: 700,
+    // Sayfa dönemlik katkı payını belirtmiyor; 700 kaynakta yoktu.
+    tuitionNonEu: undefined,
+    tuitionEu: undefined,
     livingCostPerYear: 11400,
     applicationSystem: "uni-assist",
     deadline: "07-15",
@@ -324,7 +330,8 @@ export const PROGRAMS: Program[] = [
       tr: "Harç yok, sadece dönemlik öğrenci katkı payı. Almanya'nın en büyük avantajı bu.",
       en: "No tuition, only a semester contribution — Germany's biggest advantage.",
     },
-    sourceUrl: "https://www.rwth-aachen.de/",
+    sourceUrl:
+      "https://www.rwth-aachen.de/cms/root/studium/vor-dem-studium/studiengaenge/liste-aktuelle-studiengaenge/studiengangbeschreibung/~bnev/maschinenbau-b-sc-/?lidx=1",
     facultyUrl: "https://www.maschinenbau.rwth-aachen.de/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -427,7 +434,8 @@ export const PROGRAMS: Program[] = [
       tr: "Almanya'da tıp AB-dışı öğrenci için en zor kategorilerden biri — yedek planla",
       en: "Medicine in Germany is one of the hardest routes for non-EU students — keep a backup",
     },
-    sourceUrl: "https://www.medizinische-fakultaet-hd.uni-heidelberg.de/",
+    sourceUrl:
+      "https://www.uni-heidelberg.de/en/study/all-subjects/medicine-study-location-heidelberg",
     facultyUrl: "https://www.medizinische-fakultaet-hd.uni-heidelberg.de/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -663,7 +671,12 @@ export const PROGRAMS: Program[] = [
       tr: "Campus France prosedürü Ekim'de açılır, Aralık başında kapanır. Bu adımı atlarsan vize alamazsın.",
       en: "The Campus France procedure opens in October and closes in early December. Skip it and you cannot get a visa.",
     },
-    sourceUrl: "https://sciences.sorbonne-universite.fr/",
+    // NOT (2026-08-13): Bu sayfa lisansın L2/L3 yıllarını anlatıyor ve girişin
+    // ağırlıkla Sorbonne'un kendi L1 "Sciences Formelles" portalından olduğunu
+    // söylüyor. Türk lise mezununun doğrudan bu programa girip giremeyeceği
+    // teyide muhtaç — Eda'nın karar vermesi gereken kayıt.
+    sourceUrl:
+      "https://sciences.sorbonne-universite.fr/formation-sciences/offre-de-formation/licences-0/licence-discipline/les-l2-l3-nos-huit-4",
     facultyUrl: "https://sciences.sorbonne-universite.fr/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -905,7 +918,8 @@ export const PROGRAMS: Program[] = [
     livingCostPerYear: 22800,
     applicationSystem: "direct",
     deadline: "04-30",
-    sourceUrl: "https://www.unisg.ch/en/",
+    sourceUrl:
+      "https://www.unisg.ch/en/studying/programmes/bachelor/major-in-business-administration-bwl/",
     facultyUrl: "https://www.unisg.ch/en/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -962,20 +976,27 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 78,
-      language: [
-        { test: "ielts", min: 6.5 },
-        { test: "toefl", min: 90 },
-      ],
+      // Sayfa yüzdelik bir eşik vermiyor; ulusal turda kontenjan diploma
+      // ortalaması (%66) + İsveç yetenek sınavı (%34) ile dağıtılıyor.
+      minGpa: undefined,
+      // Sayfa IELTS/TOEFL puanı VERMİYOR — şart "İsveç lisesi English 6"
+      // seviyesi. Eski kayıttaki IELTS 6.5 / TOEFL 90 kaynakta yok.
+      // (Sayfa "kabul edilenlerin çoğu IELTS 7.0 sunuyor" diye not düşüyor;
+      // bu bir şart değil, gözlem — şart olarak yazmıyoruz.)
+      language: undefined,
       requiredSubjects: [{ subject: "math", level: "basic" }],
       extras: [{ key: "motivation-letter", mandatory: true }],
     },
-    tuitionNonEu: 13500,
+    // Sayfa harcı SEK cinsinden veriyor: 3 yıl toplam SEK 390.000
+    // (yılda SEK 130.000). Bu alan EUR bekliyor; kur varsayımı yapıp sayı
+    // yazmak yerine bilinmiyor bırakıldı — çevrim kararı ve tarihi Eda'nın.
+    tuitionNonEu: undefined,
     tuitionEu: 0,
     livingCostPerYear: 10800,
     applicationSystem: "direct",
     deadline: "01-15",
-    sourceUrl: "https://www.lusem.lu.se/study",
+    sourceUrl:
+      "https://www.lunduniversity.lu.se/study/international-business-bachelors-programme-EGIBU",
     facultyUrl: "https://www.lusem.lu.se/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -1416,7 +1437,9 @@ export const PROGRAMS: Program[] = [
     livingCostPerYear: 9600,
     applicationSystem: "direct",
     deadline: "07-25",
-    sourceUrl: "https://portale.unipv.it/en",
+    // Programın kendi sitesi. Eski link (portale.unipv.it/en) üniversite ana
+    // sayfasıydı ve Cloudflare otomatik isteklere 403 veriyordu.
+    sourceUrl: "https://medicineandsurgeryharvey.cdl.unipv.it/en",
     facultyUrl: "https://portale.unipv.it/en",
     lastChecked: CHECKED,
     verification: "ai-extracted",

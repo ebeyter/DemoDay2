@@ -38,26 +38,35 @@ Bölme mantığı: *dosya sahipliği*. Aynı dosyada iki kişi çalışmazsa mer
 |---|---|
 | `src/data/programs.ts` | **S1** |
 | `src/data/taxonomy.ts` · `src/data/options.ts` | **S1** |
+| `src/data/source-checks.json` | **S1** |
+| `src/lib/freshness.ts` · `src/lib/freshness-data.ts` | **S1** |
+| `src/lib/fetch-page.ts` · `src/lib/claude.ts` | **S1** |
+| `scripts/**` | **S1** |
 | `src/app/api/extract/route.ts` | **S1** |
+| `src/components/FreshnessBadge.tsx` · `ProgramCard.tsx` | **S1** |
 | `src/app/program/[id]/page.tsx` | **S1** |
 | `src/app/compare/page.tsx` | **S1** |
 | `src/lib/matching.ts` | **S2** |
 | `src/lib/store.tsx` · `src/lib/persistent-state.ts` | **S2** |
+| `src/lib/bedrock-chat.ts` | **S2** |
+| `src/app/api/chat/route.ts` | **S2** |
 | `src/app/results/page.tsx` | **S2** |
 | `src/app/timeline/page.tsx` | **S2** |
 | `src/components/AssistantPanel.tsx` | **S2** |
-| `src/app/api/chat/route.ts` | **S2** |
 | `supabase/schema.sql` | **S2** |
 | `tests/**` | **S2** |
 | `src/lib/types.ts` | ortak — **sadece ekleme** |
 | `src/lib/i18n/dictionary.ts` | ortak — **sadece ekleme** |
-| `src/lib/claude.ts` · `src/lib/fetch-page.ts` | ortak — AI altyapısı, önce haber ver |
 | `beyond/README.md` | ortak — sadece kendi bölümün |
 | `src/components/ui.tsx` · `Header.tsx` · `globals.css` | ortak — önce haber ver |
 
-`claude.ts` / `fetch-page.ts` ikisinin de kullandığı AI altyapısı: `extract`
-(S1) ve `chat` (S2) üstünde duruyor. İmzasını değiştiren taraf **karşıya haber
-verir** — sessiz imza değişikliği diğerinin dalını derlenmez hale getirir.
+Kaynak takibi (freshness) eklendikten sonra ayrım **temizleşti**: `fetch-page.ts`
+ve `claude.ts` yalnızca `extract` ile `check-sources` tarafından kullanılıyor
+(ikisi de S1), `bedrock-chat.ts` yalnızca `api/chat` tarafından (S2). Yani
+ortak AI altyapısı kalmadı — sadece `types.ts` ve `dictionary.ts` ortak.
+
+Tek dikkat noktası: **`ProgramCard.tsx` S1'in ama S2'nin `results` sayfasında
+render ediliyor.** Kartın props'unu değiştirirsen Alp'e haber ver.
 
 ### Ortak dosya kuralı
 

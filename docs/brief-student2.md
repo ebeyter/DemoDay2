@@ -120,6 +120,10 @@ Bitti ölçütü:
 
 ### S2-4 · Çıkarılan programı kaydetme
 
+> ⚠️ **Bu görev tamamen düşebilir.** Eda `plan-student1.md` Adım 1'de
+> `/api/extract`'i kaldırmaya karar verirse kaydedilecek bir çıkarım da kalmaz.
+> Ona sormadan başlama.
+
 `/api/extract` listede olmayan bir programın şartlarını canlı çıkarıyor ama
 sonuç sadece gösteriliyor, kayboluyor.
 

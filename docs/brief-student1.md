@@ -2,6 +2,11 @@
 
 Branch: `student1` · Ortak kurallar: [README.md](README.md)
 
+> **Güncel sıra için [plan-student1.md](plan-student1.md)'e bak.** Bu dosya
+> görevlerin *ne* olduğunu ve bitti ölçütlerini tanımlar; plan dosyası hangi
+> sırayla yapılacağını ve depo durumunu tutar. Kaynak takibi eklendikten sonra
+> sıra değişti.
+
 ## Senin sorumluluğun
 
 Beyond'un tek gerçek değeri **güven**. Ürün "%78 kabul edilirsin" demiyor,
@@ -104,6 +109,12 @@ Bitti ölçütü:
 - [ ] Bursu olmayan program ekranı bozulmuyor (alan opsiyonel)
 
 ### S1-3 · Çıkarım çıktısını Program şekline oturt (Alp'e arayüz)
+
+> ⚠️ **Önce [plan-student1.md](plan-student1.md) Adım 1'i karara bağla.**
+> Sohbet Bedrock'a taşındıktan sonra `/api/extract` projedeki tek Anthropic API
+> yolu olarak kaldı ve README artık onu listelemiyor. Eğer o adımda extract'i
+> **kaldırmayı** seçersen bu görev de, Alp'in S2-4'ü de düşer. Karar vermeden
+> buraya yatırım yapma.
 
 Şu an `/api/extract` sonucu sadece gösteriliyor, kataloğa girmiyor. Kalıcı
 kaydetme **Alp'in** işi (`store.tsx`), ama kaydedilecek nesnenin şekli **senin**

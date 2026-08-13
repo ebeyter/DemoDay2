@@ -268,6 +268,25 @@ const tr = {
     noteTitle: "AB-dışı öğrenci olarak dikkat",
   },
 
+  scholarships: {
+    title: "Burslar",
+    openToNonEu: "AB-dışına açık",
+    euOnly: "Yalnızca AB vatandaşları",
+    perYear: "/yıl",
+    amountUnknown: "Tutar kaynakta belirtilmemiş",
+    noneFound: "Bu programda AB-dışı lisans öğrencisine açık burs bulunamadı.",
+    noneFoundNote:
+      "Bu bir tahmin değil: üniversitenin kendi sayfası lisans düzeyinde burs sunmadığını söylüyor. Maliyet planını burssuz yap.",
+    notChecked: "Burs bilgisi henüz araştırılmadı.",
+    kinds: {
+      "tuition-waiver": "Harç muafiyeti",
+      grant: "Nakit burs",
+      merit: "Başarı bursu",
+      "need-based": "İhtiyaç bursu",
+    },
+    sourceLink: "Burs sayfası",
+  },
+
   freshness: {
     changedBadge: "Kaynak sayfa değişti",
     diffBadge: "Katalogla fark var",
@@ -572,6 +591,25 @@ const en: Dictionary = {
 
   countries: {
     noteTitle: "As a non-EU student, note",
+  },
+
+  scholarships: {
+    title: "Scholarships",
+    openToNonEu: "Open to non-EU",
+    euOnly: "EU citizens only",
+    perYear: "/year",
+    amountUnknown: "Amount not stated at source",
+    noneFound: "No scholarship open to non-EU bachelor students was found for this program.",
+    noneFoundNote:
+      "This is not a guess: the university's own page states it offers no scholarships at bachelor level. Plan your budget without one.",
+    notChecked: "Scholarship information has not been researched yet.",
+    kinds: {
+      "tuition-waiver": "Tuition waiver",
+      grant: "Cash grant",
+      merit: "Merit award",
+      "need-based": "Need-based aid",
+    },
+    sourceLink: "Scholarship page",
   },
 
   freshness: {

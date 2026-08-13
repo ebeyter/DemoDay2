@@ -540,14 +540,6 @@ function decideBand(
   // Bir zorunlu şart tamamen kapalıysa ve başka açıklar da varsa erişilmez.
   if (hardMisses <= 1 && misses <= 2) return "reach";
 
-  // Öğrenci tarafında gerçek bir açık YOK; program "erişilemez" görünüyorsa
-  // bunun tek sebebi bizim eksik verimiz. Katalog boşluğu yüzünden öğrenciye
-  // "buraya giremezsin" demek, ürünün yapabileceği en zararlı hata: uydurma
-  // bir yüzde göstermekten farkı yok, sadece ters yönde.
-  if (hardMisses === 0 && softMisses === 0 && unknowns === 0 && dataGaps > 0) {
-    return "reach";
-  }
-
   return "out-of-reach";
 }
 

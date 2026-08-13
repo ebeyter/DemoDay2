@@ -368,10 +368,19 @@ console.log(`✓ ${PROGRAMS.length} kayıt, ihlal yok`);
 
 ### 4 bitti mi?
 
-- [ ] `npm run check-data` geçiyor
-- [ ] Bir kaydı kasten bozdun, betik yakaladı, geri aldın
-- [ ] İhlalde çıkış kodu ≠ 0
-- [ ] `package.json`'a betik eklendi
+- [x] `npm run check:data` geçiyor — 36 kayıt, ihlal yok
+- [x] Bir kaydı kasten bozdun, betik yakaladı, geri aldın — iki tur: önce 6
+      hata (id tekrarı, kök `sourceUrl`, IELTS'e 90, `deadline: "15-01"`,
+      gelecek `lastChecked`, `tuitionNonEu: 0`), sonra kalan kuralları
+      kapatmak için 3 kayda 21 hata daha. Hepsi yakalandı, katalog geri alındı
+- [x] İhlalde çıkış kodu ≠ 0
+- [x] `package.json`'a betik eklendi — betik adı `check:data` (brief'teki ad;
+      bu dosyada `check-data` yazıyordu)
+
+**Betik yazılırken bulunan gerçek:** ilk çalıştırma 6 ihlal verdi ve altısı da
+kuralın hatasıydı — İsveç/Danimarka kayıtlarındaki `tuitionEu: 0` gerçek, AB
+vatandaşı orada harç ödemiyor. Sıfır yasağı yalnızca `tuitionNonEu`'da kaldı;
+orada 0 "Türk öğrenci harç ödemiyor" iddiası olurdu.
 
 ---
 

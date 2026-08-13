@@ -164,9 +164,12 @@ Bitti ölçütü:
 "34 program" ifadesini düzelt — gerçek sayı **36**.
 
 Bitti ölçütü:
-- [ ] `npm run check:data` geçiyor
-- [ ] Kasten bozulan bir kayıtla denendi, betik yakalıyor
-- [ ] README'deki program sayısı ve ülke dağılımı doğru
+- [x] `npm run check:data` geçiyor — `scripts/check-data.mts`, 36 kayıt temiz
+- [x] Kasten bozulan bir kayıtla denendi, betik yakalıyor — iki turda 27 hata
+      enjekte edildi, hepsi yakalandı, çıkış kodu 1
+- [x] README'deki program sayısı ve ülke dağılımı doğru — katalogdan ölçüldü:
+      36 kayıt · 9 ülke (NL 6, DE 5, GB 5, FR 4, IT 4, BE 3, CH 3, DK 3, SE 3) ·
+      7 alan. README zaten 36 diyordu, "34" ifadesi kalmamış
 
 ---
 

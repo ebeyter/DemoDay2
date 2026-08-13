@@ -40,9 +40,8 @@ Bölme mantığı: *dosya sahipliği*. Aynı dosyada iki kişi çalışmazsa mer
 | `src/data/taxonomy.ts` · `src/data/options.ts` | **S1** |
 | `src/data/source-checks.json` | **S1** |
 | `src/lib/freshness.ts` · `src/lib/freshness-data.ts` | **S1** |
-| `src/lib/fetch-page.ts` · `src/lib/claude.ts` | **S1** |
+| `src/lib/fetch-page.ts` | **S1** |
 | `scripts/**` | **S1** |
-| `src/app/api/extract/route.ts` | **S1** |
 | `src/components/FreshnessBadge.tsx` · `ProgramCard.tsx` | **S1** |
 | `src/app/program/[id]/page.tsx` | **S1** |
 | `src/app/compare/page.tsx` | **S1** |
@@ -60,9 +59,9 @@ Bölme mantığı: *dosya sahipliği*. Aynı dosyada iki kişi çalışmazsa mer
 | `beyond/README.md` | ortak — sadece kendi bölümün |
 | `src/components/ui.tsx` · `Header.tsx` · `globals.css` | ortak — önce haber ver |
 
-Kaynak takibi (freshness) eklendikten sonra ayrım **temizleşti**: `fetch-page.ts`
-ve `claude.ts` yalnızca `extract` ile `check-sources` tarafından kullanılıyor
-(ikisi de S1), `bedrock-chat.ts` yalnızca `api/chat` tarafından (S2). Yani
+Kaynak takibi (freshness) eklendikten ve `/api/extract` kaldırıldıktan sonra
+ayrım **temizleşti**: `fetch-page.ts` yalnızca `check-sources` tarafından
+kullanılıyor (S1), `bedrock-chat.ts` yalnızca `api/chat` tarafından (S2). Yani
 ortak AI altyapısı kalmadı — sadece `types.ts` ve `dictionary.ts` ortak.
 
 Tek dikkat noktası: **`ProgramCard.tsx` S1'in ama S2'nin `results` sayfasında

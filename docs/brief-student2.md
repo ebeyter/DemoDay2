@@ -24,12 +24,13 @@ supabase/schema.sql
 tests/                         (yeni) test altyapısı
 ```
 
-`src/lib/claude.ts` ve `src/lib/fetch-page.ts` **ortak AI altyapısı** — Eda'nın
-`extract`'i de kullanıyor. İmzasını değiştirirsen Eda'ya haber ver.
+`src/lib/fetch-page.ts` Eda'nın `check-sources` betiği tarafından kullanılıyor —
+imzasını değiştirirsen Eda'ya haber ver. (`src/lib/claude.ts` `3f8105b` ile
+silindi; ortak AI altyapısı kalmadı.)
 
 ### Dokunmadığın dosyalar
 
-`src/data/*`, `api/extract/route.ts`, `program/[id]/page.tsx`,
+`src/data/*`, `program/[id]/page.tsx`,
 `compare/page.tsx`, `scripts/` → **Eda'nın.**
 Veride hata bulursan kendin düzeltme, Eda'ya söyle.
 
@@ -124,11 +125,18 @@ Bitti ölçütü:
 - [ ] Mevcut başvuru takvimi görünümü bozulmamış
 - [ ] TR/EN dolu
 
-### S2-4 · Çıkarılan programı kaydetme
+### S2-4 · Çıkarılan programı kaydetme — ❌ DÜŞTÜ
 
-> ⚠️ **Bu görev tamamen düşebilir.** Eda `plan-student1.md` Adım 1'de
-> `/api/extract`'i kaldırmaya karar verirse kaydedilecek bir çıkarım da kalmaz.
-> Ona sormadan başlama.
+> **Bu görev yapılmayacak — Eda'ya sormana gerek yok, karar verildi.**
+> `plan-student1.md` Adım 1 **B (kaldır)** yönünde sonuçlandı ve `3f8105b` ile
+> uygulandı: `/api/extract` rotası, `src/lib/claude.ts` ve `@anthropic-ai/*`
+> bağımlılıkları silindi, `AssistantPanel`'deki "Üniversite ekle" sekmesi
+> kaldırıldı. Kaydedilecek bir çıkarım kalmadı.
+>
+> **Bekleme:** Eda'nın S1-3'ü de düştü, yani sana gelecek bir sözleşme tipi
+> **yok**. `store.tsx`'e bu iş için dokunma. Sıran: `S2-1` → `S2-2` → `S2-3`.
+>
+> Aşağısı görevin özgün tanımı, kayıt için duruyor.
 
 `/api/extract` listede olmayan bir programın şartlarını canlı çıkarıyor ama
 sonuç sadece gösteriliyor, kayboluyor.
@@ -154,10 +162,10 @@ Bitti ölçütü:
 
 ## Sıra
 
-`S2-1` → `S2-2` → `S2-3` → `S2-4`.
+`S2-1` → `S2-2` → `S2-3`. ~~`S2-4`~~ düştü.
 
-S2-4 Eda'nın S1-3'üne bağlıydı ama o görev düşmüş olabilir — `/api/extract`
-kaldırıldı, önce Eda'ya sor.
+S2-4 Eda'nın S1-3'üne bağlıydı; `/api/extract` `3f8105b` ile kaldırıldığı için
+ikisi de düştü. Sorman gereken bir şey kalmadı, S2-3'ten sonra durabilirsin.
 
 Vaktin biterse S2-3'ü bırak; **S2-1'i asla bırakma** — test edilmemiş motor
 demonun en büyük riski.
@@ -181,8 +189,8 @@ SAHİP OLDUĞUM DOSYALAR — sadece bunları değiştir:
   src/app/results/page.tsx, src/app/timeline/page.tsx,
   src/components/AssistantPanel.tsx, supabase/schema.sql, tests/
 
-DOKUNMA (Eda'nın): src/data/*, api/extract/route.ts,
-  app/program/[id]/page.tsx, app/compare/page.tsx, scripts/
+DOKUNMA (Eda'nın): src/data/*, app/program/[id]/page.tsx,
+  app/compare/page.tsx, scripts/
 ORTAK (src/lib/types.ts, src/lib/i18n/dictionary.ts): sadece ilgili bloğun
   SONUNA ekleme yap, hiçbir satırı taşıma/yeniden biçimlendirme, ve bu
   değişikliği ayrı commit'e koy.
@@ -198,7 +206,7 @@ DEĞİŞTİRİLEMEZ İLKELER:
   mantığını değiştirme — bir uyuşmazlık bulursan bunu bana bildir, önce
   davranışın hangisi doğru olduğuna karar verelim.
 - Kullanıcıya görünen her metin TR ve EN dolu olacak.
-- Anahtarsız mod çalışmaya devam edecek (Supabase/ANTHROPIC_API_KEY yokken).
+- Anahtarsız mod çalışmaya devam edecek (Supabase/BEDROCK_* yokken).
 
 ÇALIŞMA BİÇİMİ:
 - Önce matching.ts'i baştan sona oku, sonra test yaz. Ne yaptığını varsayma.

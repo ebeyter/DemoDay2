@@ -82,7 +82,22 @@ ve `dictionary.ts` değişti.**
 
 ---
 
-## Adım 1 · `/api/extract` kararı — **~30 dk, ama karar 5 dk**
+## Adım 1 · `/api/extract` kararı — ✅ **KARAR VERİLDİ: B (kaldır)**
+
+> **Sonuç:** `3f8105b temizlik: "Üniversite ekle" sekmesi ve Anthropic
+> bağımlılıkları kaldırıldı` — `/api/extract` rotası (231 satır),
+> `src/lib/claude.ts` (107 satır), `AssistantPanel`'deki sekme çubuğu ve
+> `@anthropic-ai/sdk` · `@anthropic-ai/bedrock-sdk` ·
+> `@aws-sdk/client-bedrock-runtime` bağımlılıkları silindi. Bağımlılıklar beşe
+> indi: Supabase (2), Next, React, React-DOM.
+>
+> Aşağıdaki tabloda tahmin edilenden daha güçlü bir gerekçe çıktı: sorun sadece
+> "iki sağlayıcı" değildi — hesapta hiçbir Anthropic modeline erişim yok (hepsi
+> 403). Yani sekme jüriye demoda değil, **deploy edilen üründe her zaman** demo
+> modu gösterecekti.
+>
+> **Zinciri:** bu karar `brief-student1.md` S1-3'ü ve `brief-student2.md`
+> S2-4'ü düşürdü. İkisi de düşmüş olarak işaretlendi.
 
 Neden şimdi: burada tutarsız bir durum var ve büyümesine izin vermek istemezsin.
 
@@ -114,10 +129,12 @@ Karar senin — ama **kararsız bırakma.** Hangisini seçersen README ile kod a
 şeyi söylemeli.
 
 **Bitti mi?**
-- [ ] Karar verildi ve uygulandı
-- [ ] `grep -rn "api/extract" src/` sonucu koddaki gerçeği yansıtıyor
-- [ ] README'nin "AI nerede çalışıyor" cümlesi doğru
-- [ ] `npm run build` temiz, panel elle denendi
+- [x] Karar verildi ve uygulandı — `3f8105b`
+- [x] `grep -rn "api/extract" src/` sonucu koddaki gerçeği yansıtıyor — boş dönüyor
+- [x] README'nin "AI nerede çalışıyor" cümlesi doğru — `beyond/README.md:21`
+      "AI tek bir yerde çalışıyor: sonuçları yorumlayan soru-cevap paneli"
+- [ ] `npm run build` temiz, panel elle denendi — **panel elle denenmedi**,
+      kaldırma commit'i sonrası sekmesiz panel tarayıcıda açılıp görülmeli
 
 ---
 

@@ -24,7 +24,6 @@ sayfadan veri çıkarma kalitesi.
 src/data/programs.ts          ⭐ ana iş alanı — 36 kayıt
 src/data/taxonomy.ts          ülke, alan, başvuru sistemi tanımları
 src/data/options.ts           sınav ölçekleri
-src/app/api/extract/route.ts  canlı program çıkarımı (Claude + web_fetch)
 src/app/program/[id]/page.tsx program detay ekranı
 src/app/compare/page.tsx      karşılaştırma tahtası
 scripts/                      (yeni) veri doğrulama betikleri
@@ -36,8 +35,9 @@ scripts/                      (yeni) veri doğrulama betikleri
 `AssistantPanel.tsx`, `api/chat/route.ts`, `supabase/schema.sql`, `tests/`
 → **Alp'in.** İhtiyacın olursa kendin değiştirme, söyle.
 
-`src/lib/claude.ts` ve `src/lib/fetch-page.ts` **ortak AI altyapısı** — Alp'in
-`chat`'i de kullanıyor. İmzasını değiştirirsen Alp'e haber ver.
+`src/lib/fetch-page.ts` senin `check-sources` betiğinin sayfa indiricisi; artık
+Alp'in tarafında kullanılmıyor. (`src/lib/claude.ts` `3f8105b` ile silindi —
+ortak AI altyapısı kalmadı, Alp'in `chat`'i `bedrock-chat.ts` üzerinden gidiyor.)
 
 `types.ts` ve `dictionary.ts` ortak → **sadece sona ekleme yap**, ayrı commit.
 
@@ -111,13 +111,21 @@ Bitti ölçütü:
 - [ ] Detay + karşılaştırma ekranlarında görünüyor, TR/EN dolu
 - [ ] Bursu olmayan program ekranı bozulmuyor (alan opsiyonel)
 
-### S1-3 · Çıkarım çıktısını Program şekline oturt (Alp'e arayüz)
+### S1-3 · Çıkarım çıktısını Program şekline oturt (Alp'e arayüz) — ❌ DÜŞTÜ
 
-> ⚠️ **Önce [plan-student1.md](plan-student1.md) Adım 1'i karara bağla.**
-> Sohbet Bedrock'a taşındıktan sonra `/api/extract` projedeki tek Anthropic API
-> yolu olarak kaldı ve README artık onu listelemiyor. Eğer o adımda extract'i
-> **kaldırmayı** seçersen bu görev de, Alp'in S2-4'ü de düşer. Karar vermeden
-> buraya yatırım yapma.
+> **Bu görev yapılmayacak.** Ön koşulu olan [plan-student1.md](plan-student1.md)
+> Adım 1 kararı **B (kaldır)** yönünde verildi ve `3f8105b` ile uygulandı:
+> `/api/extract` rotası, `src/lib/claude.ts` ve `@anthropic-ai/*` bağımlılıkları
+> silindi. Şekle oturtulacak bir çıkarım çıktısı kalmadı.
+>
+> Gerekçe `3f8105b` commit mesajında: hesapta hiçbir Anthropic modeline erişim
+> yok (hepsi 403), yani sekme deploy edilen üründe her zaman "demo modu"
+> gösterecekti. Yerini kaynak takibi doldurdu — AI'sız ve doğrulanabilir.
+>
+> **Alp'e sonucu:** S2-4 de düştü, bkz. [brief-student2.md](brief-student2.md).
+> Bekleyeceği bir sözleşme tipi yok.
+>
+> Aşağısı görevin özgün tanımı, kayıt için duruyor.
 
 Şu an `/api/extract` sonucu sadece gösteriliyor, kataloğa girmiyor. Kalıcı
 kaydetme **Alp'in** işi (`store.tsx`), ama kaydedilecek nesnenin şekli **senin**
@@ -164,7 +172,8 @@ Bitti ölçütü:
 
 ## Sıra
 
-`S1-1` → `S1-2` → `S1-3` → `S1-4`. Vaktin biterse S1-4'ü bırak; **S1-1'i asla
+`S1-1` → `S1-2` → ~~`S1-3`~~ → `S1-4`. S1-3 düştü (yukarı bak), yani kalan iş
+S1-2'den sonra doğrudan S1-4. Vaktin biterse S1-4'ü bırak; **S1-1'i asla
 bırakma**, demonun güvenilirliği ona bağlı.
 
 ---
@@ -182,8 +191,7 @@ gibi) — eğitim verindeki Next.js API'leri güncel olmayabilir.
 
 SAHİP OLDUĞUM DOSYALAR — sadece bunları değiştir:
   src/data/programs.ts, src/data/taxonomy.ts, src/data/options.ts,
-  src/app/api/extract/route.ts, src/app/program/[id]/page.tsx,
-  src/app/compare/page.tsx, scripts/
+  src/app/program/[id]/page.tsx, src/app/compare/page.tsx, scripts/
 
 DOKUNMA (Alp'in): matching.ts, store.tsx, persistent-state.ts,
   results/page.tsx, timeline/page.tsx, AssistantPanel.tsx,

@@ -194,7 +194,11 @@ Her şart dört durumdan birini alır: `met` / `close` (az kaldı) / `unmet` / `
 - **5. adım** — öğrenciyi "olamazsın"dan "şunu yaparsan olursun"a taşıyan yer.
 - **7. adım** — kaynak takibi. Jüriye "verimiz güncel kalıyor" demek yerine gösteriyorsun, üstelik tıklayıp doğrulanabiliyor.
 
-Test edilmiş örnek: **IELTS 6.0 → 7.0** tek değişikliği Güvenli bandı **0'dan 4 programa** çıkarıyor, Zorlayıcı 10'dan 5'e iniyor.
+Test edilmiş örnek (`tests/matching.test.ts`'te gerçek katalogla regresyon
+testi var — kırılırsa CI'da görürsün): 100'lük not ortalaması 90, ülke/alan
+kısıtı yok, ileri düzey matematik+fizik beyan edilmiş bir profilde **IELTS
+6.0 → 7.0** tek değişikliği Güvenli bandı **0'dan 6 programa** çıkarıyor,
+Zorlayıcı 21'den 16'ya iniyor.
 
 ---
 

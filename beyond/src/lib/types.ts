@@ -131,14 +131,32 @@ export interface ExtraRequirement {
   note?: Bilingual;
 }
 
+/**
+ * EKSİK VERİ SÖZLEŞMESİ — "yok" ile "bilmiyoruz" aynı şey değil.
+ *
+ * Üniversite sayfalarının çoğu şartların tamamını yayınlamıyor. Bilinmeyen bir
+ * eşik yerine makul bir sayı yazmak, ürünün asla yapmayacağını söylediği şeydir:
+ * uydurma veriyi gerçek gibi sunmak. O yüzden model bilmemeyi ifade edebiliyor.
+ *
+ *   undefined  → kaynak sayfa bunu söylemiyor. Motor `unknown` üretir; öğrenci
+ *                cezalandırılmaz ve program `safety` bandına DÜŞEMEZ (eşiği
+ *                bilmediğin yerde "rahatça aşıyorsun" demek yanlış olur).
+ *   []         → sayfa açıkça "böyle bir şart yok" diyor. Şart üretilmez.
+ *   0          → ASLA. Sıfır "eşik yok" demektir; eksik veriyi sıfır gibi
+ *                göstermek sessiz bir yalandır.
+ */
 export interface ProgramRequirements {
   /**
    * Türk lise diploma notu (100'lük sistem) cinsinden alt eşik.
    * Diğer sistemlerden gelen notlar bu ölçeğe çevrilerek karşılaştırılır.
+   * undefined = üniversite bir eşik yayınlamıyor.
    */
-  minGpa: number;
-  /** anyOf mantığı: biri yeterli. Boş dizi = dil belgesi istenmiyor. */
-  language: LanguageRequirement[];
+  minGpa?: number;
+  /**
+   * anyOf mantığı: biri yeterli.
+   * [] = sayfa dil belgesi istemediğini söylüyor · undefined = bilinmiyor.
+   */
+  language?: LanguageRequirement[];
   standardizedTests?: StandardizedTestRequirement[];
   requiredSubjects?: SubjectRequirement[];
   extras?: ExtraRequirement[];
@@ -161,10 +179,14 @@ export interface Program {
 
   requirements: ProgramRequirements;
 
-  /** AB DIŞI öğrenci için yıllık harç (EUR). Hedef kitlemiz Türk öğrenci. */
-  tuitionNonEu: number;
+  /**
+   * AB DIŞI öğrenci için yıllık harç (EUR). Hedef kitlemiz Türk öğrenci.
+   * undefined = sayfa AB-dışı harcı belirtmiyor. Bütçe kontrolü bu durumda
+   * hesap yapmaz; "bilinmiyor" gösterir. 0 yazmak "harç yok" demek olur.
+   */
+  tuitionNonEu?: number;
   /** AB vatandaşı için yıllık harç (EUR) — karşılaştırma amaçlı referans. */
-  tuitionEu: number;
+  tuitionEu?: number;
   /** Tahmini yıllık yaşam maliyeti (EUR). */
   livingCostPerYear: number;
 
@@ -249,9 +271,19 @@ export interface StudentProfile {
  * - met      : karşılanıyor
  * - close    : karşılanmıyor ama kapatılabilir mesafede (aksiyon planına girer)
  * - unmet    : karşılanmıyor
- * - unknown  : öğrenci bu bilgiyi girmemiş — eksik veri, ceza değil uyarı
+ * - unknown  : bilinmiyor — ceza değil uyarı. Kimin bilgisi eksik olduğunu
+ *              `unknownReason` söyler; ikisi farklı şeylerdir.
  */
 export type CheckStatus = "met" | "close" | "unmet" | "unknown";
+
+/**
+ * `unknown` neden oluştu?
+ * - "student" : öğrenci bu bilgiyi girmemiş. Girerse çözülür, bizde eksik yok.
+ * - "source"  : üniversite bu şartı yayınlamıyor. Öğrencinin yapabileceği bir
+ *               şey yok, dolayısıyla bu bir eksiklik olarak ONA yazılamaz —
+ *               bandı aşağı çekmemeli. Bizim veri boşluğumuz.
+ */
+export type UnknownReason = "student" | "source";
 
 export interface RequirementCheck {
   id: string;
@@ -262,6 +294,8 @@ export interface RequirementCheck {
   detail: Bilingual;
   /** close/unmet ise ne yapılmalı — eksik analizi ekranını besler. */
   action?: Bilingual;
+  /** Yalnızca status === "unknown" iken anlamlı. */
+  unknownReason?: UnknownReason;
 }
 
 export interface MatchResult {

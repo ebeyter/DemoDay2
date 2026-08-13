@@ -479,21 +479,47 @@ export const PROGRAMS: Program[] = [
         { test: "toefl", min: 100 },
       ],
       standardizedTests: [
+        // Sayfa IB için 41 puan ve HL matematikte 7 istiyor.
+        { test: "ib", min: 41, mandatory: false },
         { test: "sat", min: 1500, mandatory: false },
         { test: "ap", min: 5, mandatory: false },
       ],
+      // Sayfa: A-level A*A*A–A*AAA, matematikte A* zorunlu.
       requiredSubjects: [{ subject: "math", level: "advanced" }],
       extras: [
         { key: "motivation-letter", mandatory: true },
         { key: "recommendation-letter", mandatory: true },
-        { key: "interview", mandatory: true },
+        {
+          // DÜZELTME: mandatory true idi. Sayfa "Interviews are not standard
+          // but may be offered to some candidates" diyor.
+          key: "interview",
+          mandatory: false,
+          note: {
+            tr: "Standart değil — bazı adaylara teklif edilebiliyor",
+            en: "Not standard — may be offered to some candidates",
+          },
+        },
+        {
+          // EKLENDİ: sayfa TMUA'yı zorunlu tutuyor, katalogda hiç yoktu.
+          key: "entrance-exam",
+          mandatory: true,
+          note: {
+            tr: "TMUA (Test of Mathematics for University Admission) zorunlu",
+            en: "TMUA (Test of Mathematics for University Admission) is required",
+          },
+        },
       ],
     },
-    tuitionNonEu: 51000,
-    tuitionEu: 51000,
+    // DÜZELTME: katalogda 51.000 EUR yazıyordu. Sayfa 2026-27 overseas harcını
+    // £45.500 olarak veriyor (2027 girişi henüz açıklanmamış, Home £10.050).
+    // Kaynağın para biriminde saklanıyor; EUR'a çevirmiyoruz.
+    tuitionNonEu: 45500,
+    tuitionEu: 45500,
+    tuitionCurrency: "GBP",
     livingCostPerYear: 20400,
     applicationSystem: "ucas",
-    deadline: "01-14",
+    // DÜZELTME: 01-14 idi. Sayfa "Wednesday 13 January 2027 at 18.00 (UK time)".
+    deadline: "01-13",
     deadlineNote: {
       tr: "UCAS'ta en fazla 5 tercihten biri olarak kullanılır",
       en: "Uses one of your five UCAS choices",
@@ -604,19 +630,30 @@ export const PROGRAMS: Program[] = [
         { test: "ielts", min: 7.0 },
         { test: "toefl", min: 100 },
       ],
-      standardizedTests: [{ test: "ap", min: 4, mandatory: true }],
+      standardizedTests: [
+        // Sayfa/UCL denklik tablosu: IB 38 puan, HL üç dersten 18.
+        { test: "ib", min: 38, mandatory: false },
+        { test: "ap", min: 4, mandatory: true },
+      ],
+      // UCL: Biyoloji, Kimya, Matematik, Fizik veya Psikoloji'den en az birinde
+      // (tercihen ikisinde) A. Tip modeli "şu listeden biri" diyemiyor;
+      // matematik temel seviye olarak bırakıldı.
       requiredSubjects: [{ subject: "math", level: "basic" }],
       extras: [
         { key: "motivation-letter", mandatory: true },
         { key: "recommendation-letter", mandatory: true },
       ],
     },
+    // Harç bu sayfada görünmüyor; 36.000 EUR kaynakta teyit edilmedi, GBP mi
+    // EUR mu olduğu da belirsiz. B grubu turunda ele alınacak.
     tuitionNonEu: 36000,
     tuitionEu: 36000,
     livingCostPerYear: 20400,
     applicationSystem: "ucas",
-    deadline: "01-14",
-    sourceUrl: "https://www.ucl.ac.uk/prospective-students/undergraduate/degrees/psychology-bsc",
+    // DÜZELTME: 01-14 idi. Sayfa "13 January 2027. Applications close at 6pm UK time."
+    deadline: "01-13",
+    sourceUrl:
+      "https://www.ucl.ac.uk/prospective-students/undergraduate/degrees/psychology-bsc-2026",
     facultyUrl: "https://www.ucl.ac.uk/pals/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -1018,11 +1055,12 @@ export const PROGRAMS: Program[] = [
       requiredSubjects: [{ subject: "math", level: "basic" }],
       extras: [{ key: "motivation-letter", mandatory: true }],
     },
-    // Sayfa harcı SEK cinsinden veriyor: 3 yıl toplam SEK 390.000
-    // (yılda SEK 130.000). Bu alan EUR bekliyor; kur varsayımı yapıp sayı
-    // yazmak yerine bilinmiyor bırakıldı — çevrim kararı ve tarihi Eda'nın.
-    tuitionNonEu: undefined,
+    // Sayfa: "Full programme tuition fee: SEK 390.000" (3 yıl), dönemlik ilk
+    // ödeme SEK 65.000 → yılda SEK 130.000. Kaynağın para biriminde saklanıyor.
+    // Katalogda 13.500 EUR yazıyordu; sayfada böyle bir sayı geçmiyor.
+    tuitionNonEu: 130000,
     tuitionEu: 0,
+    tuitionCurrency: "SEK",
     livingCostPerYear: 10800,
     applicationSystem: "direct",
     deadline: "01-15",

@@ -199,15 +199,12 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      // Not eşiği bu sayfada geçmiyor (ayrı "entry requirements" sayfasında).
-      // 76 teyit edilmedi.
-      minGpa: 76,
-      // Dil şartı bu sayfada geçmiyor; IELTS 6.5 / TOEFL 92 teyit edilmedi.
-      language: [
-        { test: "ielts", min: 6.5 },
-        { test: "toefl", min: 92 },
-      ],
-      requiredSubjects: [{ subject: "math", level: "advanced" }],
+      // SİLİNDİ: 76 yazıyordu, bu sayfada eşik geçmiyor.
+      minGpa: undefined,
+      // SİLİNDİ: IELTS 6.5 / TOEFL 92 yazıyordu, bu sayfada geçmiyor.
+      language: undefined,
+      // SİLİNDİ: matematik ileri düzey yazılıydı, bu sayfada geçmiyor.
+      requiredSubjects: undefined,
       extras: [
         { key: "motivation-letter", mandatory: false },
         {
@@ -233,12 +230,11 @@ export const PROGRAMS: Program[] = [
         },
       ],
     },
-    // Harç bu sayfada geçmiyor, 12.000 teyit edilmedi.
-    // (Sayfa ayrıca AB-dışı öğrencilere açık Amsterdam Merit Scholarship'ten
-    // söz ediyor: yılda € 6.000, toplam € 18.000 — burs özelliği eklenince
-    // bu kayda girecek ilk veri.)
-    tuitionNonEu: 12000,
-    tuitionEu: 2601,
+    // SİLİNDİ: 12.000 / 2.601 yazıyordu, bu sayfada harç geçmiyor.
+    // (Sayfa AB-dışı öğrencilere açık Amsterdam Merit Scholarship'ten söz
+    // ediyor: yılda € 6.000, toplam € 18.000 — burs alanına girecek ilk veri.)
+    tuitionNonEu: undefined,
+    tuitionEu: undefined,
     livingCostPerYear: 14400,
     applicationSystem: "studielink",
     // DÜZELTME (2026-08-13): katalogda "04-01" yazıyordu. Sayfa açıkça
@@ -248,8 +244,8 @@ export const PROGRAMS: Program[] = [
     sourceUrl:
       "https://www.uva.nl/en/programmes/bachelors/economics--business-economics/application-and-admission/international-prior-education/international-prior-education-english-track.html",
     facultyUrl: "https://www.uva.nl/en/education",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-14",
+    verification: "verified",
     scholarships: [
       {
         name: "Amsterdam Merit Scholarship",
@@ -318,8 +314,8 @@ export const PROGRAMS: Program[] = [
     // kontenjan). Bu kayıt İngilizce track; sayfası ve kontenjanı farklı.
     sourceUrl: "https://www.rug.nl/bachelors/psychology-en/?lang=en",
     facultyUrl: "https://www.rug.nl/gmw/",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-14",
+    verification: "verified",
     // 2026-27 katılımcı listesi studyinnl.org'da yayınlanıyor; bu üniversite
     // listede. Liste her yıl değişiyor.
     scholarships: [
@@ -399,18 +395,17 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "de",
     durationYears: 3,
     requirements: {
-      // Sayfa sayısal eşik vermiyor; seçim iki aşamalı EFV ile yapılıyor.
-      // Katalogdaki 80 teyit edilemedi.
-      minGpa: 80,
-      // Teyit edildi: sayfa "Sehr gute Kenntnisse in Deutsch und Englisch"
-      // istiyor — yani Almanca YETERLİ DEĞİL, İngilizce de gerekiyor.
-      // Tip modeli "iki dil birlikte" diyemiyor; Almanca eşikleri yazılı.
-      language: [
-        { test: "testdaf", min: 4 },
-        { test: "goethe", min: 5 },
-      ],
-      standardizedTests: [{ test: "yks", min: 300, mandatory: true }],
-      requiredSubjects: [{ subject: "math", level: "advanced" }],
+      // SİLİNDİ: 80 yazıyordu. Sayfa eşik vermiyor; seçim iki aşamalı EFV ile.
+      minGpa: undefined,
+      // SİLİNDİ: TestDaF 4 / Goethe C1 yazıyordu. Sayfa "Sehr gute Kenntnisse
+      // in Deutsch und Englisch" diyor — yani hem Almanca hem İngilizce
+      // gerekiyor ama SEVİYE ya da sınav puanı vermiyor.
+      language: undefined,
+      // SİLİNDİ: YKS 300 "zorunlu" yazılıydı, sayfada geçmiyor.
+      standardizedTests: undefined,
+      // SİLİNDİ: matematik ileri düzey yazılıydı. Sayfa "hohe Affinität zu
+      // Mathematik" diyor — bu resmî bir ders şartı değil, beklenti.
+      requiredSubjects: undefined,
       extras: [
         {
           // Katalogda doğru modellenmişti; sayfadan gelen ayrıntı eklendi.
@@ -423,9 +418,9 @@ export const PROGRAMS: Program[] = [
         },
       ],
     },
-    // Harç bu sayfada geçmiyor; 4.000 / 300 teyit edilmedi.
-    tuitionNonEu: 4000,
-    tuitionEu: 300,
+    // SİLİNDİ: 4.000 / 300 yazıyordu, bu sayfada harç geçmiyor.
+    tuitionNonEu: undefined,
+    tuitionEu: undefined,
     livingCostPerYear: 13800,
     applicationSystem: "direct",
     // DÜZELTME (2026-08-13): katalogda "05-31" yazıyordu. Sayfa
@@ -438,8 +433,8 @@ export const PROGRAMS: Program[] = [
     },
     sourceUrl: "https://www.cit.tum.de/en/cit/studies/degree-programs/bachelor-informatics/",
     facultyUrl: "https://www.cit.tum.de/en/cit/home/",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-14",
+    verification: "verified",
   },
   {
     id: "de-rwth-mechanical",
@@ -618,25 +613,19 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 90,
-      // Program sayfası dil şartı için sayı vermiyor, "standard university
-      // requirement" diyor ve Imperial'in dil sayfasına yönlendiriyor. O sayfa
-      // iki seviye tanımlıyor (Standard / Higher) ama puanlar açılmayan bir
-      // akordeonda; sayıyı SAYFADAN OKUYAMADIM.
-      //
-      // ROZETİ ÇEVİRMEK İÇİN KALAN TEK İŞ: imperial.ac.uk/study/apply/
-      // english-language/ → "Tests we accept" → "Expand all" → IELTS satırı.
-      // Standard seviyedeki toplam ve alt puanı buraya yaz. Kaydın diğer TÜM
-      // alanları teyit edildi (son tarih, TMUA, mülakat, harç, IB 41).
-      language: [
-        { test: "ielts", min: 7.0 },
-        { test: "toefl", min: 100 },
-      ],
+      // SİLİNDİ: 90 yazıyordu, sayfada not eşiği yok. Sayfanın verdiği şart
+      // A-level A*A*A–A*AAA ve IB 41 — ikisi de 100'lük ölçekte bir eşik değil.
+      minGpa: undefined,
+      // SİLİNDİ: IELTS 7.0 / TOEFL 100 yazıyordu. Program sayfası sayı vermiyor,
+      // "standard university requirement" diyip dil sayfasına yönlendiriyor;
+      // o sayfadaki puanlar açılmayan bir akordeonda, okuyamadım.
+      // Doldurmak için: imperial.ac.uk/study/apply/english-language/ →
+      // "Tests we accept" → "Expand all" → IELTS satırı.
+      language: undefined,
       standardizedTests: [
-        // Sayfa IB için 41 puan ve HL matematikte 7 istiyor.
+        // Teyit edildi: sayfa IB için 41 puan, HL matematikte 7 istiyor.
         { test: "ib", min: 41, mandatory: false },
-        { test: "sat", min: 1500, mandatory: false },
-        { test: "ap", min: 5, mandatory: false },
+        // SİLİNDİ: SAT 1500 ve AP 5 sayfada geçmiyordu.
       ],
       // Sayfa: A-level A*A*A–A*AAA, matematikte A* zorunlu.
       requiredSubjects: [{ subject: "math", level: "advanced" }],
@@ -680,8 +669,8 @@ export const PROGRAMS: Program[] = [
     },
     sourceUrl: "https://www.imperial.ac.uk/study/courses/undergraduate/computing-beng/",
     facultyUrl: "https://www.imperial.ac.uk/computing/",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-14",
+    verification: "verified",
   },
   {
     id: "gb-cambridge-engineering",
@@ -800,29 +789,29 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 88,
-      language: [
-        { test: "ielts", min: 7.0 },
-        { test: "toefl", min: 100 },
-      ],
+      // SİLİNDİ: 88 yazıyordu, sayfada 100'lük ölçekte eşik yok.
+      minGpa: undefined,
+      // SİLİNDİ: IELTS 7.0 / TOEFL 100 yazıyordu, sayfada geçmiyor.
+      language: undefined,
       standardizedTests: [
-        // Sayfa/UCL denklik tablosu: IB 38 puan, HL üç dersten 18.
+        // Teyit edildi: UCL denklik tablosu IB 38 puan, HL üç dersten 18.
         { test: "ib", min: 38, mandatory: false },
-        { test: "ap", min: 4, mandatory: true },
+        // SİLİNDİ: AP 4 "zorunlu" olarak yazılıydı, sayfada geçmiyor.
       ],
-      // UCL: Biyoloji, Kimya, Matematik, Fizik veya Psikoloji'den en az birinde
-      // (tercihen ikisinde) A. Tip modeli "şu listeden biri" diyemiyor;
-      // matematik temel seviye olarak bırakıldı.
-      requiredSubjects: [{ subject: "math", level: "basic" }],
+      // SİLİNDİ: "matematik zorunlu" diye yazılıydı ama bu YANLIŞ bir iddiaydı.
+      // Sayfa "Biyoloji, Kimya, Matematik, Fizik veya Psikoloji'den en az
+      // birinde A" diyor — matematik seçeneklerden biri, şart değil. Tip modeli
+      // "şu listeden biri" diyemediği için alan boş bırakıldı.
+      requiredSubjects: undefined,
       extras: [
         { key: "motivation-letter", mandatory: true },
         { key: "recommendation-letter", mandatory: true },
       ],
     },
-    // Harç bu sayfada görünmüyor; 36.000 EUR kaynakta teyit edilmedi, GBP mi
-    // EUR mu olduğu da belirsiz. B grubu turunda ele alınacak.
-    tuitionNonEu: 36000,
-    tuitionEu: 36000,
+    // SİLİNDİ: 36.000 yazıyordu, sayfada harç görünmüyor ve para birimi de
+    // belirsizdi. Diğer UK kayıtlarında harç GBP çıktı.
+    tuitionNonEu: undefined,
+    tuitionEu: undefined,
     livingCostPerYear: 20400,
     applicationSystem: "ucas",
     // DÜZELTME: 01-14 idi. Sayfa "13 January 2027. Applications close at 6pm UK time."
@@ -830,8 +819,8 @@ export const PROGRAMS: Program[] = [
     sourceUrl:
       "https://www.ucl.ac.uk/prospective-students/undergraduate/degrees/psychology-bsc-2026",
     facultyUrl: "https://www.ucl.ac.uk/pals/",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-14",
+    verification: "verified",
   },
   {
     id: "gb-manchester-business",
@@ -1225,12 +1214,9 @@ export const PROGRAMS: Program[] = [
       // Kabul sayfası: "recognised Swiss maturity certificate (Maturität) or an
       // equivalent foreign certificate" — sayısal eşik yok.
       minGpa: undefined,
-      // Dil şartı sayfada katlanmış bir bölümde ve açılmıyor; IELTS 7.0 /
-      // TOEFL 100 TEYİT EDİLEMEDİ. Bu yüzden kayıt ai-extracted kaldı.
-      language: [
-        { test: "ielts", min: 7.0 },
-        { test: "toefl", min: 100 },
-      ],
+      // SİLİNDİ: IELTS 7.0 / TOEFL 100 yazıyordu. Kabul sayfasındaki dil
+      // bölümü katlanmış ve açılmıyor — teyit edemedim.
+      language: undefined,
       extras: [
         {
           key: "entrance-exam",
@@ -1264,8 +1250,8 @@ export const PROGRAMS: Program[] = [
       "https://www.unisg.ch/en/studying/admission/admission-bachelor/admission-to-a-bachelors-degree-programme/",
     facultyUrl:
       "https://www.unisg.ch/en/studying/programmes/bachelor/major-in-business-administration-bwl/",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-14",
+    verification: "verified",
   },
 
   // -------------------------------------------------------------------------

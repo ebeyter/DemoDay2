@@ -9,7 +9,8 @@
     "lint": "eslint",
     "check:data": "tsx scripts/check-data.mts",
     "check-sources": "tsx scripts/check-sources.mts",
-    "check-demo": "tsx scripts/check-demo.mts"
+    "check-demo": "tsx scripts/check-demo.mts",
+    "check-data": "tsx scripts/check-data.mts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

@@ -18,7 +18,7 @@ const BAND_ORDER: Band[] = ["match", "reach", "safety", "out-of-reach"];
 
 export default function ResultsPage() {
   const { t, locale, pick } = useLocale();
-  const { profile, status } = useStore();
+  const { profile, status, scenarios, saveScenario, deleteScenario } = useStore();
   const router = useRouter();
 
   // --- Senaryo modu -------------------------------------------------------
@@ -29,6 +29,7 @@ export default function ResultsPage() {
   const [scenarioBudget, setScenarioBudget] = useState<number | null | undefined>(undefined);
   const [showOutOfReach, setShowOutOfReach] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [scenarioName, setScenarioName] = useState("");
 
   const scenarioActive =
     scenarioFields !== null || scenarioCountries !== null || scenarioBudget !== undefined;
@@ -39,8 +40,22 @@ export default function ResultsPage() {
     setScenarioBudget(undefined);
   }
 
+  function applyScenario(saved: (typeof scenarios)[number]) {
+    setScenarioFields(saved.fields.length > 0 ? saved.fields : null);
+    setScenarioCountries(saved.countries.length > 0 ? saved.countries : null);
+    setScenarioBudget(saved.maxTuition === null ? undefined : saved.maxTuition);
+    setPanelOpen(true);
+  }
+
   useEffect(() => {
-    if (status !== "loading" && !profile) router.replace("/profile");
+    if (status === "loading" || profile) return;
+    // localStorage'dan hidrasyon bir-iki render sürebiliyor (bkz. persistent-state.ts,
+    // useSyncExternalStore sunucu snapshot'ıyla eşleşmek için önce fallback döner).
+    // Hemen yönlendirmek, profil aslında var olsa bile hard refresh'te kullanıcıyı
+    // /profile'a fırlatıyordu. setTimeout(0) mevcut render dizisinin bitmesini
+    // bekliyor; profil bu sırada gelirse effect yeniden çalışıp temizler.
+    const timer = setTimeout(() => router.replace("/profile"), 0);
+    return () => clearTimeout(timer);
   }, [profile, status, router]);
 
   const results = useMemo(() => {
@@ -65,6 +80,21 @@ export default function ResultsPage() {
   const activeFields = scenarioFields ?? profile.fields;
   const activeCountries = scenarioCountries ?? profile.targetCountries;
   const activeBudget = scenarioBudget === undefined ? profile.maxTuition : scenarioBudget;
+
+  async function handleSaveScenario() {
+    const name = scenarioName.trim();
+    if (!name) return;
+    // Dokunulmamış kontroller de dahil, panelde o an GÖSTERİLEN durumu kaydediyoruz
+    // (scenario* state'i değil) — yoksa "sadece ülkeyi değiştirdim" senaryosu
+    // profildeki alan kısıtını sessizce kaybedip "tüm alanlar"a döner.
+    await saveScenario({
+      name,
+      fields: activeFields,
+      countries: activeCountries,
+      maxTuition: activeBudget ?? null,
+    });
+    setScenarioName("");
+  }
 
   return (
     <>
@@ -212,6 +242,63 @@ export default function ResultsPage() {
                   <Button variant="ghost" size="sm" onClick={resetScenario}>
                     ↺ {t.results.scenarioReset}
                   </Button>
+                )}
+              </div>
+
+              {/* -------------------------------------------------------
+                  Senaryo kaydet / kayıtlıları geri yükle
+                  ------------------------------------------------------- */}
+              <div className="border-t border-line pt-4 space-y-3">
+                <p className="text-[12px] font-medium uppercase tracking-wider text-ink-faint">
+                  {t.results.scenarioSaveLabel}
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <input
+                    type="text"
+                    value={scenarioName}
+                    onChange={(e) => setScenarioName(e.target.value)}
+                    placeholder={t.results.scenarioNamePlaceholder}
+                    maxLength={60}
+                    className="flex-1 min-w-[200px] rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-accent-line"
+                  />
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleSaveScenario}
+                    disabled={scenarioName.trim().length === 0}
+                  >
+                    {t.results.scenarioSaveButton}
+                  </Button>
+                </div>
+
+                {scenarios.length > 0 && (
+                  <div className="space-y-2 pt-1">
+                    <p className="text-[12px] font-medium uppercase tracking-wider text-ink-faint">
+                      {t.results.savedScenariosTitle}
+                    </p>
+                    <ul className="space-y-1.5">
+                      {scenarios.map((saved) => (
+                        <li
+                          key={saved.id}
+                          className="flex items-center justify-between gap-3 rounded-lg border border-line px-3 py-2"
+                        >
+                          <span className="text-sm text-ink truncate">{saved.name}</span>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <Button variant="ghost" size="sm" onClick={() => applyScenario(saved)}>
+                              {t.results.scenarioApply}
+                            </Button>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => deleteScenario(saved.id)}
+                            >
+                              {t.results.scenarioDelete}
+                            </Button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
               </div>
             </div>

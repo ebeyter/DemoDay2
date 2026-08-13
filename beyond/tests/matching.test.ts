@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildGapPlan, evaluateProgram, matchAll, toHundredScale } from "@/lib/matching";
+import { PROGRAMS } from "@/data/programs";
 import type { MatchResult } from "@/lib/types";
 import { makeProfile, makeProgram } from "./fixtures";
 
@@ -617,5 +618,58 @@ describe("buildGapPlan", () => {
 
     const plan = buildGapPlan([unmetResult, unknownResult, closeResult]);
     expect(plan.map((g) => g.severity)).toEqual(["close", "unknown", "unmet"]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// README regresyon senaryosu — gerçek katalogla
+// ---------------------------------------------------------------------------
+
+describe("README demo senaryosu — gerçek katalogla regresyon", () => {
+  // README'nin "Test edilmiş örnek" cümlesindeki profil: not ortalaması 90/100,
+  // ülke/alan kısıtı yok (tüm katalog taranıyor), ileri düzey matematik+fizik
+  // beyan edilmiş. Bu test kırılırsa README'deki cümle de artık doğru değil —
+  // ikisini birlikte güncelle.
+  //
+  // Not: README'nin önceki hâlinde "Güvenli 0'dan 4'e, Zorlayıcı 10'dan 5'e"
+  // yazıyordu; bu sayıları üreten profili bulamadık (300'den fazla gpa/alan/
+  // ülke kombinasyonu denendi). Sayılar muhtemelen bir önceki katalog
+  // sürümüyle (Eda'nın veri doğrulama/kaynak takibi commit'lerinden önce)
+  // elle denenmiş ve hiç testle sabitlenmemişti. Burada gerçek katalogla
+  // hesaplanan, tekrarlanabilir bir senaryo kullanıyoruz.
+  function demoProfile(ielts: number) {
+    return makeProfile({
+      gpa: 90,
+      gpaScale: "100",
+      fields: [],
+      targetCountries: [],
+      languageTests: [{ test: "ielts", score: ielts }],
+      advancedSubjects: ["math", "physics"],
+    });
+  }
+
+  function bandCounts(ielts: number) {
+    const results = matchAll(PROGRAMS, demoProfile(ielts));
+    const counts: Record<string, number> = { match: 0, reach: 0, safety: 0 };
+    for (const r of results) counts[r.band] = (counts[r.band] ?? 0) + 1;
+    return counts;
+  }
+
+  it("IELTS 6.0 iken Güvenli bandı boş, Zorlayıcı 21 program içerir", () => {
+    const counts = bandCounts(6.0);
+    expect(counts.safety).toBe(0);
+    expect(counts.reach).toBe(21);
+    expect(counts.match).toBe(2);
+  });
+
+  it("IELTS 6.0'dan 7.0'a çıkınca Güvenli 0'dan 6 programa çıkar, Zorlayıcı 21'den 16'ya iner", () => {
+    const before = bandCounts(6.0);
+    const after = bandCounts(7.0);
+
+    expect(after.safety).toBe(6);
+    expect(after.reach).toBe(16);
+
+    expect(after.safety - before.safety).toBe(6);
+    expect(before.reach - after.reach).toBe(5);
   });
 });

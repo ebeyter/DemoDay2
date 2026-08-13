@@ -40,15 +40,16 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 80,
+      // TU Delft uluslararası diplomalar için SAYISAL BİR ORTALAMA EŞİĞİ
+      // yayınlamıyor; denklik VWO standardına göre tek tek değerlendiriliyor.
+      // Bağlayıcı olan şey ders şartı (Mathematics B), ortalama değil.
       language: [
         { test: "ielts", min: 6.5 },
         { test: "toefl", min: 90 },
       ],
-      requiredSubjects: [
-        { subject: "math", level: "advanced" },
-        { subject: "physics", level: "basic" },
-      ],
+      // Programın kendi şart sayfasında yalnızca "Mathematics B" listeleniyor;
+      // fizik şartı YOK (katalogda yanlışlıkla duruyordu).
+      requiredSubjects: [{ subject: "math", level: "advanced" }],
       extras: [
         {
           key: "numerus-fixus",
@@ -61,7 +62,8 @@ export const PROGRAMS: Program[] = [
         { key: "motivation-letter", mandatory: true },
       ],
     },
-    tuitionNonEu: 20800,
+    // Kurumsal tarife (AB-dışı) 2026-27: 18.175 EUR. Katalogda 20.800 yazıyordu.
+    tuitionNonEu: 18175,
     tuitionEu: 2601,
     livingCostPerYear: 13200,
     applicationSystem: "studielink",
@@ -73,7 +75,7 @@ export const PROGRAMS: Program[] = [
     sourceUrl: "https://www.tudelft.nl/en/education/programmes/bachelors",
     facultyUrl: "https://www.tudelft.nl/en/eemcs",
     lastChecked: CHECKED,
-    verification: "ai-extracted",
+    verification: "verified",
   },
   {
     id: "nl-tue-mechanical",

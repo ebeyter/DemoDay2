@@ -1,26 +1,28 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
+import { describeClaudeError, getClaude } from "@/lib/claude";
+import { PageFetchError, fetchPageText } from "@/lib/fetch-page";
 
 /**
  * Beyond — canlı program çıkarımı.
  *
- * Öğrenci bir üniversite programının sayfasını yapıştırır; Claude sayfayı
- * okur ve şartları yapılandırılmış veriye çevirir. Aynı pipeline hem
- * katalogdaki seed veriyi üretti hem de burada canlı çalışıyor.
+ * Öğrenci bir üniversite programının sayfasını yapıştırır; sayfayı sunucudan
+ * indirip metne çeviriyor, sonra Claude'a yapılandırılmış veriye dönüştürtüyoruz.
  *
- * ÇİFT MOD: ANTHROPIC_API_KEY yoksa hazırlanmış bir örnek sonuç döner ve
- * yanıtta demoMode=true olarak işaretlenir. Arayüz bunu açıkça gösterir —
- * demo modunu canlı AI gibi sunmak yanıltıcı olur.
+ * Sayfayı Claude'un `web_fetch` aracıyla değil kendimiz indiriyoruz: o araç
+ * Amazon Bedrock'ta mevcut değil. Böylece akış Bedrock'ta da Anthropic API'de
+ * de birebir aynı çalışıyor.
+ *
+ * ÇİFT MOD: hiçbir sağlayıcı yapılandırılmamışsa hazırlanmış bir örnek sonuç
+ * döner ve yanıtta demoMode=true olarak işaretlenir. Arayüz bunu açıkça
+ * gösterir — demo modunu canlı AI gibi sunmak yanıltıcı olur.
  */
 
 export const maxDuration = 120;
 
-const MODEL = "claude-opus-5";
-
 /**
- * Çıkarımın hedef şeması. `strict: true` ile Claude'un tam olarak bu
- * yapıyı üretmesi garanti altına alınıyor — serbest metni sonradan
- * ayrıştırmaya çalışmaktan çok daha güvenilir.
+ * Çıkarımın hedef şeması. Yapılandırılmış çıktı (output_config.format) ile
+ * Claude'un tam olarak bu yapıyı üretmesi garanti altına alınıyor — serbest
+ * metni sonradan ayrıştırmaya çalışmaktan çok daha güvenilir.
  */
 const PROGRAM_SCHEMA = {
   type: "object" as const,
@@ -101,16 +103,17 @@ const PROGRAM_SCHEMA = {
   additionalProperties: false,
 };
 
-const SYSTEM_PROMPT = `Sen bir üniversite başvuru şartları çıkarım aracısın. Verilen sayfayı web_fetch ile oku ve lisans programının başvuru şartlarını yapılandırılmış veriye çevir.
+const SYSTEM_PROMPT = `Sen bir üniversite başvuru şartları çıkarım aracısın. Sana bir üniversite sayfasının düz metne çevrilmiş hali veriliyor. Bu metinden lisans programının başvuru şartlarını yapılandırılmış veriye çevir.
 
 Kurallar:
-- SADECE sayfada açıkça yazan bilgiyi aktar. Bulamadığın alanı boş bırak; asla tahmin etme veya genel bilgiden doldurma.
-- Harç bilgisinde AB-dışı (non-EU / international) tarifeyi ara. Sayfada sadece AB tarifesi varsa bunu notes'ta belirt.
-- Sayfa bir program sayfası değilse (ana sayfa, haber, liste sayfası) found=false döndür ve notes'ta ne bulduğunu açıkla.
+- SADECE metinde açıkça yazan bilgiyi aktar. Bulamadığın alanı boş bırak; asla tahmin etme veya genel bilgiden doldurma.
+- Harç bilgisinde AB-dışı (non-EU / international) tarifeyi ara. Metinde sadece AB tarifesi varsa bunu notes'ta belirt.
+- Metin bir program sayfası değilse (ana sayfa, haber, liste sayfası) found=false döndür ve notes'ta ne bulduğunu açıkla.
+- Sayfa kırpıldıysa ve şartlar görünmüyorsa bunu notes'ta söyle.
 - notes alanını her zaman doldur: hangi bilgiyi bulamadığını ve öğrencinin nereye bakması gerektiğini yaz.
 - Türkçe yaz (program ve üniversite adları hariç, onlar kaynak dilinde kalsın).`;
 
-/** Anahtar yokken dönen örnek sonuç. Arayüz bunu "demo modu" olarak etiketler. */
+/** Sağlayıcı yokken dönen örnek sonuç. Arayüz bunu "demo modu" olarak etiketler. */
 const DEMO_RESULT = {
   found: true,
   university: "Aalto University",
@@ -135,7 +138,7 @@ const DEMO_RESULT = {
   deadlineNote: "Ocak başvuru dönemi — genelde Ocak ortasında kapanıyor",
   applicationSystem: "Doğrudan (Studyinfo.fi)",
   notes:
-    "Bu bir DEMO MODU sonucudur — gerçek bir sayfa okunmadı. ANTHROPIC_API_KEY tanımlandığında bu akış girilen bağlantıyı canlı olarak okur.",
+    "Bu bir DEMO MODU sonucudur — gerçek bir sayfa okunmadı. Bedrock veya Anthropic anahtarı tanımlandığında bu akış girilen bağlantıyı canlı olarak okur.",
 };
 
 export async function POST(request: Request) {
@@ -151,49 +154,49 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Bir bağlantı gerekiyor." }, { status: 400 });
   }
 
-  // Basit doğrulama — kullanıcı bir sayfa adresi yapıştırmalı.
-  let parsed: URL;
-  try {
-    parsed = new URL(url.startsWith("http") ? url : `https://${url}`);
-  } catch {
-    return NextResponse.json(
-      { error: "Bu bir geçerli web adresi gibi görünmüyor." },
-      { status: 400 }
-    );
-  }
-
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const claude = getClaude();
 
   // --- Demo modu -----------------------------------------------------------
-  if (!apiKey) {
-    // Küçük bir gecikme: arayüzün yükleniyor durumunu göstermesi için.
+  if (!claude) {
     await new Promise((resolve) => setTimeout(resolve, 900));
-    return NextResponse.json({ demoMode: true, program: DEMO_RESULT, sourceUrl: parsed.href });
+    return NextResponse.json({ demoMode: true, program: DEMO_RESULT, sourceUrl: url });
   }
 
-  // --- Canlı çıkarım -------------------------------------------------------
-  const client = new Anthropic({ apiKey });
-
+  // --- 1. Sayfayı indir ----------------------------------------------------
+  let page;
   try {
-    const response = await client.beta.messages.create({
-      model: MODEL,
+    page = await fetchPageText(url);
+  } catch (error) {
+    if (error instanceof PageFetchError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+    return NextResponse.json({ error: "Sayfa okunamadı." }, { status: 502 });
+  }
+
+  // --- 2. Metni yapılandırılmış veriye çevir -------------------------------
+  try {
+    const response = await claude.client.messages.create({
+      model: claude.model,
       max_tokens: 8000,
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
       system: SYSTEM_PROMPT,
       thinking: { type: "adaptive" },
       output_config: {
         effort: "medium",
-        format: {
-          type: "json_schema",
-          schema: PROGRAM_SCHEMA,
-        },
+        format: { type: "json_schema", schema: PROGRAM_SCHEMA },
       },
-      tools: [{ type: "web_fetch_20260209", name: "web_fetch", max_uses: 4 }],
       messages: [
         {
           role: "user",
-          content: `Bu sayfadaki lisans programının başvuru şartlarını çıkar: ${parsed.href}`,
+          content: [
+            {
+              type: "text",
+              text:
+                `Sayfa adresi: ${page.url}\n` +
+                `Sayfa başlığı: ${page.title || "(yok)"}\n` +
+                (page.truncated ? "NOT: Sayfa uzun olduğu için metin kırpıldı.\n" : "") +
+                `\n--- SAYFA METNİ ---\n${page.text}`,
+            },
+          ],
         },
       ],
     });
@@ -206,36 +209,23 @@ export async function POST(request: Request) {
       );
     }
 
-    const textBlock = response.content.find(
-      (block): block is Anthropic.Beta.BetaTextBlock => block.type === "text"
-    );
-
-    if (!textBlock) {
+    const textBlock = response.content.find((block) => block.type === "text");
+    if (!textBlock || textBlock.type !== "text") {
       return NextResponse.json(
-        { error: "Sayfa okunabildi ama yapılandırılmış sonuç üretilemedi." },
+        { error: "Sayfa okundu ama yapılandırılmış sonuç üretilemedi." },
         { status: 502 }
       );
     }
 
-    const program = JSON.parse(textBlock.text);
-    return NextResponse.json({ demoMode: false, program, sourceUrl: parsed.href });
+    return NextResponse.json({
+      demoMode: false,
+      provider: claude.provider,
+      program: JSON.parse(textBlock.text),
+      sourceUrl: page.url,
+    });
   } catch (error) {
-    if (error instanceof Anthropic.RateLimitError) {
-      return NextResponse.json(
-        { error: "Şu an çok yoğunuz, birkaç saniye sonra tekrar dene." },
-        { status: 429 }
-      );
-    }
-    if (error instanceof Anthropic.AuthenticationError) {
-      return NextResponse.json(
-        { error: "API anahtarı geçersiz. .env.local dosyasını kontrol et." },
-        { status: 401 }
-      );
-    }
-    console.error("[extract] beklenmeyen hata:", error);
-    return NextResponse.json(
-      { error: "Sayfa okunamadı. Bağlantı erişilebilir mi, kontrol eder misin?" },
-      { status: 502 }
-    );
+    console.error("[extract] model hatası:", error);
+    const { message, status } = describeClaudeError(error);
+    return NextResponse.json({ error: message }, { status });
   }
 }

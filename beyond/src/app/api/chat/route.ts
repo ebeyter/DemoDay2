@@ -1,5 +1,10 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
+import {
+  describeBedrockError,
+  getBedrockChatConfig,
+  streamBedrockChat,
+  type ChatTurn,
+} from "@/lib/bedrock-chat";
 
 /**
  * Beyond — profil-bilir asistan.
@@ -8,13 +13,16 @@ import { NextResponse } from "next/server";
  * yorumlar. Eşleştirme kararlarını ASLA yeniden hesaplamaz — o iş deterministik
  * motorda; asistanın işi motorun çıktısını açıklamak.
  *
- * ÇİFT MOD: ANTHROPIC_API_KEY yoksa hazır bir cevap döner ve demoMode=true
- * başlığıyla işaretlenir.
+ * Amazon Bedrock'un Converse API'si üzerinden çalışıyor: model bağımsız, yani
+ * hesapta erişimin olan herhangi bir model (Gemma, Llama, Claude…) iş görür.
+ * Sohbet sadece metin girip metin aldığı için yapılandırılmış çıktıya ihtiyaç
+ * duymuyor — katalog senkronu ise AI kullanmıyor (değişiklik dedektörü).
+ *
+ * ÇİFT MOD: Bedrock yapılandırılmamışsa hazır bir cevap döner ve
+ * demoMode başlığıyla işaretlenir.
  */
 
 export const maxDuration = 120;
-
-const MODEL = "claude-opus-5";
 
 const SYSTEM_PROMPT = `Sen Beyond'un asistanısın. Beyond, lise öğrencilerinin Avrupa ve İngiltere'deki üniversite programlarını kendi profillerine göre değerlendirmesine yardım eden bir araç.
 
@@ -37,12 +45,32 @@ En pratik hamle şu: IELTS puanını yarım basamak yükseltmek. Bu tek adım Zo
 
 Bütçe tarafında dikkat etmen gereken şey harçtan çok yaşam maliyeti: İsviçre'de harç çok düşük ama Zürih'in yaşam maliyeti listenin en yükseği. Hollanda ve Almanya bu ikisinin toplamında daha dengeli duruyor.
 
-_ANTHROPIC_API_KEY tanımlandığında bu panel gerçek zamanlı cevap verir._`;
+_Bedrock ayarları .env.local'a girilince bu panel gerçek zamanlı cevap verir._`;
 
 interface ChatRequest {
-  messages: { role: "user" | "assistant"; content: string }[];
+  messages: ChatTurn[];
   /** Uygulamanın hesapladığı bağlam — asistan bunu yorumlar, üretmez. */
   context: string;
+}
+
+function streamText(text: string, demoMode: boolean, delayMs = 18): Response {
+  const encoder = new TextEncoder();
+  const words = text.split(" ");
+  const stream = new ReadableStream({
+    async start(controller) {
+      for (const word of words) {
+        controller.enqueue(encoder.encode(word + " "));
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+      controller.close();
+    },
+  });
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "X-Beyond-Demo-Mode": String(demoMode),
+    },
+  });
 }
 
 export async function POST(request: Request) {
@@ -58,101 +86,41 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Bir mesaj gerekiyor." }, { status: 400 });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const config = getBedrockChatConfig();
 
   // --- Demo modu -----------------------------------------------------------
-  if (!apiKey) {
-    const encoder = new TextEncoder();
-    const words = DEMO_REPLY.split(" ");
-    const stream = new ReadableStream({
-      async start(controller) {
-        // Kelime kelime akıtmak demo modunda da canlı bir his veriyor.
-        for (const word of words) {
-          controller.enqueue(encoder.encode(word + " "));
-          await new Promise((resolve) => setTimeout(resolve, 18));
-        }
-        controller.close();
-      },
-    });
-    return new Response(stream, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "X-Beyond-Demo-Mode": "true",
-      },
-    });
+  if (!config) {
+    return streamText(DEMO_REPLY, true);
   }
 
   // --- Canlı asistan -------------------------------------------------------
-  const client = new Anthropic({ apiKey });
+  const system = body.context
+    ? `${SYSTEM_PROMPT}\n\n<ogrenci_verisi>\n${body.context}\n</ogrenci_verisi>\n\nYukarıdaki veri uygulamanın hesapladığı sonuçlardır. Cevaplarını buna dayandır.`
+    : `${SYSTEM_PROMPT}\n\nÖğrenci henüz profilini doldurmamış. Önce profilini oluşturmasını öner.`;
 
-  const contextBlock = body.context
-    ? `<ogrenci_verisi>\n${body.context}\n</ogrenci_verisi>\n\nYukarıdaki veri uygulamanın hesapladığı sonuçlardır. Cevaplarını buna dayandır.`
-    : "Öğrenci henüz profilini doldurmamış. Önce profilini oluşturmasını öner.";
-
-  try {
-    const anthropicStream = client.beta.messages.stream({
-      model: MODEL,
-      max_tokens: 2000,
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
-      system: [
-        { type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } },
-        { type: "text", text: contextBlock },
-      ],
-      thinking: { type: "adaptive" },
-      output_config: { effort: "low" },
-      messages: messages.map((message) => ({
-        role: message.role,
-        content: message.content,
-      })),
-    });
-
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const event of anthropicStream) {
-            if (
-              event.type === "content_block_delta" &&
-              event.delta.type === "text_delta"
-            ) {
-              controller.enqueue(encoder.encode(event.delta.text));
-            }
-          }
-
-          const finalMessage = await anthropicStream.finalMessage();
-          if (finalMessage.stop_reason === "refusal") {
-            controller.enqueue(
-              encoder.encode(
-                "\n\nBu soruyu cevaplayamıyorum. Başka bir şekilde sorar mısın?"
-              )
-            );
-          }
-        } catch (error) {
-          console.error("[chat] akış hatası:", error);
-          controller.enqueue(
-            encoder.encode("\n\n_Bağlantı kesildi. Tekrar dener misin?_")
-          );
-        } finally {
-          controller.close();
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        for await (const chunk of streamBedrockChat(config, system, messages)) {
+          controller.enqueue(encoder.encode(chunk));
         }
-      },
-    });
+      } catch (error) {
+        console.error("[chat] Bedrock hatası:", error);
+        // Akış başlamış olabileceği için HTTP durumu değiştiremeyiz;
+        // hatayı okunur bir not olarak akışa yazıyoruz.
+        controller.enqueue(encoder.encode(`\n\n_${describeBedrockError(error)}_`));
+      } finally {
+        controller.close();
+      }
+    },
+  });
 
-    return new Response(stream, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "X-Beyond-Demo-Mode": "false",
-      },
-    });
-  } catch (error) {
-    if (error instanceof Anthropic.AuthenticationError) {
-      return NextResponse.json(
-        { error: "API anahtarı geçersiz. .env.local dosyasını kontrol et." },
-        { status: 401 }
-      );
-    }
-    console.error("[chat] beklenmeyen hata:", error);
-    return NextResponse.json({ error: "Asistan şu an cevap veremiyor." }, { status: 502 });
-  }
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "X-Beyond-Demo-Mode": "false",
+      "X-Beyond-Model": config.modelId,
+    },
+  });
 }

@@ -999,7 +999,11 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 85,
+      // Kabul sayfası: "recognised Swiss maturity certificate (Maturität) or an
+      // equivalent foreign certificate" — sayısal eşik yok.
+      minGpa: undefined,
+      // Dil şartı sayfada katlanmış bir bölümde ve açılmıyor; IELTS 7.0 /
+      // TOEFL 100 TEYİT EDİLEMEDİ. Bu yüzden kayıt ai-extracted kaldı.
       language: [
         { test: "ielts", min: 7.0 },
         { test: "toefl", min: 100 },
@@ -1009,21 +1013,34 @@ export const PROGRAMS: Program[] = [
           key: "entrance-exam",
           mandatory: true,
           note: {
-            tr: "Uluslararası adaylar için giriş sınavı",
-            en: "Entrance examination for international applicants",
+            // Kabul sayfası uluslararası adaylar için seçme prosedürünü
+            // (yetenek testi + video mülakat) zorunlu tutuyor.
+            tr: "Uluslararası adaylar için seçme prosedürü — yetenek testi ve video mülakat",
+            en: "Selection procedure for international applicants — aptitude test and video interview",
           },
         },
         { key: "motivation-letter", mandatory: true },
       ],
     },
-    tuitionNonEu: 6500,
-    tuitionEu: 3300,
+    // DÜZELTME (2026-08-13): katalogda 6.500 / 3.300 EUR yazıyordu, para birimi
+    // yanlıştı. Harç sayfası (unisg.ch/.../costs-of-an-hsg-degree/):
+    //   yabancı uyruklu lisans  CHF 3.129 / dönem → yılda CHF 6.258
+    //   İsviçre uyruklu lisans  CHF 1.229 / dönem → yılda CHF 2.458
+    // Ayrıca CHF 250 başvuru ücreti. Üniversite toplam yıllık maliyeti
+    // CHF 25.000-30.000 olarak öneriyor.
+    tuitionNonEu: 6258,
+    tuitionEu: 2458,
+    tuitionCurrency: "CHF",
     livingCostPerYear: 22800,
     applicationSystem: "direct",
+    // Teyit edildi: kabul sayfası "Application period: 1 October - 30 April".
     deadline: "04-30",
+    // Şartlar ve harçlar program sayfasında değil kabul sayfasında; öğrencinin
+    // tıklayıp doğrulayacağı yer burası.
     sourceUrl:
+      "https://www.unisg.ch/en/studying/admission/admission-bachelor/admission-to-a-bachelors-degree-programme/",
+    facultyUrl:
       "https://www.unisg.ch/en/studying/programmes/bachelor/major-in-business-administration-bwl/",
-    facultyUrl: "https://www.unisg.ch/en/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
   },

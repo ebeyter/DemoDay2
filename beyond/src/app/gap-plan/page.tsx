@@ -22,7 +22,14 @@ export default function GapPlanPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (status !== "loading" && !profile) router.replace("/profile");
+    if (status === "loading" || profile) return;
+    // localStorage'dan hidrasyon bir-iki render sürebiliyor (bkz. persistent-state.ts,
+    // useSyncExternalStore sunucu snapshot'ıyla eşleşmek için önce fallback döner).
+    // Hemen yönlendirmek, profil aslında var olsa bile hard refresh'te kullanıcıyı
+    // /profile'a fırlatıyordu. setTimeout(0) mevcut render dizisinin bitmesini
+    // bekliyor; profil bu sırada gelirse effect yeniden çalışıp temizler.
+    const timer = setTimeout(() => router.replace("/profile"), 0);
+    return () => clearTimeout(timer);
   }, [profile, status, router]);
 
   const plan = useMemo(() => {

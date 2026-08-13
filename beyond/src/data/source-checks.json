@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-13T19:48:46.679Z",
+  "generatedAt": "2026-08-13T20:12:05.507Z",
   "checks": {
     "nl-tudelft-cse": {
       "programId": "nl-tudelft-cse",
@@ -7,7 +7,7 @@
       "fingerprint": "d35fa9e83cafb1006180251a92889d22",
       "sourceUrl": "https://www.tudelft.nl/en/education/programmes/bachelors",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "nl-tue-mechanical": {
@@ -16,7 +16,7 @@
       "fingerprint": "ba29e71f9f22c635eafc0a86e044ec79",
       "sourceUrl": "https://www.tue.nl/en/education/tue-bachelor-college/bachelor-programs/mechanical-engineering",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "nl-erasmus-iba": {
@@ -25,7 +25,7 @@
       "fingerprint": "c6a7335c60b80a71063c2487aad2326d",
       "sourceUrl": "https://www.eur.nl/en/education",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": [
         {
           "field": "deadline",
@@ -43,26 +43,17 @@
       "fingerprint": "c24d0594f992f6d50739966a23ff5663",
       "sourceUrl": "https://www.uva.nl/en/education/bachelor-s/bachelor-s-programmes/bachelor-s-programmes.html",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "nl-groningen-psychology": {
       "programId": "nl-groningen-psychology",
       "status": "ok",
-      "fingerprint": "0665c6236ead2841617b8ada050302f6",
-      "sourceUrl": "https://www.rug.nl/bachelors/psychology/",
+      "fingerprint": "bfc4d1734933904387e3fc43e529ab50",
+      "sourceUrl": "https://www.rug.nl/bachelors/psychology-en/?lang=en",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
-      "discrepancies": [
-        {
-          "field": "tuition",
-          "catalog": "11400",
-          "found": [
-            "2694",
-            "14000"
-          ]
-        }
-      ]
+      "checkedAt": "2026-08-13T20:12:05.507Z",
+      "discrepancies": []
     },
     "nl-utrecht-chemistry": {
       "programId": "nl-utrecht-chemistry",
@@ -70,7 +61,7 @@
       "fingerprint": "a0589f0a8c977907747e22c530f9c445",
       "sourceUrl": "https://www.uu.nl/en/bachelors",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "de-tum-informatics": {
@@ -79,7 +70,7 @@
       "fingerprint": "5654b4efe51017a6d752ec4c39979b67",
       "sourceUrl": "https://www.cit.tum.de/en/cit/studies/degree-programs/bachelor-informatics/",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "de-rwth-mechanical": {
@@ -88,7 +79,7 @@
       "fingerprint": "3f2656ebf63e59c67a56a3b0dd20e997",
       "sourceUrl": "https://www.rwth-aachen.de/cms/root/studium/vor-dem-studium/studiengaenge/liste-aktuelle-studiengaenge/studiengangbeschreibung/~bnev/maschinenbau-b-sc-/?lidx=1",
       "changedAt": "2026-08-13T19:47:01.829Z",
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "de-mannheim-business": {
@@ -97,7 +88,7 @@
       "fingerprint": "222985cd765b5f546937b49ab80c7dea",
       "sourceUrl": "https://www.uni-mannheim.de/en/academics/programs/",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": [
         {
           "field": "tuition",
@@ -115,7 +106,7 @@
       "fingerprint": "ff28a5c3a23676440cb5814dc3913276",
       "sourceUrl": "https://www.uni-heidelberg.de/en/study/all-subjects/physics",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "de-heidelberg-medicine": {
@@ -124,7 +115,7 @@
       "fingerprint": "61d96c8c40b45f357a4bc708f155ea13",
       "sourceUrl": "https://www.uni-heidelberg.de/en/study/all-subjects/medicine-study-location-heidelberg",
       "changedAt": "2026-08-13T19:47:01.829Z",
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "gb-imperial-computing": {
@@ -133,20 +124,8 @@
       "fingerprint": "195581bebdf4a0b4d03a394729f4f5c5",
       "sourceUrl": "https://www.imperial.ac.uk/study/courses/undergraduate/computing-beng/",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
-      "discrepancies": [
-        {
-          "field": "tuition",
-          "catalog": "51000",
-          "found": [
-            "5000",
-            "10050",
-            "15000",
-            "45500",
-            "70000"
-          ]
-        }
-      ]
+      "checkedAt": "2026-08-13T20:12:05.507Z",
+      "discrepancies": []
     },
     "gb-cambridge-engineering": {
       "programId": "gb-cambridge-engineering",
@@ -154,7 +133,7 @@
       "fingerprint": "3c578fc510d666f3b12f4797a5cec80d",
       "sourceUrl": "https://www.undergraduate.study.cam.ac.uk/courses/engineering",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "gb-lse-economics": {
@@ -163,22 +142,23 @@
       "fingerprint": "8b8686056abfda4ef19f0ffd1162cf52",
       "sourceUrl": "https://www.lse.ac.uk/study-at-lse/Undergraduate",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "gb-ucl-psychology": {
       "programId": "gb-ucl-psychology",
       "status": "ok",
-      "fingerprint": "bc15c403e55d1323683a24345a84ff29",
-      "sourceUrl": "https://www.ucl.ac.uk/prospective-students/undergraduate/degrees/psychology-bsc",
+      "fingerprint": "56bc9b01e69bd3b1c4fdc345a92f07e5",
+      "sourceUrl": "https://www.ucl.ac.uk/prospective-students/undergraduate/degrees/psychology-bsc-2026",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": [
         {
-          "field": "deadline",
-          "catalog": "01-14",
+          "field": "tuition",
+          "catalog": "36000",
           "found": [
-            "01-13"
+            "9790",
+            "42700"
           ]
         }
       ]
@@ -189,7 +169,7 @@
       "fingerprint": "1d15e1210a3752460c973aa0bb39cdd4",
       "sourceUrl": "https://www.manchester.ac.uk/study/undergraduate/courses/",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "fr-sorbonne-informatique": {
@@ -198,31 +178,31 @@
       "fingerprint": "96f24a26e0f082e94dfa31373290ec14",
       "sourceUrl": "https://sciences.sorbonne-universite.fr/formation-sciences/offre-de-formation/licences-0/licence-discipline/les-l2-l3-nos-huit-4",
       "changedAt": "2026-08-13T19:47:01.829Z",
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "fr-polytechnique-bachelor": {
       "programId": "fr-polytechnique-bachelor",
       "status": "ok",
-      "fingerprint": "eef146f6ece538391fa168bd25d53af3",
-      "sourceUrl": "https://programmes.polytechnique.edu/en/bachelor/bachelor-of-science",
+      "fingerprint": "4452e9728641faa2f2d525f6651bf50f",
+      "sourceUrl": "https://programmes.polytechnique.edu/en/bachelor/admissions/admissions-criteria-and-procedure",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "fr-sciencespo-economics": {
       "programId": "fr-sciencespo-economics",
       "status": "ok",
-      "fingerprint": "4b0cd033db3358ad03e0a2692498757c",
-      "sourceUrl": "https://www.sciencespo.fr/college/en/",
-      "changedAt": "2026-08-13T19:47:01.829Z",
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "fingerprint": "f39ace41cb9cb9bad97073d615f75372",
+      "sourceUrl": "https://www.sciencespo.fr/admissions/en/undergraduate/undergraduate-admissions/",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": [
         {
           "field": "deadline",
           "catalog": "03-12",
           "found": [
-            "07-09"
+            "11-28"
           ]
         }
       ]
@@ -233,7 +213,7 @@
       "fingerprint": "0515910cd1d0981e07c2d025e8077bd2",
       "sourceUrl": "https://www.universite-paris-saclay.fr/formation/licence/mathematiques",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "ch-ethz-cs": {
@@ -242,7 +222,7 @@
       "fingerprint": "dd19dffd56ff36e8300e375cf94e4ab0",
       "sourceUrl": "https://inf.ethz.ch/studies/bachelor.html",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "ch-epfl-communication": {
@@ -251,7 +231,7 @@
       "fingerprint": "92988768602bc924b721dec5152d8ac0",
       "sourceUrl": "https://www.epfl.ch/education/bachelor/programs/communication-systems/",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "ch-hsg-business": {
@@ -260,7 +240,7 @@
       "fingerprint": "c05af577dd98efb374e969e0cf33b5fe",
       "sourceUrl": "https://www.unisg.ch/en/studying/programmes/bachelor/major-in-business-administration-bwl/",
       "changedAt": "2026-08-13T19:47:01.829Z",
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "se-kth-ict": {
@@ -269,7 +249,7 @@
       "fingerprint": "7aeef6a68887d5b1c1e896b93c2cd2f1",
       "sourceUrl": "https://www.kth.se/en/studies/bachelor",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "se-lund-ib": {
@@ -278,8 +258,15 @@
       "fingerprint": "69a0bf4aa8283f443b81e41725951c4a",
       "sourceUrl": "https://www.lunduniversity.lu.se/study/international-business-bachelors-programme-EGIBU",
       "changedAt": "2026-08-13T19:47:01.829Z",
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": [
+        {
+          "field": "tuition",
+          "catalog": "130000",
+          "found": [
+            "65000"
+          ]
+        },
         {
           "field": "deadline",
           "catalog": "01-15",
@@ -296,7 +283,7 @@
       "fingerprint": "ea8b442ca20f31db904b691f9c709595",
       "sourceUrl": "https://www.uu.se/en/study/programme",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "be-kuleuven-business": {
@@ -305,7 +292,7 @@
       "fingerprint": "4fbe55b08debf70abb008288c97181b6",
       "sourceUrl": "https://onderwijsaanbod.kuleuven.be/opleidingen/e/",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "be-ghent-engineering": {
@@ -314,7 +301,7 @@
       "fingerprint": "06ee894490ac1d232b14a85b807fd8aa",
       "sourceUrl": "https://studiekiezer.ugent.be/2026/bachelor-of-science-in-engineering-computerwetenschappen/programma",
       "changedAt": "2026-08-13T19:47:01.829Z",
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "be-ulb-psychology": {
@@ -323,7 +310,7 @@
       "fingerprint": "7f49e896016649c3d9d155134f88ebf4",
       "sourceUrl": "https://www.ulb.be/en/programme",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "dk-dtu-general-engineering": {
@@ -332,7 +319,7 @@
       "fingerprint": "62d148a2349a3ef8d634776f8c0a9964",
       "sourceUrl": "https://www.dtu.dk/english/education",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "dk-cbs-ib": {
@@ -341,7 +328,7 @@
       "fingerprint": "a9e66bf017e150a150e6ea85594dfc03",
       "sourceUrl": "https://www.cbs.dk/en/study/bachelor",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": [
         {
           "field": "deadline",
@@ -359,7 +346,7 @@
       "fingerprint": "2b91d14b7347c30db7c0c00f00af544b",
       "sourceUrl": "https://studies.ku.dk/bachelor/machine-learning-and-data-science/",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": [
         {
           "field": "deadline",
@@ -377,7 +364,7 @@
       "fingerprint": "dbb2ea2a653aff856f0fba805f3f8595",
       "sourceUrl": "https://www.polimi.it/en/programmes",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "it-bocconi-bief": {
@@ -386,16 +373,16 @@
       "fingerprint": "ca60e6f2ec8be5696f7177530fc17726",
       "sourceUrl": "https://www.unibocconi.it/en/programs/bachelor-science/international-economics-and-finance",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "it-bologna-medicine": {
       "programId": "it-bologna-medicine",
       "status": "ok",
-      "fingerprint": "17a3fbd92927494c6dbdaa60ecfed67f",
-      "sourceUrl": "https://corsi.unibo.it/singlecycle/MedicineSurgery",
+      "fingerprint": "b67461a0115450a2cc0a4087c7631a89",
+      "sourceUrl": "https://corsi.unibo.it/singlecycle/MedicineAndSurgery/how-to-enrol",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": []
     },
     "it-pavia-medicine": {
@@ -403,7 +390,7 @@
       "status": "unreachable",
       "fingerprint": "",
       "changedAt": null,
-      "checkedAt": "2026-08-13T19:48:46.679Z",
+      "checkedAt": "2026-08-13T20:12:05.507Z",
       "discrepancies": [],
       "error": "Sayfa 405 döndürdü. Bağlantı herkese açık mı?"
     }

@@ -1,10 +1,20 @@
 import type { Locale } from "./i18n/dictionary";
+import type { Currency } from "./types";
 
-/** Para birimi — sayı okunabilirliği için binlik ayraç, kuruş yok. */
-export function formatMoney(amount: number, locale: Locale): string {
+/**
+ * Para birimi — sayı okunabilirliği için binlik ayraç, kuruş yok.
+ *
+ * `currency` verilmezse EUR varsayılır. Kaynak sayfa harcı £ veya SEK olarak
+ * yayınlıyorsa o birimde gösteriyoruz; çevirmiyoruz (bkz. Program.tuitionCurrency).
+ */
+export function formatMoney(
+  amount: number,
+  locale: Locale,
+  currency: Currency = "EUR"
+): string {
   return new Intl.NumberFormat(locale === "tr" ? "tr-TR" : "en-GB", {
     style: "currency",
-    currency: "EUR",
+    currency,
     maximumFractionDigits: 0,
   }).format(amount);
 }

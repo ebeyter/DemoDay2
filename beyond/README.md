@@ -14,7 +14,7 @@ Exposure AI Academy — Demo Day 2 · Alp & Eda
 2. **Eksikleri kapatma planı** — hangi sınav, kaç puan, ne zamana kadar
 3. **Tek bir başvuru takvimi** — UCAS, Studielink, uni-assist, Parcoursup, Campus France ayrı ayrı değil, bir arada
 
-Ek olarak: **kaynak takibi** (üniversite sayfası değişince kartta rozet çıkar), senaryo modu (profili bozmadan "ya Almanya deseydim?"), 4 programa kadar karşılaştırma tahtası ve profilini bilen bir soru-cevap paneli.
+Ek olarak: **kaynak takibi** (üniversite sayfası değişince kartta rozet çıkar), kaydedilebilir senaryo modu (profili bozmadan "ya Almanya deseydim?", isimlendirip geri çağırabilirsin), burs bilgisi (AB-dışı öğrenciye açık olanlar işaretli), vize/oturum izni adımları (kaynaklı, aralık olarak), 4 programa kadar karşılaştırma tahtası ve profilini bilen bir soru-cevap paneli.
 
 ## Neden bu şekilde tasarlandı
 
@@ -22,7 +22,7 @@ Ek olarak: **kaynak takibi** (üniversite sayfası değişince kartta rozet çı
 
 **Kabul olasılığı verilmiyor.** Avrupa'da kabul çoğunlukla eşik bazlı ve kabul istatistikleri kamuya açık değil. Olasılık uydurmak öğrenciye yardımcı olmaz, ürünün güvenilirliğini de bitirir.
 
-**Her kayıt doğrulama rozeti taşıyor.** Katalogdaki kayıtların tamamı şu an `ai-extracted` (derlenmiş ama kaynağından tek tek doğrulanmamış) ve arayüzde bu açıkça görünüyor. Bir kaydı `verified` yapmadan önce `sourceUrl`'deki sayfadan elle teyit et ve `lastChecked` tarihini güncelle.
+**Her kayıt doğrulama rozeti taşıyor.** Katalogdaki 9/36 kayıt kaynağından teyit edilip `verified` yapıldı, geri kalanı `ai-extracted` (derlenmiş ama kaynağından tek tek doğrulanmamış) — arayüzde bu açıkça görünüyor. Bir kaydı `verified` yapmadan önce `sourceUrl`'deki sayfadan elle teyit et ve `lastChecked` tarihini güncelle.
 
 ---
 
@@ -144,7 +144,7 @@ src/
     program/[id]/         Şart checklist'i + eksik planı
     gap-plan/             Tüm eksiklerin öncelikli listesi
     compare/              Yan yana karşılaştırma
-    timeline/             Başvuru sistemine göre gruplu takvim
+    timeline/             Başvuru sistemine göre gruplu takvim + vize/oturum izni adımları
     sign-in/              E-posta + şifre
     api/chat/             "Sor AI'a" — Bedrock, akışlı
     api/freshness/        Tarama sonuçlarını arayüze verir
@@ -156,16 +156,21 @@ src/
     freshness-context.tsx İki katmanlı tazelik kaynağı (Supabase → JSON yedek)
     fetch-page.ts         Sayfa indirme + metne çevirme (SSRF korumalı)
     bedrock-chat.ts       Bedrock Converse sohbeti (model bağımsız)
+    visa-steps.ts         9 ülke için kabul-sonrası vize/oturum izni adımları, kaynaklı
     types.ts              Çekirdek tip modeli
-    store.tsx             Tek veri katmanı (Supabase ↔ localStorage)
+    store.tsx             Tek veri katmanı (Supabase ↔ localStorage), kaydedilen senaryolar
     i18n/                 TR/EN sözlük
   data/
     programs.ts           36 program · 9 ülke × 7 alan
+    demo-profile.ts       Demo Day'de kullanılan sabit profil (README sayılarının kaynağı)
     source-checks.json    Son tarama sonuçları (npm run check-sources üretir)
     taxonomy.ts           Ülke, alan, başvuru sistemi tanımları
     options.ts            Sınav ölçekleri (IELTS, TestDaF, CEFR…)
 scripts/
   check-sources.mts       Kaynak sayfa tarayıcısı
+  check-demo.mts          Demo iddialarını (README'deki sayılar) gerçek katalogla ölçer
+tests/
+  matching.test.ts        Eşleştirme motoru testleri (vitest) — karar noktaları + regresyon
 ```
 
 ### Eşleştirme motoru nasıl çalışıyor
@@ -194,23 +199,46 @@ Her şart dört durumdan birini alır: `met` / `close` (az kaldı) / `unmet` / `
 - **5. adım** — öğrenciyi "olamazsın"dan "şunu yaparsan olursun"a taşıyan yer.
 - **7. adım** — kaynak takibi. Jüriye "verimiz güncel kalıyor" demek yerine gösteriyorsun, üstelik tıklayıp doğrulanabiliyor.
 
-Test edilmiş örnek (`tests/matching.test.ts`'te gerçek katalogla regresyon
-testi var — kırılırsa CI'da görürsün): 100'lük not ortalaması 90, ülke/alan
-kısıtı yok, ileri düzey matematik+fizik beyan edilmiş bir profilde **IELTS
-6.0 → 7.0** tek değişikliği Güvenli bandı **0'dan 6 programa** çıkarıyor,
-Zorlayıcı 21'den 16'ya iniyor.
+Test edilmiş örnek: **IELTS 6.0 → 7.0** tek değişikliği **Uygun bandı 2'den 5 programa** çıkarıyor, Zorlayıcı 10'dan 7'ye iniyor.
+
+Bu sayılar `npm run check-demo` ile ölçülüyor; profil `src/data/demo-profile.ts`
+içinde sabit ve `tests/matching.test.ts`'teki regresyon testi de aynı profili
+kullanıyor — kırılırsa hem CI'da hem sahne provasında görürsün. Katalog
+değişince sayılar da değişir — **sahnede söylemeden önce betiği çalıştır.**
+
+### Güvenli bandı boş — ve bu bir hata değil, bulgumuz
+
+İlk sürümde bu cümle *"Güvenli bandı 0'dan 4'e çıkarıyor"* diyordu. Doğrulama
+turunda o dört programın **dördünde de** seçme kapısı olduğu ortaya çıktı:
+
+| Program | Katalogda | Kaynak sayfada |
+|---|---|---|
+| KTH ICT | seçme şartı yok | 2024'te şartları karşılayan 684 adaydan 71'i alınmış (%10) |
+| TU/e Makine | seçme şartı yok | *"Admission requires passing a selection procedure"* |
+| UvA Ekonomi | seçme şartı yok | numerus fixus, **850 kontenjan**, zorunlu seçme sınavı |
+| Groningen Psikoloji | `mandatory: false` | 250 kontenjan, seçme sınavı sıralaması |
+
+Dördü de "Güvenli" olarak gösteriliyordu. **%10 kabul oranı olan bir programa
+"rahatça aşıyorsun" demek**, bu ürünün vermemeye söz verdiği yanlış güvenin ta
+kendisi. Kapıları ekleyince Güvenli bandı sıfırlandı.
+
+Bunun ürün açısından anlamı şu: **Reach/Match/Safety üçlemesi ABD kabul
+sistemine ait ve Avrupa'ya birebir oturmuyor.** Avrupa'da rekabetçi
+İngilizce-öğretimli programların çoğu kontenjan sınırlı; eşiği geçmek sıraya
+girmek demek, kabul demek değil.
+
+Sahnede kullanılacak cümle bu — rakip araçlar burada bir yüzde gösterir, biz
+kontenjan gerçeğini gösteriyoruz.
 
 ---
 
 ## Bilinen sınırlar
 
-- **Bağlantılar doğrulandı, şartlar doğrulanmadı.** 36 kaydın kaynak bağlantıları tek tek kontrol edildi (35'i 200 dönüyor; Pavia bota 403 veriyor ama tarayıcıda açılıyor). Ancak not eşikleri, dil barajları, harçlar ve son tarihler kaynağından teyit edilmedi — hepsi `ai-extracted` rozetiyle görünüyor. Demo öncesi kullanacağın 5-6 programın **şartlarını** elle doğrulayıp `verification: "verified"` yapmak ürünü ciddi biçimde güçlendirir.
+- **Bağlantılar doğrulandı, şartlar kısmen doğrulandı.** 36 kaydın kaynak bağlantıları tek tek kontrol edildi (35'i 200 dönüyor; Pavia bota 403 veriyor ama tarayıcıda açılıyor). Not eşikleri, dil barajları, harçlar ve son tarihler için 9/36 kayıt kaynağından teyit edilip `verification: "verified"` yapıldı — geri kalan 27'si hâlâ `ai-extracted`. `npm run check-demo` demoda hangi kayıtların ekrana geleceğini ve kaçının doğrulandığını gösterir.
 - **Not çevrimi yaklaşıktır.** 4'lük ve IB dönüşümleri genel kabul gören tablolara dayanıyor; üniversiteler kendi tablolarını kullanabilir. Arayüz bunu kullanıcıya söylüyor.
-- **Kaydedilen senaryo yok.** Senaryo modu oturum içinde çalışıyor, kaydedilmiyor.
-- **Katalog statik.** Yeni program eklemek `src/data/programs.ts` düzenlemeyi gerektiriyor; AI çıkarımı sonucu şu an oturuma kaydedilmiyor, sadece gösteriliyor.
+- **Katalog statik.** Yeni program eklemek `src/data/programs.ts` düzenlemeyi gerektiriyor.
 
 ## Sonraki adımlar
 
-- Dedektörün fark bulduğu kayıtları kaynağından doğrulama turu (`verification: "verified"`)
-- Burs verisi (özellikle AB-dışı öğrencilere açık olanlar)
-- Vize ve oturum izni adımlarının takvime eklenmesi
+- Dedektörün fark bulduğu kayıtları kaynağından doğrulama turu (`verification: "verified"`) — 9/36 tamam
+- Kalan programların doğrulanması (`npm run check-demo` demoda görünecekleri sıralı listeler)

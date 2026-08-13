@@ -606,9 +606,15 @@ export function evaluateProgram(program: Program, profile: StudentProfile): Matc
     // programı haksız yere eler; "aşmıyor" saymak öğrenciye yanlış güven verir.
     // İkisi de yapılmıyor: false kalır, eksik bilgi arayüzde harç satırında
     // "bilinmiyor" olarak görünür.
+    //
+    // Para birimi de aynı sebepten kontrol ediliyor: öğrencinin bütçesi EUR
+    // cinsinden giriliyor. Imperial'in £45.500'ünü 15.000 EUR'luk bütçeyle
+    // kıyaslamak sayısal olarak çalışır ama anlamsızdır — kur varsayımı
+    // yapmadan karşılaştırılamaz, o yüzden karşılaştırmıyoruz.
     overBudget:
       profile.maxTuition !== undefined &&
       program.tuitionNonEu !== undefined &&
+      (program.tuitionCurrency ?? "EUR") === "EUR" &&
       program.tuitionNonEu > profile.maxTuition,
   };
 }

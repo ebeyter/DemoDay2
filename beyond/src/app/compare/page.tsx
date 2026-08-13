@@ -86,9 +86,11 @@ export default function ComparePage() {
       render: ({ program }) =>
         program.tuitionNonEu === undefined
           ? t.program.notStated
-          : formatMoney(program.tuitionNonEu, locale),
+          : formatMoney(program.tuitionNonEu, locale, program.tuitionCurrency),
       raw: ({ program }) =>
-        program.tuitionNonEu === undefined ? t.program.notStated : String(program.tuitionNonEu),
+        program.tuitionNonEu === undefined
+          ? t.program.notStated
+          : `${program.tuitionNonEu} ${program.tuitionCurrency ?? "EUR"}`,
       emphasis: true,
     },
     {
@@ -99,20 +101,67 @@ export default function ComparePage() {
     {
       // Harç bilinmiyorsa toplam da bilinmiyor — eksik veriyi yaşam maliyetiyle
       // toplayıp gerçekten daha ucuz bir programmış gibi göstermek, tam olarak
-      // karşılaştırma tahtasının yanıltmaması gereken yer.
+      // karşılaştırma tahtasının yanıltmaması gereken yer. Aynısı para birimi
+      // için de geçerli: yaşam maliyeti EUR, harç £ ise toplam anlamsızdır.
       label: t.program.totalCost,
       render: ({ program }) => (
         <span className="font-semibold">
-          {program.tuitionNonEu === undefined
+          {program.tuitionNonEu === undefined ||
+          (program.tuitionCurrency ?? "EUR") !== "EUR"
             ? t.program.notStated
             : formatMoney(program.tuitionNonEu + program.livingCostPerYear, locale)}
         </span>
       ),
       raw: ({ program }) =>
-        program.tuitionNonEu === undefined
+        program.tuitionNonEu === undefined ||
+        (program.tuitionCurrency ?? "EUR") !== "EUR"
           ? t.program.notStated
           : String(program.tuitionNonEu + program.livingCostPerYear),
       emphasis: true,
+    },
+    {
+      // Burs satırı maliyetin hemen altında: "bu kadar tutuyor" bilgisinin
+      // ardından gelen soru "peki nasıl karşılarım" oluyor.
+      //
+      // Üç durum ayrı gösteriliyor. Özellikle "baktık, yok" ile "bakmadık"
+      // aynı hücreye düşerse karşılaştırma yanıltır: burs verisi olmayan bir
+      // program, bursu olmadığı doğrulanmış bir programdan daha iyi görünür.
+      label: t.scholarships.title,
+      render: ({ program }) => {
+        const list = program.scholarships;
+        if (list === undefined) {
+          return <span className="text-ink-faint">{t.scholarships.notChecked}</span>;
+        }
+        if (list.length === 0) {
+          return <span className="text-ink-faint">— {t.scholarships.noneFound}</span>;
+        }
+        return (
+          <ul className="space-y-1.5">
+            {list.map((sc) => (
+              <li key={sc.name}>
+                <span className="font-medium">{sc.name}</span>
+                {sc.amountPerYear !== undefined && (
+                  <span className="block tabular-nums">
+                    {formatMoney(sc.amountPerYear, locale)}
+                    <span className="text-ink-faint">{t.scholarships.perYear}</span>
+                  </span>
+                )}
+                {!sc.openToNonEu && (
+                  <span className="block text-[11px] text-ink-faint">
+                    {t.scholarships.euOnly}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        );
+      },
+      raw: ({ program }) => {
+        const list = program.scholarships;
+        if (list === undefined) return "bakılmadı";
+        if (list.length === 0) return "yok";
+        return list.map((sc) => `${sc.name}:${sc.amountPerYear ?? "?"}`).join("|");
+      },
     },
     {
       label: t.program.teachingLanguage,

@@ -83,7 +83,7 @@ export function ProgramCard({ result, index = 0 }: { result: MatchResult; index?
               <span className="text-ink-faint font-normal">{t.program.notStated}</span>
             ) : (
               <>
-                {formatMoney(program.tuitionNonEu, locale)}
+                {formatMoney(program.tuitionNonEu, locale, program.tuitionCurrency)}
                 <span className="text-ink-faint font-normal">{t.common.perYear}</span>
               </>
             )}

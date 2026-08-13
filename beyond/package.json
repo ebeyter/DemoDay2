@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "check-sources": "tsx scripts/check-sources.mts"
+    "check-sources": "tsx scripts/check-sources.mts",
+    "check-demo": "tsx scripts/check-demo.mts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

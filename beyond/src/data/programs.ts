@@ -40,15 +40,16 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 80,
+      // TU Delft uluslararası diplomalar için SAYISAL BİR ORTALAMA EŞİĞİ
+      // yayınlamıyor; denklik VWO standardına göre tek tek değerlendiriliyor.
+      // Bağlayıcı olan şey ders şartı (Mathematics B), ortalama değil.
       language: [
         { test: "ielts", min: 6.5 },
         { test: "toefl", min: 90 },
       ],
-      requiredSubjects: [
-        { subject: "math", level: "advanced" },
-        { subject: "physics", level: "basic" },
-      ],
+      // Programın kendi şart sayfasında yalnızca "Mathematics B" listeleniyor;
+      // fizik şartı YOK (katalogda yanlışlıkla duruyordu).
+      requiredSubjects: [{ subject: "math", level: "advanced" }],
       extras: [
         {
           key: "numerus-fixus",
@@ -61,7 +62,8 @@ export const PROGRAMS: Program[] = [
         { key: "motivation-letter", mandatory: true },
       ],
     },
-    tuitionNonEu: 20800,
+    // Kurumsal tarife (AB-dışı) 2026-27: 18.175 EUR. Katalogda 20.800 yazıyordu.
+    tuitionNonEu: 18175,
     tuitionEu: 2601,
     livingCostPerYear: 13200,
     applicationSystem: "studielink",
@@ -73,7 +75,12 @@ export const PROGRAMS: Program[] = [
     sourceUrl: "https://www.tudelft.nl/en/education/programmes/bachelors",
     facultyUrl: "https://www.tudelft.nl/en/eemcs",
     lastChecked: CHECKED,
-    verification: "ai-extracted",
+    verification: "verified",
+    // Baktık: TU Delft'in bursları yalnızca yüksek lisans düzeyinde
+    // ("specifically designed to ... pursue a MSc degree") ve üniversite
+    // 2026-27 NL Scholarship listesinde yok.
+    // Boş dizi "burs yok" demek — alanın hiç olmaması "bakmadık" demek olurdu.
+    scholarships: [],
   },
   {
     id: "nl-tue-mechanical",
@@ -87,7 +94,12 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 75,
+      // Sayfa sayısal eşik vermiyor; şart "pre-university certificate,
+      // including mathematics B and physics".
+      minGpa: undefined,
+      // Dil şartı bu sayfada geçmiyor. Katalogdaki IELTS 6.0 / TOEFL 80
+      // teyit edilemedi — bilerek bırakıldı, doğrulama turunda TU/e'nin
+      // dil şartları sayfasından teyit edilmeli.
       language: [
         { test: "ielts", min: 6.0 },
         { test: "toefl", min: 80 },
@@ -96,8 +108,24 @@ export const PROGRAMS: Program[] = [
         { subject: "math", level: "advanced" },
         { subject: "physics", level: "advanced" },
       ],
-      extras: [{ key: "motivation-letter", mandatory: false }],
+      extras: [
+        { key: "motivation-letter", mandatory: false },
+        {
+          // EKLENDİ: katalogda seçme şartı hiç yoktu ve bu program demoda
+          // GÜVENLİ bandında çıkıyor. Sayfa "Program with selection" ve
+          // "Admission to the program also requires passing a selection
+          // procedure" diyor. Seçme kapısı olan bir programa "rahatça
+          // aşıyorsun" demek, ürünün vermemeye söz verdiği yanlış güven.
+          key: "numerus-fixus",
+          mandatory: true,
+          note: {
+            tr: "Seçme prosedürünü geçmek zorunlu — şartları karşılamak tek başına yeterli değil",
+            en: "Passing the selection procedure is required — meeting the requirements alone is not enough",
+          },
+        },
+      ],
     },
+    // Harç bu sayfada geçmiyor; 11.900 teyit edilmedi.
     tuitionNonEu: 11900,
     tuitionEu: 2601,
     livingCostPerYear: 12000,
@@ -107,6 +135,21 @@ export const PROGRAMS: Program[] = [
     facultyUrl: "https://www.tue.nl/en/our-university/departments/mechanical-engineering",
     lastChecked: CHECKED,
     verification: "ai-extracted",
+    // 2026-27 katılımcı listesi studyinnl.org'da yayınlanıyor; bu üniversite
+    // listede. Liste her yıl değişiyor.
+    scholarships: [
+      {
+        name: "NL Scholarship",
+        amountPerYear: 5000,
+        kind: "grant",
+        openToNonEu: true,
+        sourceUrl: "https://www.studyinnl.org/finances/nl-scholarship",
+        note: {
+          tr: "Yalnızca AB/AEA dışı vatandaşlar için ve sadece BİRİNCİ yıl ödeniyor — tam harç bursu değil. Hollanda'da daha önce derece almamış olmak gerekiyor.",
+          en: "Non-EEA nationals only and paid in the FIRST year only — not a full-tuition scholarship. You must not already hold a degree from a Dutch institution.",
+        },
+      },
+    ],
   },
   {
     id: "nl-erasmus-iba",
@@ -156,20 +199,54 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
+      // Not eşiği bu sayfada geçmiyor (ayrı "entry requirements" sayfasında).
+      // 76 teyit edilmedi.
       minGpa: 76,
+      // Dil şartı bu sayfada geçmiyor; IELTS 6.5 / TOEFL 92 teyit edilmedi.
       language: [
         { test: "ielts", min: 6.5 },
         { test: "toefl", min: 92 },
       ],
       requiredSubjects: [{ subject: "math", level: "advanced" }],
-      extras: [{ key: "motivation-letter", mandatory: false }],
+      extras: [
+        { key: "motivation-letter", mandatory: false },
+        {
+          // EKLENDİ: sayfa "The English track is a numerus fixus programme with
+          // only 850 spots available" diyor. Katalogda hiç kontenjan şartı
+          // yoktu ve bu program demoda tek GÜVENLİ kart olarak görünüyordu.
+          key: "numerus-fixus",
+          mandatory: true,
+          note: {
+            tr: "İngilizce track numerus fixus — yılda yalnızca 850 kontenjan",
+            en: "The English track is numerus fixus — only 850 places a year",
+          },
+        },
+        {
+          // EKLENDİ: başvuru adımları arasında "Sign up for the selection and
+          // take the test" var; sıralama numarası 15 Nisan'da açıklanıyor.
+          key: "entrance-exam",
+          mandatory: true,
+          note: {
+            tr: "Seçme sınavına girmek zorunlu; sıralama numarası 15 Nisan'da açıklanıyor",
+            en: "Taking the selection test is required; your ranking number is published on 15 April",
+          },
+        },
+      ],
     },
+    // Harç bu sayfada geçmiyor, 12.000 teyit edilmedi.
+    // (Sayfa ayrıca AB-dışı öğrencilere açık Amsterdam Merit Scholarship'ten
+    // söz ediyor: yılda € 6.000, toplam € 18.000 — burs özelliği eklenince
+    // bu kayda girecek ilk veri.)
     tuitionNonEu: 12000,
     tuitionEu: 2601,
     livingCostPerYear: 14400,
     applicationSystem: "studielink",
-    deadline: "04-01",
-    sourceUrl: "https://www.uva.nl/en/education/bachelor-s/bachelor-s-programmes/bachelor-s-programmes.html",
+    // DÜZELTME (2026-08-13): katalogda "04-01" yazıyordu. Sayfa açıkça
+    // "There is an early application deadline: 15 January" diyor.
+    // 2,5 ay geç bir tarih — bu kayda güvenen öğrenci yılı kaçırırdı.
+    deadline: "01-15",
+    sourceUrl:
+      "https://www.uva.nl/en/programmes/bachelors/economics--business-economics/application-and-admission/international-prior-education/international-prior-education-english-track.html",
     facultyUrl: "https://www.uva.nl/en/education",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -186,31 +263,64 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 72,
-      language: [
-        { test: "ielts", min: 6.5 },
-        { test: "toefl", min: 90 },
-      ],
+      // Sayfa yurt dışı diploması için sayısal eşik vermiyor; diplomanın VWO'ya
+      // denk olması ve seçme sınavındaki sıralaman belirleyici.
+      minGpa: undefined,
+      // IELTS 6.5 şartı programın seçme prosedürü sayfasında geçiyor
+      // (rug.nl/gmw/bachelors/psychology/selectieprocedure-bachelor-psychology-en)
+      // ve konuşma + yazma ALT puanı olarak isteniyor. Tip modeli alt puan
+      // ayrımını taşıyamıyor; genel eşik olarak yazıldı.
+      language: [{ test: "ielts", min: 6.5 }],
       extras: [
         {
+          // DÜZELTME: mandatory false idi. Kontenjan 250 ve yerler seçme
+          // prosedürüyle dağıtılıyor — bu isteğe bağlı bir durum değil.
           key: "numerus-fixus",
-          mandatory: false,
+          mandatory: true,
           note: {
-            tr: "Kontenjan sınırlı — şartları karşılamak kabul garantisi değil",
-            en: "Capped intake — meeting requirements does not guarantee a place",
+            tr: "Yılda 250 kontenjan, yerler seçme sınavı sıralamasıyla dağıtılıyor — şartları karşılamak kabul garantisi değil",
+            en: "250 places a year, assigned by selection-test ranking — meeting requirements does not guarantee a place",
+          },
+        },
+        {
+          key: "entrance-exam",
+          mandatory: true,
+          note: {
+            tr: "Seçme sınavı zorunlu; sıralaman diğer adaylarla karşılaştırılıyor",
+            en: "Selection test is mandatory; your ranking is compared with other applicants",
           },
         },
       ],
     },
-    tuitionNonEu: 11400,
-    tuitionEu: 2601,
+    // DÜZELTME (2026-08-13): katalogda 11.400 / 2.601 yazıyordu.
+    // Sayfa 2026-2027 için AB-dışı € 14.000, AB € 2.694 diyor.
+    // Dedektörün işaretlediği fark gerçekti.
+    tuitionNonEu: 14000,
+    tuitionEu: 2694,
     livingCostPerYear: 11400,
     applicationSystem: "studielink",
     deadline: "01-15",
-    sourceUrl: "https://www.rug.nl/bachelors/psychology/",
+    // DÜZELTME: eski link Hollandaca track'in sayfasıydı (NT2-II şartı, 365
+    // kontenjan). Bu kayıt İngilizce track; sayfası ve kontenjanı farklı.
+    sourceUrl: "https://www.rug.nl/bachelors/psychology-en/?lang=en",
     facultyUrl: "https://www.rug.nl/gmw/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
+    // 2026-27 katılımcı listesi studyinnl.org'da yayınlanıyor; bu üniversite
+    // listede. Liste her yıl değişiyor.
+    scholarships: [
+      {
+        name: "NL Scholarship",
+        amountPerYear: 5000,
+        kind: "grant",
+        openToNonEu: true,
+        sourceUrl: "https://www.studyinnl.org/finances/nl-scholarship",
+        note: {
+          tr: "Yalnızca AB/AEA dışı vatandaşlar için ve sadece BİRİNCİ yıl ödeniyor — tam harç bursu değil. Hollanda'da daha önce derece almamış olmak gerekiyor.",
+          en: "Non-EEA nationals only and paid in the FIRST year only — not a full-tuition scholarship. You must not already hold a degree from a Dutch institution.",
+        },
+      },
+    ],
   },
   {
     id: "nl-utrecht-chemistry",
@@ -243,6 +353,21 @@ export const PROGRAMS: Program[] = [
     facultyUrl: "https://www.uu.nl/en/organisation/faculty-of-science",
     lastChecked: CHECKED,
     verification: "ai-extracted",
+    // 2026-27 katılımcı listesi studyinnl.org'da yayınlanıyor; bu üniversite
+    // listede. Liste her yıl değişiyor.
+    scholarships: [
+      {
+        name: "NL Scholarship",
+        amountPerYear: 5000,
+        kind: "grant",
+        openToNonEu: true,
+        sourceUrl: "https://www.studyinnl.org/finances/nl-scholarship",
+        note: {
+          tr: "Yalnızca AB/AEA dışı vatandaşlar için ve sadece BİRİNCİ yıl ödeniyor — tam harç bursu değil. Hollanda'da daha önce derece almamış olmak gerekiyor.",
+          en: "Non-EEA nationals only and paid in the FIRST year only — not a full-tuition scholarship. You must not already hold a degree from a Dutch institution.",
+        },
+      },
+    ],
   },
 
   // -------------------------------------------------------------------------
@@ -260,7 +385,12 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "de",
     durationYears: 3,
     requirements: {
+      // Sayfa sayısal eşik vermiyor; seçim iki aşamalı EFV ile yapılıyor.
+      // Katalogdaki 80 teyit edilemedi.
       minGpa: 80,
+      // Teyit edildi: sayfa "Sehr gute Kenntnisse in Deutsch und Englisch"
+      // istiyor — yani Almanca YETERLİ DEĞİL, İngilizce de gerekiyor.
+      // Tip modeli "iki dil birlikte" diyemiyor; Almanca eşikleri yazılı.
       language: [
         { test: "testdaf", min: 4 },
         { test: "goethe", min: 5 },
@@ -269,20 +399,25 @@ export const PROGRAMS: Program[] = [
       requiredSubjects: [{ subject: "math", level: "advanced" }],
       extras: [
         {
+          // Katalogda doğru modellenmişti; sayfadan gelen ayrıntı eklendi.
           key: "entrance-exam",
           mandatory: true,
           note: {
-            tr: "Yetenek tespit sınavı (Eignungsfeststellungsverfahren)",
-            en: "Aptitude assessment (Eignungsfeststellungsverfahren)",
+            tr: "Eignungsfeststellungsverfahren — iki aşamalı: 1) dosya incelemesi, 2) Garching'de yüz yüze test (kış dönemi için 21.08.2026)",
+            en: "Eignungsfeststellungsverfahren — two stages: 1) document review, 2) an in-person test in Garching (21 Aug 2026 for the winter intake)",
           },
         },
       ],
     },
+    // Harç bu sayfada geçmiyor; 4.000 / 300 teyit edilmedi.
     tuitionNonEu: 4000,
     tuitionEu: 300,
     livingCostPerYear: 13800,
     applicationSystem: "direct",
-    deadline: "05-31",
+    // DÜZELTME (2026-08-13): katalogda "05-31" yazıyordu. Sayfa
+    // "Bewerbungsfrist Wintersemester: 15. Mai bis 15. Juli" diyor —
+    // başvuru penceresi 15 Mayıs'ta açılıyor, 15 TEMMUZ'da kapanıyor.
+    deadline: "07-15",
     deadlineNote: {
       tr: "Almanca eğitim — TestDaF 4 veya Goethe C1 zorunlu. Ayrıca YKS yerleşmen olmalı.",
       en: "Taught in German — TestDaF 4 or Goethe C1 required, plus a YKS university placement.",
@@ -304,16 +439,30 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "de",
     durationYears: 3.5,
     requirements: {
-      // Program sayfası "open admission (no NC)" diyor — yani sayısal bir not
-      // eşiği yok. Katalogdaki 72 kaynakta desteklenmiyordu.
-      // (RWTH'nin genel uluslararası başvuru sayfası "ortalama 2,5 veya daha
-      // iyi" diyor ama bu Alman not ölçeği ve ayrı bir sayfa; bu programın
-      // kaynağında eşik geçmiyor.)
+      // Programın kendi sayfası "open admission (no NC)" diyor. Uluslararası
+      // başvuru sayfası ise SOMUT bir eşik veriyor: "The overall average grade
+      // of your HZB must be at least equivalent to the German grade 2.5."
+      //
+      // Yine de undefined bırakıldı, çünkü bu eşik ALMAN 1-6 ÖLÇEĞİNDE ve bu
+      // alan 100'lük Türk ölçeği bekliyor. 2,5'i 100'lüğe çevirmenin tek bir
+      // doğru yolu yok (Bavyera formülü, ANABIN tabloları farklı sonuç verir).
+      // Uydurma bir sayı yazmak yerine bilinmiyor bırakıldı.
+      //
+      // ÖNEMLİ TELAFİ: ortalama 2,5'ten kötüyse TestAS ile kapatılabiliyor.
+      // Bu, öğrenciye "olamazsın" demek yerine yol gösteren bir bilgi ama
+      // modelde TestAS diye bir sınav yok (StandardizedTest: sat/ib/ap/yks).
       minGpa: undefined,
+      // Teyit edildi: "RWTH currently only offers Bachelor and Staatsexamen
+      // courses of study in German. You must therefore provide proof of German
+      // language skills at C1 level when you enroll." TestDaF 4 ve Goethe C1
+      // bu seviyeye karşılık geliyor — katalog doğruydu.
+      // (Not: bazı bölümlerde ek olarak İngilizce B2 isteniyor, örnek olarak
+      // bilgisayar bilimleri veriliyor; makine mühendisliği sayılmamış.)
       language: [
         { test: "testdaf", min: 4 },
         { test: "goethe", min: 5 },
       ],
+      // YKS 250 bu sayfada geçmiyor, teyit edilmedi.
       standardizedTests: [{ test: "yks", min: 250, mandatory: true }],
       requiredSubjects: [
         { subject: "math", level: "advanced" },
@@ -461,21 +610,47 @@ export const PROGRAMS: Program[] = [
         { test: "toefl", min: 100 },
       ],
       standardizedTests: [
+        // Sayfa IB için 41 puan ve HL matematikte 7 istiyor.
+        { test: "ib", min: 41, mandatory: false },
         { test: "sat", min: 1500, mandatory: false },
         { test: "ap", min: 5, mandatory: false },
       ],
+      // Sayfa: A-level A*A*A–A*AAA, matematikte A* zorunlu.
       requiredSubjects: [{ subject: "math", level: "advanced" }],
       extras: [
         { key: "motivation-letter", mandatory: true },
         { key: "recommendation-letter", mandatory: true },
-        { key: "interview", mandatory: true },
+        {
+          // DÜZELTME: mandatory true idi. Sayfa "Interviews are not standard
+          // but may be offered to some candidates" diyor.
+          key: "interview",
+          mandatory: false,
+          note: {
+            tr: "Standart değil — bazı adaylara teklif edilebiliyor",
+            en: "Not standard — may be offered to some candidates",
+          },
+        },
+        {
+          // EKLENDİ: sayfa TMUA'yı zorunlu tutuyor, katalogda hiç yoktu.
+          key: "entrance-exam",
+          mandatory: true,
+          note: {
+            tr: "TMUA (Test of Mathematics for University Admission) zorunlu",
+            en: "TMUA (Test of Mathematics for University Admission) is required",
+          },
+        },
       ],
     },
-    tuitionNonEu: 51000,
-    tuitionEu: 51000,
+    // DÜZELTME: katalogda 51.000 EUR yazıyordu. Sayfa 2026-27 overseas harcını
+    // £45.500 olarak veriyor (2027 girişi henüz açıklanmamış, Home £10.050).
+    // Kaynağın para biriminde saklanıyor; EUR'a çevirmiyoruz.
+    tuitionNonEu: 45500,
+    tuitionEu: 45500,
+    tuitionCurrency: "GBP",
     livingCostPerYear: 20400,
     applicationSystem: "ucas",
-    deadline: "01-14",
+    // DÜZELTME: 01-14 idi. Sayfa "Wednesday 13 January 2027 at 18.00 (UK time)".
+    deadline: "01-13",
     deadlineNote: {
       tr: "UCAS'ta en fazla 5 tercihten biri olarak kullanılır",
       en: "Uses one of your five UCAS choices",
@@ -491,11 +666,17 @@ export const PROGRAMS: Program[] = [
     country: "GB",
     city: "Cambridge",
     name: "Engineering",
-    degree: "BEng",
+    // DÜZELTME (2026-08-13): katalogda BEng yazıyordu. Sayfanın başlığı
+    // "Engineering, BA (Hons) and MEng" — Cambridge BEng vermiyor.
+    // Üç yıllık varyant BA (Hons), dört yıllık MEng. durationYears 4 olarak
+    // bırakıldı çünkü kayıt MEng varyantını temsil ediyor.
+    degree: "BA",
     field: "engineering",
     teachingLanguage: "en",
     durationYears: 4,
     requirements: {
+      // Sayfa sayısal eşik vermiyor; belirleyici olan sıralama ve mülakat.
+      // (Katalogdaki 95 teyit edilemedi.)
       minGpa: 95,
       language: [
         { test: "ielts", min: 7.5 },
@@ -518,18 +699,33 @@ export const PROGRAMS: Program[] = [
         { key: "interview", mandatory: true },
         { key: "motivation-letter", mandatory: true },
         { key: "recommendation-letter", mandatory: true },
+        {
+          // EKLENDİ: sayfa 2025 döngüsü için "Applications per place: 10,
+          // Accepted: 335" diyor. Kontenjan gerçeği katalogda hiç yoktu.
+          key: "numerus-fixus",
+          mandatory: true,
+          note: {
+            tr: "2025 döngüsünde her kontenjan için 10 başvuru; 335 kişi kabul edildi",
+            en: "In the 2025 cycle there were 10 applications per place; 335 were accepted",
+          },
+        },
       ],
     },
+    // Harç bu sayfada geçmiyor; 46.000 teyit edilmedi ve GBP mi EUR mu belirsiz.
+    // Diğer UK kayıtlarında harç GBP çıktı (Imperial £45.500), bu kayıt da
+    // muhtemelen GBP — ama teyit etmeden para birimi atamıyorum.
     tuitionNonEu: 46000,
     tuitionEu: 46000,
     livingCostPerYear: 16800,
     applicationSystem: "ucas",
+    // Son tarih bu sayfada geçmiyor; UCAS'ın Oxbridge tarihi 15 Ekim.
     deadline: "10-15",
     deadlineNote: {
       tr: "Oxford/Cambridge son tarihi diğerlerinden 3 ay önce — 15 Ekim",
       en: "Oxford/Cambridge close three months earlier than everyone else — 15 October",
     },
-    sourceUrl: "https://www.undergraduate.study.cam.ac.uk/courses/engineering",
+    // Eski link kanonik adrese yönlendiriyordu; yönlendirme hedefi yazıldı.
+    sourceUrl: "https://www.undergraduate.study.cam.ac.uk/courses/engineering-ba-hons-meng",
     facultyUrl: "https://www.eng.cam.ac.uk/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -586,19 +782,30 @@ export const PROGRAMS: Program[] = [
         { test: "ielts", min: 7.0 },
         { test: "toefl", min: 100 },
       ],
-      standardizedTests: [{ test: "ap", min: 4, mandatory: true }],
+      standardizedTests: [
+        // Sayfa/UCL denklik tablosu: IB 38 puan, HL üç dersten 18.
+        { test: "ib", min: 38, mandatory: false },
+        { test: "ap", min: 4, mandatory: true },
+      ],
+      // UCL: Biyoloji, Kimya, Matematik, Fizik veya Psikoloji'den en az birinde
+      // (tercihen ikisinde) A. Tip modeli "şu listeden biri" diyemiyor;
+      // matematik temel seviye olarak bırakıldı.
       requiredSubjects: [{ subject: "math", level: "basic" }],
       extras: [
         { key: "motivation-letter", mandatory: true },
         { key: "recommendation-letter", mandatory: true },
       ],
     },
+    // Harç bu sayfada görünmüyor; 36.000 EUR kaynakta teyit edilmedi, GBP mi
+    // EUR mu olduğu da belirsiz. B grubu turunda ele alınacak.
     tuitionNonEu: 36000,
     tuitionEu: 36000,
     livingCostPerYear: 20400,
     applicationSystem: "ucas",
-    deadline: "01-14",
-    sourceUrl: "https://www.ucl.ac.uk/prospective-students/undergraduate/degrees/psychology-bsc",
+    // DÜZELTME: 01-14 idi. Sayfa "13 January 2027. Applications close at 6pm UK time."
+    deadline: "01-13",
+    sourceUrl:
+      "https://www.ucl.ac.uk/prospective-students/undergraduate/degrees/psychology-bsc-2026",
     facultyUrl: "https://www.ucl.ac.uk/pals/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -656,17 +863,24 @@ export const PROGRAMS: Program[] = [
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
+        // Kaynak: campusfrance.org → DAP prosedürü, en az B2 (DELF B2 /
+        // DELF Junior / TCF TP).
         { test: "delf", min: 4 },
         { test: "tcf", min: 400 },
       ],
       requiredSubjects: [{ subject: "math", level: "advanced" }],
       extras: [{ key: "motivation-letter", mandatory: true }],
     },
-    tuitionNonEu: 2850,
-    tuitionEu: 175,
+    // "Droits différenciés": AB/AEA/İsviçre dışı öğrenciler için 2026-27
+    // lisans harcı. Üniversiteler bireysel durumlara göre muafiyet
+    // verebiliyor. AB tarifesi aynı programda 178 EUR.
+    tuitionNonEu: 2902,
+    tuitionEu: 178,
     livingCostPerYear: 14400,
     applicationSystem: "campus-france",
-    deadline: "12-05",
+    // Campus France DAP başvuru penceresi: 1 Ekim – 15 Aralık.
+    // Üniversite cevapları 30 Nisan'a, öğrencinin yanıtı 31 Mayıs'a kadar.
+    deadline: "12-15",
     deadlineNote: {
       tr: "Campus France prosedürü Ekim'de açılır, Aralık başında kapanır. Bu adımı atlarsan vize alamazsın.",
       en: "The Campus France procedure opens in October and closes in early December. Skip it and you cannot get a visa.",
@@ -678,8 +892,8 @@ export const PROGRAMS: Program[] = [
     sourceUrl:
       "https://sciences.sorbonne-universite.fr/formation-sciences/offre-de-formation/licences-0/licence-discipline/les-l2-l3-nos-huit-4",
     facultyUrl: "https://sciences.sorbonne-universite.fr/",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
+    verification: "verified",
   },
   {
     id: "fr-polytechnique-bachelor",
@@ -697,7 +911,8 @@ export const PROGRAMS: Program[] = [
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
-        { test: "ielts", min: 6.5 },
+        // Kaynak: programmes.polytechnique.edu → admissions-criteria-and-procedure
+        { test: "ielts", min: 6.5 }, // her beceriden en az 6.0
         { test: "toefl", min: 90 },
       ],
       standardizedTests: [
@@ -714,15 +929,15 @@ export const PROGRAMS: Program[] = [
         { key: "recommendation-letter", mandatory: true },
       ],
     },
-    tuitionNonEu: 15000,
-    tuitionEu: 12000,
+    tuitionNonEu: 19200,
+    tuitionEu: 15900,
     livingCostPerYear: 12000,
     applicationSystem: "direct",
-    deadline: "01-10",
-    sourceUrl: "https://programmes.polytechnique.edu/en/bachelor/bachelor-of-science",
+    deadline: "02-09",
+    sourceUrl: "https://programmes.polytechnique.edu/en/bachelor/admissions/admissions-criteria-and-procedure",
     facultyUrl: "https://www.polytechnique.edu/en",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
+    verification: "verified",
   },
   {
     id: "fr-sciencespo-economics",
@@ -739,28 +954,38 @@ export const PROGRAMS: Program[] = [
       // üniversite sayısal bir not eşiği YAYINLAMIYOR. Uydurma bir eşik
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
-      language: [
-        { test: "ielts", min: 7.0 },
-        { test: "toefl", min: 100 },
-      ],
+      // Kaynak: sciencespo.fr → foreign-secondary-schools/language-requirements
+      // "Attaching proof of language proficiency is entirely optional."
+      // Dil yeterliliği mülakat ve yazılı metinlerle değerlendiriliyor
+      // (İngilizce programlar için beklenen seviye C1). Katalogda önceden
+      // IELTS 7.0 zorunluymuş gibi yazıyordu — böyle bir şart yok.
+      language: [],
       extras: [
         { key: "motivation-letter", mandatory: true },
         { key: "interview", mandatory: true },
         { key: "recommendation-letter", mandatory: true },
       ],
     },
-    tuitionNonEu: 14500,
-    tuitionEu: 14500,
+    // AEA dışında ikamet edenler sabit 10.250 EUR öder. AEA içinde ise
+    // hane gelirine göre 0–10.250 arası kayan tarife, tek rakam yok.
+    tuitionNonEu: 10250,
     livingCostPerYear: 10800,
-    applicationSystem: "parcoursup",
+    // Parcoursup DEĞİL: Parcoursup Fransız bakalorya adayları için.
+    // Yabancı lise diploması olanlar Sciences Po'nun kendi başvuru
+    // sitesinden başvuruyor.
+    applicationSystem: "direct",
+    // UYARI: bu tarih eski Parcoursup takviminden kalma ve artık geçerli değil
+    // (yabancı diplomalılar Sciences Po'nun kendi sistemini kullanıyor).
+    // Kaynak: 2027 dönemi başvuruları Eylül 2026'da açılacak, takvim henüz
+    // yayınlanmadı.
     deadline: "03-12",
     deadlineNote: {
       tr: "Harç aile gelirine göre kademeli — düşük gelirde ciddi biçimde düşüyor",
       en: "Tuition is income-scaled and drops substantially for lower incomes",
     },
-    sourceUrl: "https://www.sciencespo.fr/college/en/",
+    sourceUrl: "https://www.sciencespo.fr/admissions/en/undergraduate/undergraduate-admissions/",
     facultyUrl: "https://www.sciencespo.fr/college/en/",
-    lastChecked: CHECKED,
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
     verification: "ai-extracted",
   },
   {
@@ -780,20 +1005,27 @@ export const PROGRAMS: Program[] = [
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
+        // Kaynak: campusfrance.org → DAP prosedürü, en az B2 (DELF B2 /
+        // DELF Junior / TCF TP).
         { test: "delf", min: 4 },
         { test: "tcf", min: 400 },
       ],
       requiredSubjects: [{ subject: "math", level: "advanced" }],
     },
-    tuitionNonEu: 2850,
-    tuitionEu: 175,
+    // "Droits différenciés": AB/AEA/İsviçre dışı öğrenciler için 2026-27
+    // lisans harcı. Üniversiteler bireysel durumlara göre muafiyet
+    // verebiliyor. AB tarifesi aynı programda 178 EUR.
+    tuitionNonEu: 2902,
+    tuitionEu: 178,
     livingCostPerYear: 11400,
     applicationSystem: "campus-france",
-    deadline: "12-05",
+    // Campus France DAP başvuru penceresi: 1 Ekim – 15 Aralık.
+    // Üniversite cevapları 30 Nisan'a, öğrencinin yanıtı 31 Mayıs'a kadar.
+    deadline: "12-15",
     sourceUrl: "https://www.universite-paris-saclay.fr/formation/licence/mathematiques",
     facultyUrl: "https://www.universite-paris-saclay.fr/",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
+    verification: "verified",
   },
 
   // -------------------------------------------------------------------------
@@ -808,10 +1040,17 @@ export const PROGRAMS: Program[] = [
     name: "Computer Science (Informatik)",
     degree: "BSc",
     field: "cs",
+    // Teyit edildi (inf.ethz.ch/studies/bachelor.html): "The language of
+    // instruction at the beginning of the study programme is German. Starting
+    // from the second year, courses are increasingly taught in English."
+    // Yani birinci yıl Almanca — Türk öğrenci için belirleyici bilgi.
     teachingLanguage: "de",
     durationYears: 3,
     requirements: {
-      minGpa: 85,
+      // Sayfa sayısal eşik vermiyor; Türk diploması tek başına yetmiyor ve
+      // giriş sınavı belirleyici.
+      minGpa: undefined,
+      // Goethe C1 seviyesi bu sayfada geçmiyor, teyit edilmedi.
       language: [{ test: "goethe", min: 5 }],
       requiredSubjects: [
         { subject: "math", level: "advanced" },
@@ -828,14 +1067,28 @@ export const PROGRAMS: Program[] = [
         },
       ],
     },
-    tuitionNonEu: 1800,
-    tuitionEu: 1500,
+    // DÜZELTME (2026-08-13): katalogda 1.800 / 1.500 yazıyordu, para birimi de
+    // yoktu (yani EUR sayılıyordu). İkisi de yanlış.
+    //
+    // ETH 2025 güz döneminden itibaren İKİ HARÇ GRUBU uyguluyor ve İsviçre
+    // dışı diplomayla gelenler "threefold tuition fee (Group 2)" grubunda —
+    // yani üç kat ödüyor. Kesin tutarlar sayfada değil, indirilen bir PDF'te;
+    // okuyamadım. Uydurmak yerine bilinmiyor bırakıldı.
+    //
+    // Doğrulama turunda yapılacak: ethz.ch/students/en/studies/financial/
+    // tuition-fees.html sayfasındaki "Tuition fees (PDF)" dosyasından Group 2
+    // dönemlik tutarını al, yıllığa çevir, tuitionCurrency CHF olarak yaz.
+    tuitionNonEu: undefined,
+    tuitionEu: undefined,
+    tuitionCurrency: "CHF",
     livingCostPerYear: 26400,
     applicationSystem: "direct",
     deadline: "03-15",
     deadlineNote: {
-      tr: "Harç çok düşük ama Zürih'te yaşam maliyeti listedeki en yüksek kalem — asıl bütçe orada",
-      en: "Tuition is very low, but Zürich living costs are the highest on this list — that is the real budget",
+      // ESKİ NOT "harç çok düşük" diyordu — üç kat harç kuralı yüzünden bu
+      // iddia artık dayanaksız. Sahnede söylenmemesi için değiştirildi.
+      tr: "Zürih'te yaşam maliyeti listedeki en yüksek kalem. Harç için dikkat: İsviçre dışı diplomayla gelenler 2025'ten beri üç kat harç grubunda.",
+      en: "Zürich living costs are the highest on this list. Note on tuition: since 2025, students with a non-Swiss certificate fall into the threefold fee group.",
     },
     sourceUrl: "https://inf.ethz.ch/studies/bachelor.html",
     facultyUrl: "https://inf.ethz.ch/",
@@ -896,7 +1149,11 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 85,
+      // Kabul sayfası: "recognised Swiss maturity certificate (Maturität) or an
+      // equivalent foreign certificate" — sayısal eşik yok.
+      minGpa: undefined,
+      // Dil şartı sayfada katlanmış bir bölümde ve açılmıyor; IELTS 7.0 /
+      // TOEFL 100 TEYİT EDİLEMEDİ. Bu yüzden kayıt ai-extracted kaldı.
       language: [
         { test: "ielts", min: 7.0 },
         { test: "toefl", min: 100 },
@@ -906,21 +1163,34 @@ export const PROGRAMS: Program[] = [
           key: "entrance-exam",
           mandatory: true,
           note: {
-            tr: "Uluslararası adaylar için giriş sınavı",
-            en: "Entrance examination for international applicants",
+            // Kabul sayfası uluslararası adaylar için seçme prosedürünü
+            // (yetenek testi + video mülakat) zorunlu tutuyor.
+            tr: "Uluslararası adaylar için seçme prosedürü — yetenek testi ve video mülakat",
+            en: "Selection procedure for international applicants — aptitude test and video interview",
           },
         },
         { key: "motivation-letter", mandatory: true },
       ],
     },
-    tuitionNonEu: 6500,
-    tuitionEu: 3300,
+    // DÜZELTME (2026-08-13): katalogda 6.500 / 3.300 EUR yazıyordu, para birimi
+    // yanlıştı. Harç sayfası (unisg.ch/.../costs-of-an-hsg-degree/):
+    //   yabancı uyruklu lisans  CHF 3.129 / dönem → yılda CHF 6.258
+    //   İsviçre uyruklu lisans  CHF 1.229 / dönem → yılda CHF 2.458
+    // Ayrıca CHF 250 başvuru ücreti. Üniversite toplam yıllık maliyeti
+    // CHF 25.000-30.000 olarak öneriyor.
+    tuitionNonEu: 6258,
+    tuitionEu: 2458,
+    tuitionCurrency: "CHF",
     livingCostPerYear: 22800,
     applicationSystem: "direct",
+    // Teyit edildi: kabul sayfası "Application period: 1 October - 30 April".
     deadline: "04-30",
+    // Şartlar ve harçlar program sayfasında değil kabul sayfasında; öğrencinin
+    // tıklayıp doğrulayacağı yer burası.
     sourceUrl:
+      "https://www.unisg.ch/en/studying/admission/admission-bachelor/admission-to-a-bachelors-degree-programme/",
+    facultyUrl:
       "https://www.unisg.ch/en/studying/programmes/bachelor/major-in-business-administration-bwl/",
-    facultyUrl: "https://www.unisg.ch/en/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
   },
@@ -940,29 +1210,62 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 75,
+      // Sayfa sayısal eşik vermiyor: "Selection is based on upper secondary
+      // education grade point average" — yani eşik değil, SIRALAMA.
+      minGpa: undefined,
+      // Sayfa: IELTS toplam 6.5, hiçbir bölüm 5.5 altında olmayacak.
+      // TOEFL toplam 90, yazma bölümü 20. Alt puan şartları tip modelinde
+      // taşınamıyor; toplam eşikler yazıldı.
       language: [
         { test: "ielts", min: 6.5 },
         { test: "toefl", min: 90 },
       ],
       requiredSubjects: [
+        // Sayfa: "Mathematics 4 (advanced level of mathematics)"
         { subject: "math", level: "advanced" },
-        { subject: "physics", level: "basic" },
+        // DÜZELTME: katalogda "basic" yazıyordu. Sayfa "Physics 2 (advanced
+        // level of physics)" diyor.
+        { subject: "physics", level: "advanced" },
+      ],
+      extras: [
+        {
+          // EKLENDİ: katalogda hiç seçme şartı yoktu ve bu program demoda
+          // GÜVENLİ bandında görünüyor. Sayfa 2024 için 684 uygun adaydan
+          // 71'inin alındığını yazıyor — %10. Şartları karşılamak burada
+          // kabul anlamına gelmiyor; "rahatça aşıyorsun" demek yanıltıcı olur.
+          key: "numerus-fixus",
+          mandatory: true,
+          note: {
+            tr: "Kontenjan sıralamayla dağıtılıyor — 2024'te şartları karşılayan 684 adaydan 71'i alındı (%10)",
+            en: "Places are allocated by ranking — in 2024, 71 of 684 eligible applicants were admitted (10%)",
+          },
+        },
       ],
     },
-    tuitionNonEu: 15600,
+    // DÜZELTME: katalogda 15.600 EUR yazıyordu. KTH harç sayfası programın
+    // tamamı için SEK 423.000 diyor → 3 yıl, yılda SEK 141.000.
+    // Ayrıca SEK 900 başvuru ücreti var (modelde karşılığı yok).
+    tuitionNonEu: 141000,
     tuitionEu: 0,
+    tuitionCurrency: "SEK",
     livingCostPerYear: 12000,
     applicationSystem: "direct",
+    // Son tarih bu sayfada geçmiyor; İsveç ulusal turu ortak tarih kullanıyor.
     deadline: "01-15",
     deadlineNote: {
       tr: "Tüm İsveç başvuruları universityadmissions.se üzerinden, tek son tarih",
       en: "All Swedish applications go through universityadmissions.se with a single deadline",
     },
-    sourceUrl: "https://www.kth.se/en/studies/bachelor",
+    sourceUrl:
+      "https://www.kth.se/en/studies/bachelor/information-communication-technology/entry-requirements-for-information-and-communication-technology-1.450313",
     facultyUrl: "https://www.kth.se/en/eecs",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-13",
+    verification: "verified",
+    // Baktık: KTH bu program için birebir şöyle diyor: "KTH does not offer any
+    // scholarships for the Bachelor's programme in Information and
+    // Communication Technology".
+    // Boş dizi "burs yok" demek — alanın hiç olmaması "bakmadık" demek olurdu.
+    scholarships: [],
   },
   {
     id: "se-lund-ib",
@@ -987,11 +1290,12 @@ export const PROGRAMS: Program[] = [
       requiredSubjects: [{ subject: "math", level: "basic" }],
       extras: [{ key: "motivation-letter", mandatory: true }],
     },
-    // Sayfa harcı SEK cinsinden veriyor: 3 yıl toplam SEK 390.000
-    // (yılda SEK 130.000). Bu alan EUR bekliyor; kur varsayımı yapıp sayı
-    // yazmak yerine bilinmiyor bırakıldı — çevrim kararı ve tarihi Eda'nın.
-    tuitionNonEu: undefined,
+    // Sayfa: "Full programme tuition fee: SEK 390.000" (3 yıl), dönemlik ilk
+    // ödeme SEK 65.000 → yılda SEK 130.000. Kaynağın para biriminde saklanıyor.
+    // Katalogda 13.500 EUR yazıyordu; sayfada böyle bir sayı geçmiyor.
+    tuitionNonEu: 130000,
     tuitionEu: 0,
+    tuitionCurrency: "SEK",
     livingCostPerYear: 10800,
     applicationSystem: "direct",
     deadline: "01-15",
@@ -1148,23 +1452,39 @@ export const PROGRAMS: Program[] = [
     country: "DK",
     city: "Kongens Lyngby",
     name: "General Engineering",
-    degree: "BEng",
+    // DÜZELTME: katalogda BEng yazıyordu. Sayfa "BSc in General Engineering"
+    // diyor — DTU'nun BEng programları Danca veriliyor, bu İngilizce olan BSc.
+    degree: "BSc",
     field: "engineering",
     teachingLanguage: "en",
     durationYears: 3.5,
     requirements: {
-      minGpa: 74,
+      // Sayfa not ortalaması eşiği vermiyor; seviye değerlendirmesini
+      // başvuruda DTU'nun kabul ekibi yapıyor.
+      minGpa: undefined,
+      // Sayfa: IELTS Academic minimum 6.5 · TOEFL iBT minimum 88 · Cambridge 180.
+      // İkisi de katalogdakiyle birebir uyuşuyor.
       language: [
         { test: "ielts", min: 6.5 },
         { test: "toefl", min: 88 },
       ],
       requiredSubjects: [
+        // Sayfa: "Mathematics A-level, English B-level, Physics B-level,
+        // Chemistry B-level".
         { subject: "math", level: "advanced" },
-        { subject: "physics", level: "advanced" },
+        // DÜZELTME: physics "advanced" değil B seviyesi.
+        { subject: "physics", level: "basic" },
+        // EKLENDİ: kimya B seviyesi katalogda hiç yoktu.
+        { subject: "chemistry", level: "basic" },
       ],
     },
+    // Sayfa: yılda € 15.000, dönemlik iki taksitte € 7.500. Katalogdaki değer
+    // doğruydu ve gerçekten EUR. AB/AEA vatandaşı harç ödemiyor.
+    // (Ayrıca € 100 başvuru ücreti ve lisans düzeyinde burs YOK — burs
+    // özelliği eklendiğinde bu kayıt "burs yok" olarak işaretlenebilir.)
     tuitionNonEu: 15000,
     tuitionEu: 0,
+    tuitionCurrency: "EUR",
     livingCostPerYear: 14400,
     applicationSystem: "direct",
     deadline: "01-15",
@@ -1172,10 +1492,15 @@ export const PROGRAMS: Program[] = [
       tr: "AB-dışı son tarih 15 Ocak — AB'lilerin 15 Mart tarihine bakma, seni bağlamıyor",
       en: "Non-EU deadline is 15 January — the 15 March EU date does not apply to you",
     },
-    sourceUrl: "https://www.dtu.dk/english/education",
-    facultyUrl: "https://www.dtu.dk/english",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    sourceUrl:
+      "https://www.dtu.dk/english/education/undergraduate/general-engineering/admission-and-deadlines/admission-requirements",
+    facultyUrl: "https://www.dtu.dk/english/education/undergraduate/general-engineering",
+    lastChecked: "2026-08-13",
+    verification: "verified",
+    // Baktık: DTU birebir şöyle diyor: lisans düzeyinde harç muafiyeti veya
+    // başka bir destek sunmuyor. Muafiyetler yalnızca yüksek lisansta.
+    // Boş dizi "burs yok" demek — alanın hiç olmaması "bakmadık" demek olurdu.
+    scholarships: [],
   },
   {
     id: "dk-cbs-ib",
@@ -1255,8 +1580,11 @@ export const PROGRAMS: Program[] = [
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
-        { test: "ielts", min: 6.0 },
-        { test: "toefl", min: 78 },
+        // Kaynak: polimi.it → language-requirements → "Students of an
+        // English-Language Laurea Study Programme". Katalogda önceden 6.0/78
+        // yazıyordu; o değerler LAUREA MAGISTRALE (yüksek lisans) şartı.
+        { test: "ielts", min: 5.0 },
+        { test: "toefl", min: 59 },
       ],
       requiredSubjects: [{ subject: "math", level: "advanced" }],
       extras: [
@@ -1270,10 +1598,14 @@ export const PROGRAMS: Program[] = [
         },
       ],
     },
-    tuitionNonEu: 3900,
+    // ISEE (aile geliri) belgesi verilirse 165 EUR'a kadar iniyor; AB-dışı
+    // öğrenci ISEE vermezse azami dilimi öder: 3.891,59 EUR.
+    tuitionNonEu: 3892,
     tuitionEu: 900,
     livingCostPerYear: 12000,
     applicationSystem: "direct",
+    // UYARI: bu tarih doğrulanamadı. PoliMi başvuru takvimini yıllık "bando"
+    // ile yayınlıyor ve ulaşabildiğimiz sayfalarda 2026-27 tarihi yoktu.
     deadline: "02-20",
     deadlineNote: {
       tr: "Harç aile gelirine (ISEE) göre kademeli, düşük gelirde ciddi biçimde düşüyor",
@@ -1281,7 +1613,7 @@ export const PROGRAMS: Program[] = [
     },
     sourceUrl: "https://www.polimi.it/en/programmes",
     facultyUrl: "https://www.deib.polimi.it/eng/home-page",
-    lastChecked: CHECKED,
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
     verification: "ai-extracted",
   },
   {
@@ -1301,8 +1633,10 @@ export const PROGRAMS: Program[] = [
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
-        { test: "ielts", min: 6.5 },
+        // Kaynak: unibocconi.it → english-certificates-accepted-enrollment
+        { test: "ielts", min: 6.5 }, // her bölümden en az 6.0
         { test: "toefl", min: 88 },
+        { test: "duolingo", min: 110 },
       ],
       standardizedTests: [
         { test: "sat", min: 1350, mandatory: false },
@@ -1325,15 +1659,15 @@ export const PROGRAMS: Program[] = [
     tuitionEu: 17000,
     livingCostPerYear: 14400,
     applicationSystem: "direct",
-    deadline: "01-15",
+    deadline: "01-23",
     deadlineNote: {
       tr: "Turlu başvuru — erken turlarda kabul şansı ve burs olasılığı daha yüksek",
       en: "Rolling rounds — earlier rounds carry better odds and scholarship chances",
     },
     sourceUrl: "https://www.unibocconi.it/en/programs/bachelor-science/international-economics-and-finance",
     facultyUrl: "https://www.unibocconi.it/en",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
+    verification: "verified",
   },
   {
     id: "it-bologna-medicine",
@@ -1351,10 +1685,11 @@ export const PROGRAMS: Program[] = [
       // üniversite sayısal bir not eşiği YAYINLAMIYOR. Uydurma bir eşik
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
-      language: [
-        { test: "ielts", min: 6.0 },
-        { test: "toefl", min: 80 },
-      ],
+      // Kaynak açıkça söylüyor: "English language qualifications are not a
+      // mandatory requirement" — İngilizce yeterliliği giriş sınavının
+      // kendisiyle ölçülüyor, sertifika yalnızca eşitlik bozucu.
+      // Boş dizi = "şart yok" (undefined = "bilinmiyor" ile aynı şey değil).
+      language: [],
       requiredSubjects: [
         { subject: "biology", level: "advanced" },
         { subject: "chemistry", level: "advanced" },
@@ -1378,19 +1713,41 @@ export const PROGRAMS: Program[] = [
         },
       ],
     },
-    tuitionNonEu: 3000,
-    tuitionEu: 3000,
+    // Harç ISEE (aile geliri) belgesine göre hesaplanıyor; düşük gelirde tam
+    // muafiyet var. Sabit bir rakam yayınlanmıyor, o yüzden uydurmuyoruz.
     livingCostPerYear: 10800,
     applicationSystem: "direct",
-    deadline: "07-25",
+    deadline: "09-29",
     deadlineNote: {
       tr: "IMAT kaydı son tarihi — sınavın kendisi Eylül'de",
       en: "IMAT registration deadline — the exam itself is in September",
     },
-    sourceUrl: "https://corsi.unibo.it/singlecycle/MedicineSurgery",
+    sourceUrl: "https://corsi.unibo.it/singlecycle/MedicineAndSurgery/how-to-enrol",
     facultyUrl: "https://www.unibo.it/en",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
+    verification: "verified",
+    scholarships: [
+      {
+        name: "MAECI — İtalyan Dışişleri Bakanlığı bursu",
+        kind: "grant",
+        openToNonEu: true,
+        sourceUrl: "https://www.unibo.it/en/study/study-grants-and-subsidies",
+        note: {
+          tr: "İtalyan Dışişleri Bakanlığı'nın uluslararası öğrencilere verdiği burs. Tutar üniversitenin sayfasında belirtilmiyor, bakanlığın yıllık çağrısından bakılmalı.",
+          en: "Granted by the Italian Ministry of Foreign Affairs to international students. The amount is not stated on the university page — check the ministry's annual call.",
+        },
+      },
+      {
+        name: "AB/OECD dışı vatandaşlar için indirimli sabit harç",
+        kind: "tuition-waiver",
+        openToNonEu: true,
+        sourceUrl: "https://www.unibo.it/en/study/study-grants-and-subsidies",
+        note: {
+          tr: "AB ve OECD üyesi olmayan, düşük gelirli ülke vatandaşlarına indirimli sabit harç uygulanıyor. Türkiye OECD üyesi olduğu için bu kalem Türk öğrenciyi KAPSAMAYABİLİR — başvuru öncesi teyit et.",
+          en: "A reduced flat fee applies to citizens of low-income countries outside the EU and OECD. Türkiye is an OECD member, so this may NOT apply to Turkish students — confirm before applying.",
+        },
+      },
+    ],
   },
   {
     id: "it-pavia-medicine",
@@ -1408,10 +1765,9 @@ export const PROGRAMS: Program[] = [
       // üniversite sayısal bir not eşiği YAYINLAMIYOR. Uydurma bir eşik
       // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
       // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
-      language: [
-        { test: "ielts", min: 6.0 },
-        { test: "toefl", min: 80 },
-      ],
+      // Bologna ile aynı ulusal sınav sistemi: İngilizce yeterliliği sınavla
+      // ölçülüyor, ayrı sertifika zorunlu değil.
+      language: [],
       requiredSubjects: [
         { subject: "biology", level: "advanced" },
         { subject: "chemistry", level: "basic" },
@@ -1432,17 +1788,17 @@ export const PROGRAMS: Program[] = [
         },
       ],
     },
-    tuitionNonEu: 3500,
-    tuitionEu: 3500,
+    // AB-dışı öğrenciler sabit tarife ödüyor ama tek bir rakam yok:
+    // vatandaşlık ve alana göre 390–4.550 EUR/yıl arasında değişiyor.
     livingCostPerYear: 9600,
     applicationSystem: "direct",
-    deadline: "07-25",
+    deadline: "09-29",
     // Programın kendi sitesi. Eski link (portale.unipv.it/en) üniversite ana
     // sayfasıydı ve Cloudflare otomatik isteklere 403 veriyordu.
-    sourceUrl: "https://medicineandsurgeryharvey.cdl.unipv.it/en",
+    sourceUrl: "https://medicineandsurgeryharvey.cdl.unipv.it/en/enroll/access-requirements",
     facultyUrl: "https://portale.unipv.it/en",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-13", // FR/IT doğrulama turu
+    verification: "verified",
   },
 ];
 

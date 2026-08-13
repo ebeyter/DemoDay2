@@ -229,12 +229,15 @@ const tr = {
     notStated: "Kaynakta belirtilmemiş",
     notStatedNote:
       "Üniversite bu bilgiyi kaynak sayfasında yayınlamıyor. Tahmin üretmiyoruz — başvuru ofisine sorman gerekiyor.",
+    currencyNote:
+      "Harç, üniversitenin yayınladığı para biriminde gösteriliyor. Kur her gün değiştiği için EUR'a çevirmiyoruz; bu yüzden toplam yıllık maliyet ve bütçe karşılaştırması bu programda hesaplanmıyor.",
   },
 
   verification: {
     verified: "Kaynağından doğrulandı",
     "ai-extracted": "AI ile çıkarıldı, doğrulanmadı",
-    verifiedTip: "Bu kayıt üniversitenin resmi sayfasından elle teyit edildi.",
+    verifiedTip:
+      "Bu kaydın her alanı üniversitenin resmi program sayfasıyla tek tek karşılaştırıldı. Sayfanın belirtmediği alanlar tahminle doldurulmadı, boş bırakıldı.",
     "ai-extractedTip":
       "Bu kayıt otomatik derlendi ama tek tek doğrulanmadı. Başvurmadan önce kaynak bağlantısından kontrol et.",
   },
@@ -278,6 +281,25 @@ const tr = {
 
   countries: {
     noteTitle: "AB-dışı öğrenci olarak dikkat",
+  },
+
+  scholarships: {
+    title: "Burslar",
+    openToNonEu: "AB-dışına açık",
+    euOnly: "Yalnızca AB vatandaşları",
+    perYear: "/yıl",
+    amountUnknown: "Tutar kaynakta belirtilmemiş",
+    noneFound: "Bu programda AB-dışı lisans öğrencisine açık burs bulunamadı.",
+    noneFoundNote:
+      "Bu bir tahmin değil: üniversitenin kendi sayfası lisans düzeyinde burs sunmadığını söylüyor. Maliyet planını burssuz yap.",
+    notChecked: "Burs bilgisi henüz araştırılmadı.",
+    kinds: {
+      "tuition-waiver": "Harç muafiyeti",
+      grant: "Nakit burs",
+      merit: "Başarı bursu",
+      "need-based": "İhtiyaç bursu",
+    },
+    sourceLink: "Burs sayfası",
   },
 
   freshness: {
@@ -547,12 +569,15 @@ const en: Dictionary = {
     notStated: "Not stated at source",
     notStatedNote:
       "The university does not publish this on its source page. We do not generate an estimate — you need to ask the admissions office.",
+    currencyNote:
+      "Tuition is shown in the currency the university publishes. We do not convert to EUR because rates change daily, so the annual total and budget comparison are not calculated for this program.",
   },
 
   verification: {
     verified: "Verified at source",
     "ai-extracted": "AI-extracted, not verified",
-    verifiedTip: "This record was manually confirmed against the university's official page.",
+    verifiedTip:
+      "Every field in this record was compared against the university's official programme page. Fields the page does not state were left empty rather than estimated.",
     "ai-extractedTip":
       "This record was compiled automatically and not individually verified. Check the source link before applying.",
   },
@@ -596,6 +621,25 @@ const en: Dictionary = {
 
   countries: {
     noteTitle: "As a non-EU student, note",
+  },
+
+  scholarships: {
+    title: "Scholarships",
+    openToNonEu: "Open to non-EU",
+    euOnly: "EU citizens only",
+    perYear: "/year",
+    amountUnknown: "Amount not stated at source",
+    noneFound: "No scholarship open to non-EU bachelor students was found for this program.",
+    noneFoundNote:
+      "This is not a guess: the university's own page states it offers no scholarships at bachelor level. Plan your budget without one.",
+    notChecked: "Scholarship information has not been researched yet.",
+    kinds: {
+      "tuition-waiver": "Tuition waiver",
+      grant: "Cash grant",
+      merit: "Merit award",
+      "need-based": "Need-based aid",
+    },
+    sourceLink: "Scholarship page",
   },
 
   freshness: {

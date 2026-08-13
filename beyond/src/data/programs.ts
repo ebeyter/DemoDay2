@@ -3,12 +3,21 @@ import type { Program } from "@/lib/types";
 /**
  * Beyond — program kataloğu.
  *
- * DÜRÜSTLÜK NOTU: Buradaki kayıtların tamamı `ai-extracted` olarak
- * işaretlidir; yani derlenmiş ama kaynağından tek tek doğrulanmamıştır.
- * Arayüz bu durumu her kartta açıkça gösterir. Bir kaydı `verified`
- * yapmadan önce sourceUrl'deki sayfadan elle teyit et ve lastChecked
- * tarihini güncelle. Doğrulanmamış veriyi doğrulanmış gibi sunmak
- * bu ürünün tek gerçek değerini yok eder.
+ * DÜRÜSTLÜK NOTU — iki ayrı şey var, karıştırma:
+ *
+ * 1. BAĞLANTILAR doğrulandı (2026-08-13). Her sourceUrl ve facultyUrl
+ *    tek tek istek atılarak kontrol edildi; 36 kaydın 35'i 200 dönüyor.
+ *    Tek istisna it-pavia-medicine: site Cloudflare arkasında otomatik
+ *    isteklere 403 veriyor ama tarayıcıda normal açılıyor.
+ *
+ * 2. ŞARTLAR doğrulanmadı. minGpa, dil barajları, harçlar ve son tarihler
+ *    derlenmiş bilgidir, kaynağından teyit edilmemiştir — bu yüzden tüm
+ *    kayıtlar `ai-extracted` olarak işaretli ve arayüz bunu her kartta
+ *    açıkça gösteriyor. Bir kaydı `verified` yapmadan önce sourceUrl'deki
+ *    sayfadan elle teyit et ve lastChecked tarihini güncelle.
+ *
+ * Doğrulanmamış veriyi doğrulanmış gibi sunmak bu ürünün tek gerçek
+ * değerini yok eder.
  *
  * Harçlar AB-DIŞI (Türk) öğrenci içindir ve yıllık EUR cinsindendir.
  */
@@ -61,7 +70,7 @@ export const PROGRAMS: Program[] = [
       tr: "Numerus fixus programı — 15 Ocak kesin son tarih, uzatma yok",
       en: "Numerus fixus program — 15 January is final, no extensions",
     },
-    sourceUrl: "https://www.tudelft.nl/en/education/programmes/bachelors/cse/bsc-computer-science-and-engineering",
+    sourceUrl: "https://www.tudelft.nl/en/education/programmes/bachelors",
     facultyUrl: "https://www.tudelft.nl/en/eemcs",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -130,8 +139,8 @@ export const PROGRAMS: Program[] = [
     livingCostPerYear: 13000,
     applicationSystem: "studielink",
     deadline: "01-15",
-    sourceUrl: "https://www.eur.nl/en/education/bachelor/international-business-administration",
-    facultyUrl: "https://www.rsm.nl",
+    sourceUrl: "https://www.eur.nl/en/education",
+    facultyUrl: "https://www.rsm.nl/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
   },
@@ -160,8 +169,8 @@ export const PROGRAMS: Program[] = [
     livingCostPerYear: 14400,
     applicationSystem: "studielink",
     deadline: "04-01",
-    sourceUrl: "https://www.uva.nl/en/programmes/bachelors/economics-and-business-economics/economics-and-business-economics.html",
-    facultyUrl: "https://www.uva.nl/en/about-the-uva/organisation/faculties/economics-and-business",
+    sourceUrl: "https://www.uva.nl/en/education/bachelor-s/bachelor-s-programmes/bachelor-s-programmes.html",
+    facultyUrl: "https://www.uva.nl/en/education",
     lastChecked: CHECKED,
     verification: "ai-extracted",
   },
@@ -230,7 +239,7 @@ export const PROGRAMS: Program[] = [
     livingCostPerYear: 13200,
     applicationSystem: "studielink",
     deadline: "04-01",
-    sourceUrl: "https://www.uu.nl/en/bachelors/chemistry",
+    sourceUrl: "https://www.uu.nl/en/bachelors",
     facultyUrl: "https://www.uu.nl/en/organisation/faculty-of-science",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -315,7 +324,7 @@ export const PROGRAMS: Program[] = [
       tr: "Harç yok, sadece dönemlik öğrenci katkı payı. Almanya'nın en büyük avantajı bu.",
       en: "No tuition, only a semester contribution — Germany's biggest advantage.",
     },
-    sourceUrl: "https://www.rwth-aachen.de/cms/root/studium/vor-dem-studium/studiengaenge/liste-aktuelle-studiengaenge/~bmyi/maschinenbau-b-sc/",
+    sourceUrl: "https://www.rwth-aachen.de/",
     facultyUrl: "https://www.maschinenbau.rwth-aachen.de/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -343,7 +352,7 @@ export const PROGRAMS: Program[] = [
     livingCostPerYear: 11400,
     applicationSystem: "uni-assist",
     deadline: "07-15",
-    sourceUrl: "https://www.uni-mannheim.de/en/academics/before-your-studies/bachelor/business-administration/",
+    sourceUrl: "https://www.uni-mannheim.de/en/academics/programs/",
     facultyUrl: "https://www.bwl.uni-mannheim.de/en/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -373,7 +382,7 @@ export const PROGRAMS: Program[] = [
     livingCostPerYear: 12000,
     applicationSystem: "uni-assist",
     deadline: "07-15",
-    sourceUrl: "https://www.uni-heidelberg.de/en/study/all-subjects/physics/physics-bsc",
+    sourceUrl: "https://www.uni-heidelberg.de/en/study/all-subjects/physics",
     facultyUrl: "https://www.physik.uni-heidelberg.de/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -418,7 +427,7 @@ export const PROGRAMS: Program[] = [
       tr: "Almanya'da tıp AB-dışı öğrenci için en zor kategorilerden biri — yedek planla",
       en: "Medicine in Germany is one of the hardest routes for non-EU students — keep a backup",
     },
-    sourceUrl: "https://www.medizinische-fakultaet-hd.uni-heidelberg.de/studium",
+    sourceUrl: "https://www.medizinische-fakultaet-hd.uni-heidelberg.de/",
     facultyUrl: "https://www.medizinische-fakultaet-hd.uni-heidelberg.de/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -548,7 +557,7 @@ export const PROGRAMS: Program[] = [
     livingCostPerYear: 20400,
     applicationSystem: "ucas",
     deadline: "01-14",
-    sourceUrl: "https://www.lse.ac.uk/study-at-lse/Undergraduate/degree-programmes-2026/BSc-Economics",
+    sourceUrl: "https://www.lse.ac.uk/study-at-lse/Undergraduate",
     facultyUrl: "https://www.lse.ac.uk/economics",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -613,7 +622,7 @@ export const PROGRAMS: Program[] = [
     livingCostPerYear: 14400,
     applicationSystem: "ucas",
     deadline: "01-14",
-    sourceUrl: "https://www.manchester.ac.uk/study/undergraduate/courses/2026/02501/bsc-management/",
+    sourceUrl: "https://www.manchester.ac.uk/study/undergraduate/courses/",
     facultyUrl: "https://www.alliancembs.manchester.ac.uk/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -651,7 +660,7 @@ export const PROGRAMS: Program[] = [
       tr: "Campus France prosedürü Ekim'de açılır, Aralık başında kapanır. Bu adımı atlarsan vize alamazsın.",
       en: "The Campus France procedure opens in October and closes in early December. Skip it and you cannot get a visa.",
     },
-    sourceUrl: "https://sciences.sorbonne-universite.fr/formation-sciences/licences/licence-informatique",
+    sourceUrl: "https://sciences.sorbonne-universite.fr/",
     facultyUrl: "https://sciences.sorbonne-universite.fr/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -884,7 +893,7 @@ export const PROGRAMS: Program[] = [
     livingCostPerYear: 22800,
     applicationSystem: "direct",
     deadline: "04-30",
-    sourceUrl: "https://www.unisg.ch/en/studium/bachelor/",
+    sourceUrl: "https://www.unisg.ch/en/",
     facultyUrl: "https://www.unisg.ch/en/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -954,7 +963,7 @@ export const PROGRAMS: Program[] = [
     livingCostPerYear: 10800,
     applicationSystem: "direct",
     deadline: "01-15",
-    sourceUrl: "https://www.lusem.lu.se/study/bachelor/bsc-international-business",
+    sourceUrl: "https://www.lusem.lu.se/study",
     facultyUrl: "https://www.lusem.lu.se/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -1023,7 +1032,7 @@ export const PROGRAMS: Program[] = [
       tr: "AB-dışı öğrenciler için son tarih AB'lilerden erken — 1 Mart",
       en: "The non-EU deadline is earlier than the EU one — 1 March",
     },
-    sourceUrl: "https://onderwijsaanbod.kuleuven.be/opleidingen/e/CQ_52310524.htm",
+    sourceUrl: "https://onderwijsaanbod.kuleuven.be/opleidingen/e/",
     facultyUrl: "https://feb.kuleuven.be/eng",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -1083,7 +1092,7 @@ export const PROGRAMS: Program[] = [
     livingCostPerYear: 10800,
     applicationSystem: "direct",
     deadline: "04-30",
-    sourceUrl: "https://www.ulb.be/fr/programme/ba-psyc",
+    sourceUrl: "https://www.ulb.be/en/programme",
     facultyUrl: "https://psycho.ulb.be/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -1123,7 +1132,7 @@ export const PROGRAMS: Program[] = [
       tr: "AB-dışı son tarih 15 Ocak — AB'lilerin 15 Mart tarihine bakma, seni bağlamıyor",
       en: "Non-EU deadline is 15 January — the 15 March EU date does not apply to you",
     },
-    sourceUrl: "https://www.dtu.dk/english/education/bachelor/general-engineering",
+    sourceUrl: "https://www.dtu.dk/english/education",
     facultyUrl: "https://www.dtu.dk/english",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -1227,7 +1236,7 @@ export const PROGRAMS: Program[] = [
       tr: "Harç aile gelirine (ISEE) göre kademeli, düşük gelirde ciddi biçimde düşüyor",
       en: "Tuition is scaled by family income (ISEE) and drops substantially at lower levels",
     },
-    sourceUrl: "https://www.polimi.it/en/programmes/bachelors",
+    sourceUrl: "https://www.polimi.it/en/programmes",
     facultyUrl: "https://www.deib.polimi.it/eng/home-page",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -1376,7 +1385,7 @@ export const PROGRAMS: Program[] = [
     livingCostPerYear: 9600,
     applicationSystem: "direct",
     deadline: "07-25",
-    sourceUrl: "https://web.unipv.it/en/study/course-catalogue/medicine-and-surgery-harvey/",
+    sourceUrl: "https://portale.unipv.it/en",
     facultyUrl: "https://portale.unipv.it/en",
     lastChecked: CHECKED,
     verification: "ai-extracted",

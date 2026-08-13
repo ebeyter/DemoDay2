@@ -179,20 +179,54 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
+      // Not eşiği bu sayfada geçmiyor (ayrı "entry requirements" sayfasında).
+      // 76 teyit edilmedi.
       minGpa: 76,
+      // Dil şartı bu sayfada geçmiyor; IELTS 6.5 / TOEFL 92 teyit edilmedi.
       language: [
         { test: "ielts", min: 6.5 },
         { test: "toefl", min: 92 },
       ],
       requiredSubjects: [{ subject: "math", level: "advanced" }],
-      extras: [{ key: "motivation-letter", mandatory: false }],
+      extras: [
+        { key: "motivation-letter", mandatory: false },
+        {
+          // EKLENDİ: sayfa "The English track is a numerus fixus programme with
+          // only 850 spots available" diyor. Katalogda hiç kontenjan şartı
+          // yoktu ve bu program demoda tek GÜVENLİ kart olarak görünüyordu.
+          key: "numerus-fixus",
+          mandatory: true,
+          note: {
+            tr: "İngilizce track numerus fixus — yılda yalnızca 850 kontenjan",
+            en: "The English track is numerus fixus — only 850 places a year",
+          },
+        },
+        {
+          // EKLENDİ: başvuru adımları arasında "Sign up for the selection and
+          // take the test" var; sıralama numarası 15 Nisan'da açıklanıyor.
+          key: "entrance-exam",
+          mandatory: true,
+          note: {
+            tr: "Seçme sınavına girmek zorunlu; sıralama numarası 15 Nisan'da açıklanıyor",
+            en: "Taking the selection test is required; your ranking number is published on 15 April",
+          },
+        },
+      ],
     },
+    // Harç bu sayfada geçmiyor, 12.000 teyit edilmedi.
+    // (Sayfa ayrıca AB-dışı öğrencilere açık Amsterdam Merit Scholarship'ten
+    // söz ediyor: yılda € 6.000, toplam € 18.000 — burs özelliği eklenince
+    // bu kayda girecek ilk veri.)
     tuitionNonEu: 12000,
     tuitionEu: 2601,
     livingCostPerYear: 14400,
     applicationSystem: "studielink",
-    deadline: "04-01",
-    sourceUrl: "https://www.uva.nl/en/education/bachelor-s/bachelor-s-programmes/bachelor-s-programmes.html",
+    // DÜZELTME (2026-08-13): katalogda "04-01" yazıyordu. Sayfa açıkça
+    // "There is an early application deadline: 15 January" diyor.
+    // 2,5 ay geç bir tarih — bu kayda güvenen öğrenci yılı kaçırırdı.
+    deadline: "01-15",
+    sourceUrl:
+      "https://www.uva.nl/en/programmes/bachelors/economics--business-economics/application-and-admission/international-prior-education/international-prior-education-english-track.html",
     facultyUrl: "https://www.uva.nl/en/education",
     lastChecked: CHECKED,
     verification: "ai-extracted",

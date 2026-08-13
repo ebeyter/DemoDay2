@@ -19,9 +19,13 @@ src/lib/persistent-state.ts
 src/app/results/page.tsx       Reach/Match/Safety + senaryo modu
 src/app/timeline/page.tsx      başvuru takvimi
 src/components/AssistantPanel.tsx
+src/app/api/chat/route.ts      profil-bilir asistan (streaming)
 supabase/schema.sql
 tests/                         (yeni) test altyapısı
 ```
+
+`src/lib/claude.ts` ve `src/lib/fetch-page.ts` **ortak AI altyapısı** — Eda'nın
+`extract`'i de kullanıyor. İmzasını değiştirirsen Eda'ya haber ver.
 
 ### Dokunmadığın dosyalar
 

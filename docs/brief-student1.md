@@ -28,8 +28,11 @@ scripts/                      (yeni) veri doğrulama betikleri
 ### Dokunmadığın dosyalar
 
 `matching.ts`, `store.tsx`, `results/page.tsx`, `timeline/page.tsx`,
-`AssistantPanel.tsx`, `supabase/schema.sql`, `tests/` → **Alp'in.**
-İhtiyacın olursa kendin değiştirme, söyle.
+`AssistantPanel.tsx`, `api/chat/route.ts`, `supabase/schema.sql`, `tests/`
+→ **Alp'in.** İhtiyacın olursa kendin değiştirme, söyle.
+
+`src/lib/claude.ts` ve `src/lib/fetch-page.ts` **ortak AI altyapısı** — Alp'in
+`chat`'i de kullanıyor. İmzasını değiştirirsen Alp'e haber ver.
 
 `types.ts` ve `dictionary.ts` ortak → **sadece sona ekleme yap**, ayrı commit.
 

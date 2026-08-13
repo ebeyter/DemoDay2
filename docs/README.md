@@ -46,12 +46,18 @@ Bölme mantığı: *dosya sahipliği*. Aynı dosyada iki kişi çalışmazsa mer
 | `src/app/results/page.tsx` | **S2** |
 | `src/app/timeline/page.tsx` | **S2** |
 | `src/components/AssistantPanel.tsx` | **S2** |
+| `src/app/api/chat/route.ts` | **S2** |
 | `supabase/schema.sql` | **S2** |
 | `tests/**` | **S2** |
 | `src/lib/types.ts` | ortak — **sadece ekleme** |
 | `src/lib/i18n/dictionary.ts` | ortak — **sadece ekleme** |
+| `src/lib/claude.ts` · `src/lib/fetch-page.ts` | ortak — AI altyapısı, önce haber ver |
 | `beyond/README.md` | ortak — sadece kendi bölümün |
 | `src/components/ui.tsx` · `Header.tsx` · `globals.css` | ortak — önce haber ver |
+
+`claude.ts` / `fetch-page.ts` ikisinin de kullandığı AI altyapısı: `extract`
+(S1) ve `chat` (S2) üstünde duruyor. İmzasını değiştiren taraf **karşıya haber
+verir** — sessiz imza değişikliği diğerinin dalını derlenmez hale getirir.
 
 ### Ortak dosya kuralı
 

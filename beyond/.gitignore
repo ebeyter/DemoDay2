@@ -30,8 +30,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files — gerçek anahtarlar asla depoya girmez
 .env*
+# ...ama şablon dosya girsin: içinde sır yok, kurulum talimatı var.
+!.env.example
 
 # vercel
 .vercel

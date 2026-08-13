@@ -1,0 +1,359 @@
+{
+  "generatedAt": "2026-08-13T18:51:50.932Z",
+  "checks": {
+    "nl-tudelft-cse": {
+      "programId": "nl-tudelft-cse",
+      "status": "ok",
+      "fingerprint": "d35fa9e83cafb1006180251a92889d22",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "nl-tue-mechanical": {
+      "programId": "nl-tue-mechanical",
+      "status": "ok",
+      "fingerprint": "ba29e71f9f22c635eafc0a86e044ec79",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "nl-erasmus-iba": {
+      "programId": "nl-erasmus-iba",
+      "status": "ok",
+      "fingerprint": "c6a7335c60b80a71063c2487aad2326d",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": [
+        {
+          "field": "deadline",
+          "catalog": "01-15",
+          "found": [
+            "10-03",
+            "11-21"
+          ]
+        }
+      ]
+    },
+    "nl-uva-economics": {
+      "programId": "nl-uva-economics",
+      "status": "ok",
+      "fingerprint": "c24d0594f992f6d50739966a23ff5663",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "nl-groningen-psychology": {
+      "programId": "nl-groningen-psychology",
+      "status": "ok",
+      "fingerprint": "0665c6236ead2841617b8ada050302f6",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": [
+        {
+          "field": "tuition",
+          "catalog": "11400",
+          "found": [
+            "2694",
+            "14000"
+          ]
+        }
+      ]
+    },
+    "nl-utrecht-chemistry": {
+      "programId": "nl-utrecht-chemistry",
+      "status": "ok",
+      "fingerprint": "a0589f0a8c977907747e22c530f9c445",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "de-tum-informatics": {
+      "programId": "de-tum-informatics",
+      "status": "ok",
+      "fingerprint": "5654b4efe51017a6d752ec4c39979b67",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "de-rwth-mechanical": {
+      "programId": "de-rwth-mechanical",
+      "status": "ok",
+      "fingerprint": "5ddbdc4b17f9c94bf2f02eb16cd8bff4",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "de-mannheim-business": {
+      "programId": "de-mannheim-business",
+      "status": "ok",
+      "fingerprint": "222985cd765b5f546937b49ab80c7dea",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": [
+        {
+          "field": "tuition",
+          "catalog": "3000",
+          "found": [
+            "8500",
+            "32000"
+          ]
+        }
+      ]
+    },
+    "de-heidelberg-physics": {
+      "programId": "de-heidelberg-physics",
+      "status": "ok",
+      "fingerprint": "ff28a5c3a23676440cb5814dc3913276",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "de-heidelberg-medicine": {
+      "programId": "de-heidelberg-medicine",
+      "status": "ok",
+      "fingerprint": "4b379c1083f50d2b89013c3dfa002e4f",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "gb-imperial-computing": {
+      "programId": "gb-imperial-computing",
+      "status": "ok",
+      "fingerprint": "195581bebdf4a0b4d03a394729f4f5c5",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": [
+        {
+          "field": "tuition",
+          "catalog": "51000",
+          "found": [
+            "5000",
+            "10050",
+            "15000",
+            "45500",
+            "70000"
+          ]
+        }
+      ]
+    },
+    "gb-cambridge-engineering": {
+      "programId": "gb-cambridge-engineering",
+      "status": "ok",
+      "fingerprint": "3c578fc510d666f3b12f4797a5cec80d",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "gb-lse-economics": {
+      "programId": "gb-lse-economics",
+      "status": "ok",
+      "fingerprint": "8b8686056abfda4ef19f0ffd1162cf52",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "gb-ucl-psychology": {
+      "programId": "gb-ucl-psychology",
+      "status": "ok",
+      "fingerprint": "bc15c403e55d1323683a24345a84ff29",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": [
+        {
+          "field": "deadline",
+          "catalog": "01-14",
+          "found": [
+            "01-13"
+          ]
+        }
+      ]
+    },
+    "gb-manchester-business": {
+      "programId": "gb-manchester-business",
+      "status": "ok",
+      "fingerprint": "1d15e1210a3752460c973aa0bb39cdd4",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "fr-sorbonne-informatique": {
+      "programId": "fr-sorbonne-informatique",
+      "status": "ok",
+      "fingerprint": "2215cd23e47c3eca9b8f684eb13e36ec",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "fr-polytechnique-bachelor": {
+      "programId": "fr-polytechnique-bachelor",
+      "status": "ok",
+      "fingerprint": "eef146f6ece538391fa168bd25d53af3",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "fr-sciencespo-economics": {
+      "programId": "fr-sciencespo-economics",
+      "status": "ok",
+      "fingerprint": "ffe8ab6525b1b579eca2105bd72d1500",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "fr-parissaclay-math": {
+      "programId": "fr-parissaclay-math",
+      "status": "ok",
+      "fingerprint": "0515910cd1d0981e07c2d025e8077bd2",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "ch-ethz-cs": {
+      "programId": "ch-ethz-cs",
+      "status": "ok",
+      "fingerprint": "dd19dffd56ff36e8300e375cf94e4ab0",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "ch-epfl-communication": {
+      "programId": "ch-epfl-communication",
+      "status": "ok",
+      "fingerprint": "92988768602bc924b721dec5152d8ac0",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "ch-hsg-business": {
+      "programId": "ch-hsg-business",
+      "status": "ok",
+      "fingerprint": "dec8ee3356a7a7a7337082ed65a47bbc",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "se-kth-ict": {
+      "programId": "se-kth-ict",
+      "status": "ok",
+      "fingerprint": "7aeef6a68887d5b1c1e896b93c2cd2f1",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "se-lund-ib": {
+      "programId": "se-lund-ib",
+      "status": "ok",
+      "fingerprint": "2005e58cfeb012f44702d4cc06dd301e",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "se-uppsala-biology": {
+      "programId": "se-uppsala-biology",
+      "status": "ok",
+      "fingerprint": "ea8b442ca20f31db904b691f9c709595",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "be-kuleuven-business": {
+      "programId": "be-kuleuven-business",
+      "status": "ok",
+      "fingerprint": "4fbe55b08debf70abb008288c97181b6",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "be-ghent-engineering": {
+      "programId": "be-ghent-engineering",
+      "status": "ok",
+      "fingerprint": "6715d00feb2a42ef823d27b3eb296609",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "be-ulb-psychology": {
+      "programId": "be-ulb-psychology",
+      "status": "ok",
+      "fingerprint": "7f49e896016649c3d9d155134f88ebf4",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "dk-dtu-general-engineering": {
+      "programId": "dk-dtu-general-engineering",
+      "status": "ok",
+      "fingerprint": "62d148a2349a3ef8d634776f8c0a9964",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "dk-cbs-ib": {
+      "programId": "dk-cbs-ib",
+      "status": "ok",
+      "fingerprint": "a9e66bf017e150a150e6ea85594dfc03",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": [
+        {
+          "field": "deadline",
+          "catalog": "01-15",
+          "found": [
+            "01-29",
+            "02-24"
+          ]
+        }
+      ]
+    },
+    "dk-ku-machine-learning": {
+      "programId": "dk-ku-machine-learning",
+      "status": "ok",
+      "fingerprint": "2b91d14b7347c30db7c0c00f00af544b",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": [
+        {
+          "field": "deadline",
+          "catalog": "01-15",
+          "found": [
+            "03-15",
+            "07-05"
+          ]
+        }
+      ]
+    },
+    "it-polimi-cse": {
+      "programId": "it-polimi-cse",
+      "status": "ok",
+      "fingerprint": "dbb2ea2a653aff856f0fba805f3f8595",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "it-bocconi-bief": {
+      "programId": "it-bocconi-bief",
+      "status": "ok",
+      "fingerprint": "ca60e6f2ec8be5696f7177530fc17726",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "it-bologna-medicine": {
+      "programId": "it-bologna-medicine",
+      "status": "ok",
+      "fingerprint": "17a3fbd92927494c6dbdaa60ecfed67f",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": []
+    },
+    "it-pavia-medicine": {
+      "programId": "it-pavia-medicine",
+      "status": "unreachable",
+      "fingerprint": "",
+      "changedAt": null,
+      "checkedAt": "2026-08-13T18:51:50.932Z",
+      "discrepancies": [],
+      "error": "Sayfa 403 döndürdü. Bağlantı herkese açık mı?"
+    }
+  }
+}

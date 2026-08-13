@@ -125,6 +125,29 @@ const AP_CLOSE_MARGIN = 1;
 function checkGpa(program: Program, profile: StudentProfile): RequirementCheck {
   const student = toHundredScale(profile.gpa, profile.gpaScale);
   const required = program.requirements.minGpa;
+  const studentOnly = student.toFixed(0);
+
+  // Üniversite bir eşik yayınlamıyor. Öğrencinin notu iyi ya da kötü olabilir;
+  // bilmediğimiz için ne "karşılıyor" ne "karşılamıyor" diyoruz. Uydurma bir
+  // eşiğe göre öğrenciyi elemek, bu ürünün yapmamaya söz verdiği şey.
+  if (required === undefined) {
+    return {
+      id: "gpa",
+      label: { tr: "Not ortalaması", en: "Grade average" },
+      status: "unknown",
+      unknownReason: "source",
+      mandatory: true,
+      detail: {
+        tr: `${studentOnly}/100 · üniversite bir alt eşik yayınlamıyor`,
+        en: `${studentOnly}/100 · the university publishes no minimum`,
+      },
+      action: {
+        tr: "Bu programın not eşiği kaynak sayfada yazmıyor. Uydurmuyoruz — başvuru ofisine sorman ya da benzer programların eşiklerine bakman gerekiyor.",
+        en: "This program's grade threshold is not stated on the source page. We do not invent one — ask the admissions office or compare with similar programs.",
+      },
+    };
+  }
+
   const gap = required - student;
 
   let status: CheckStatus;
@@ -174,6 +197,29 @@ const TEST_LABEL: Record<LanguageTest, string> = {
 
 function checkLanguage(program: Program, profile: StudentProfile): RequirementCheck | null {
   const reqs = program.requirements.language;
+
+  // undefined ile [] AYNI ŞEY DEĞİL:
+  //   []        → sayfa "dil belgesi istemiyoruz" diyor. Şart üretmiyoruz.
+  //   undefined → sayfa bu konuda sessiz. "İstenmiyor" demek yanlış iddia olur,
+  //               çünkü çoğu program ister; bilmediğimizi söylüyoruz.
+  if (reqs === undefined) {
+    return {
+      id: "language",
+      label: { tr: "Dil belgesi", en: "Language certificate" },
+      status: "unknown",
+      unknownReason: "source",
+      mandatory: true,
+      detail: {
+        tr: "Kaynak sayfa hangi dil belgesinin istendiğini yazmıyor",
+        en: "The source page does not state which language certificate is required",
+      },
+      action: {
+        tr: "Bu programın dil şartı kaynak sayfada yok. Neredeyse tüm programlar bir belge ister — üniversiteye sorup teyit et, IELTS/TOEFL hazırlığını yine de planla.",
+        en: "This program's language requirement is not on the source page. Nearly all programs require one — confirm with the university and plan for IELTS/TOEFL anyway.",
+      },
+    };
+  }
+
   if (reqs.length === 0) return null;
 
   const accepted = reqs.map((r) => `${TEST_LABEL[r.test]} ${r.min}`).join(" · ");
@@ -193,6 +239,7 @@ function checkLanguage(program: Program, profile: StudentProfile): RequirementCh
       id: "language",
       label: { tr: "Dil belgesi", en: "Language certificate" },
       status: "unknown",
+      unknownReason: "student",
       mandatory: true,
       detail: {
         tr: `Henüz belgen yok · kabul edilenler: ${accepted}`,
@@ -254,7 +301,8 @@ function checkStandardizedTests(program: Program, profile: StudentProfile): Requ
           tr: req.mandatory ? `${name} (zorunlu)` : `${name} (isteğe bağlı)`,
           en: req.mandatory ? `${name} (required)` : `${name} (optional)`,
         },
-        status: req.mandatory ? "unknown" : "unknown",
+        status: "unknown",
+        unknownReason: "student",
         mandatory: req.mandatory,
         detail: {
           tr: `Puanın yok · en az ${req.min} isteniyor`,
@@ -444,17 +492,41 @@ function decideBand(
   const mandatory = checks.filter((c) => c.mandatory);
   const hardMisses = mandatory.filter((c) => c.status === "unmet").length;
   const softMisses = mandatory.filter((c) => c.status === "close").length;
-  const unknowns = mandatory.filter((c) => c.status === "unknown").length;
+
+  // İki tür `unknown` var ve bandı farklı etkilemeleri gerekir:
+  //   student → öğrenci bilgi girmemiş. Girerse çözülür; eksiklik olarak sayılır.
+  //   source  → üniversite şartı yayınlamıyor. Öğrencinin yapabileceği bir şey
+  //             yok, bizim veri boşluğumuz. Bunu öğrenciye eksiklik yazmak,
+  //             kendi eksiğimizin cezasını ona kesmek olur.
+  const unknowns = mandatory.filter(
+    (c) => c.status === "unknown" && c.unknownReason !== "source"
+  ).length;
+  const dataGaps = mandatory.filter(
+    (c) => c.status === "unknown" && c.unknownReason === "source"
+  ).length;
+
   const misses = hardMisses + softMisses + unknowns;
+
+  // Veri boşluğu "Güvenli" dedirtmez: eşiği bilmediğin yerde "rahatça
+  // aşıyorsun" demek yanlış olur. En iyi hâli "Uygun".
+  if (misses === 0 && dataGaps > 0) return "match";
 
   if (misses === 0) {
     // Tüm zorunlu şartlar karşılanıyor. Rahat mı geçiyor, kıl payı mı?
+    //
+    // Buraya program verisi eksikken DÜŞÜLEMEZ: bilinmeyen bir eşik `unknown`
+    // üretir, `unknown` yukarıda `misses`e sayılır, dolayısıyla misses > 0 olur.
+    // Yani "rahatça aşıyorsun" iddiası hiçbir zaman bilmediğimiz bir eşiğin
+    // üstüne kurulmuyor. Aşağıdaki undefined kontrolleri o güvenceyi tip
+    // düzeyinde de sabitliyor — biri ileride bant mantığını değiştirirse
+    // sessizce yanlış "Güvenli" üretmesin.
     const studentGpa = toHundredScale(profile.gpa, profile.gpaScale);
-    const gpaComfort = studentGpa >= program.requirements.minGpa + GPA_COMFORT_MARGIN;
+    const minGpa = program.requirements.minGpa;
+    const gpaComfort = minGpa !== undefined && studentGpa >= minGpa + GPA_COMFORT_MARGIN;
 
     const langReqs = program.requirements.language;
-    let langComfort = langReqs.length === 0;
-    for (const req of langReqs) {
+    let langComfort = langReqs !== undefined && langReqs.length === 0;
+    for (const req of langReqs ?? []) {
       const owned = profile.languageTests.find((t) => t.test === req.test);
       if (owned && owned.score >= req.min + (CLOSE_MARGIN[req.test] || 0.5)) {
         langComfort = true;
@@ -467,6 +539,15 @@ function decideBand(
 
   // Bir zorunlu şart tamamen kapalıysa ve başka açıklar da varsa erişilmez.
   if (hardMisses <= 1 && misses <= 2) return "reach";
+
+  // Öğrenci tarafında gerçek bir açık YOK; program "erişilemez" görünüyorsa
+  // bunun tek sebebi bizim eksik verimiz. Katalog boşluğu yüzünden öğrenciye
+  // "buraya giremezsin" demek, ürünün yapabileceği en zararlı hata: uydurma
+  // bir yüzde göstermekten farkı yok, sadece ters yönde.
+  if (hardMisses === 0 && softMisses === 0 && unknowns === 0 && dataGaps > 0) {
+    return "reach";
+  }
+
   return "out-of-reach";
 }
 
@@ -529,8 +610,14 @@ export function evaluateProgram(program: Program, profile: StudentProfile): Matc
     checks,
     metMandatory: mandatory.filter((c) => c.status === "met").length,
     totalMandatory: mandatory.length,
+    // Harç bilinmiyorsa bütçe aşımı İDDİA EDİLMEZ. Bilinmeyeni "aşıyor" saymak
+    // programı haksız yere eler; "aşmıyor" saymak öğrenciye yanlış güven verir.
+    // İkisi de yapılmıyor: false kalır, eksik bilgi arayüzde harç satırında
+    // "bilinmiyor" olarak görünür.
     overBudget:
-      profile.maxTuition !== undefined && program.tuitionNonEu > profile.maxTuition,
+      profile.maxTuition !== undefined &&
+      program.tuitionNonEu !== undefined &&
+      program.tuitionNonEu > profile.maxTuition,
   };
 }
 

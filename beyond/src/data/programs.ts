@@ -76,6 +76,11 @@ export const PROGRAMS: Program[] = [
     facultyUrl: "https://www.tudelft.nl/en/eemcs",
     lastChecked: CHECKED,
     verification: "verified",
+    // Baktık: TU Delft'in bursları yalnızca yüksek lisans düzeyinde
+    // ("specifically designed to ... pursue a MSc degree") ve üniversite
+    // 2026-27 NL Scholarship listesinde yok.
+    // Boş dizi "burs yok" demek — alanın hiç olmaması "bakmadık" demek olurdu.
+    scholarships: [],
   },
   {
     id: "nl-tue-mechanical",
@@ -130,6 +135,21 @@ export const PROGRAMS: Program[] = [
     facultyUrl: "https://www.tue.nl/en/our-university/departments/mechanical-engineering",
     lastChecked: CHECKED,
     verification: "ai-extracted",
+    // 2026-27 katılımcı listesi studyinnl.org'da yayınlanıyor; bu üniversite
+    // listede. Liste her yıl değişiyor.
+    scholarships: [
+      {
+        name: "NL Scholarship",
+        amountPerYear: 5000,
+        kind: "grant",
+        openToNonEu: true,
+        sourceUrl: "https://www.studyinnl.org/finances/nl-scholarship",
+        note: {
+          tr: "Yalnızca AB/AEA dışı vatandaşlar için ve sadece BİRİNCİ yıl ödeniyor — tam harç bursu değil. Hollanda'da daha önce derece almamış olmak gerekiyor.",
+          en: "Non-EEA nationals only and paid in the FIRST year only — not a full-tuition scholarship. You must not already hold a degree from a Dutch institution.",
+        },
+      },
+    ],
   },
   {
     id: "nl-erasmus-iba",
@@ -286,6 +306,21 @@ export const PROGRAMS: Program[] = [
     facultyUrl: "https://www.rug.nl/gmw/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
+    // 2026-27 katılımcı listesi studyinnl.org'da yayınlanıyor; bu üniversite
+    // listede. Liste her yıl değişiyor.
+    scholarships: [
+      {
+        name: "NL Scholarship",
+        amountPerYear: 5000,
+        kind: "grant",
+        openToNonEu: true,
+        sourceUrl: "https://www.studyinnl.org/finances/nl-scholarship",
+        note: {
+          tr: "Yalnızca AB/AEA dışı vatandaşlar için ve sadece BİRİNCİ yıl ödeniyor — tam harç bursu değil. Hollanda'da daha önce derece almamış olmak gerekiyor.",
+          en: "Non-EEA nationals only and paid in the FIRST year only — not a full-tuition scholarship. You must not already hold a degree from a Dutch institution.",
+        },
+      },
+    ],
   },
   {
     id: "nl-utrecht-chemistry",
@@ -318,6 +353,21 @@ export const PROGRAMS: Program[] = [
     facultyUrl: "https://www.uu.nl/en/organisation/faculty-of-science",
     lastChecked: CHECKED,
     verification: "ai-extracted",
+    // 2026-27 katılımcı listesi studyinnl.org'da yayınlanıyor; bu üniversite
+    // listede. Liste her yıl değişiyor.
+    scholarships: [
+      {
+        name: "NL Scholarship",
+        amountPerYear: 5000,
+        kind: "grant",
+        openToNonEu: true,
+        sourceUrl: "https://www.studyinnl.org/finances/nl-scholarship",
+        note: {
+          tr: "Yalnızca AB/AEA dışı vatandaşlar için ve sadece BİRİNCİ yıl ödeniyor — tam harç bursu değil. Hollanda'da daha önce derece almamış olmak gerekiyor.",
+          en: "Non-EEA nationals only and paid in the FIRST year only — not a full-tuition scholarship. You must not already hold a degree from a Dutch institution.",
+        },
+      },
+    ],
   },
 
   // -------------------------------------------------------------------------
@@ -1197,6 +1247,11 @@ export const PROGRAMS: Program[] = [
     facultyUrl: "https://www.kth.se/en/eecs",
     lastChecked: "2026-08-13",
     verification: "verified",
+    // Baktık: KTH bu program için birebir şöyle diyor: "KTH does not offer any
+    // scholarships for the Bachelor's programme in Information and
+    // Communication Technology".
+    // Boş dizi "burs yok" demek — alanın hiç olmaması "bakmadık" demek olurdu.
+    scholarships: [],
   },
   {
     id: "se-lund-ib",
@@ -1428,6 +1483,10 @@ export const PROGRAMS: Program[] = [
     facultyUrl: "https://www.dtu.dk/english/education/undergraduate/general-engineering",
     lastChecked: "2026-08-13",
     verification: "verified",
+    // Baktık: DTU birebir şöyle diyor: lisans düzeyinde harç muafiyeti veya
+    // başka bir destek sunmuyor. Muafiyetler yalnızca yüksek lisansta.
+    // Boş dizi "burs yok" demek — alanın hiç olmaması "bakmadık" demek olurdu.
+    scholarships: [],
   },
   {
     id: "dk-cbs-ib",
@@ -1653,6 +1712,28 @@ export const PROGRAMS: Program[] = [
     facultyUrl: "https://www.unibo.it/en",
     lastChecked: "2026-08-13", // FR/IT doğrulama turu
     verification: "verified",
+    scholarships: [
+      {
+        name: "MAECI — İtalyan Dışişleri Bakanlığı bursu",
+        kind: "grant",
+        openToNonEu: true,
+        sourceUrl: "https://www.unibo.it/en/study/study-grants-and-subsidies",
+        note: {
+          tr: "İtalyan Dışişleri Bakanlığı'nın uluslararası öğrencilere verdiği burs. Tutar üniversitenin sayfasında belirtilmiyor, bakanlığın yıllık çağrısından bakılmalı.",
+          en: "Granted by the Italian Ministry of Foreign Affairs to international students. The amount is not stated on the university page — check the ministry's annual call.",
+        },
+      },
+      {
+        name: "AB/OECD dışı vatandaşlar için indirimli sabit harç",
+        kind: "tuition-waiver",
+        openToNonEu: true,
+        sourceUrl: "https://www.unibo.it/en/study/study-grants-and-subsidies",
+        note: {
+          tr: "AB ve OECD üyesi olmayan, düşük gelirli ülke vatandaşlarına indirimli sabit harç uygulanıyor. Türkiye OECD üyesi olduğu için bu kalem Türk öğrenciyi KAPSAMAYABİLİR — başvuru öncesi teyit et.",
+          en: "A reduced flat fee applies to citizens of low-income countries outside the EU and OECD. Türkiye is an OECD member, so this may NOT apply to Turkish students — confirm before applying.",
+        },
+      },
+    ],
   },
   {
     id: "it-pavia-medicine",

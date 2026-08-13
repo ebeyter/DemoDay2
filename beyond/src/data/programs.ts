@@ -643,7 +643,10 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "fr",
     durationYears: 3,
     requirements: {
-      minGpa: 72,
+      // Giriş Campus France (DAP) dosya değerlendirmesi ile yapılıyor;
+      // üniversite sayısal bir not eşiği YAYINLAMIYOR. Uydurma bir eşik
+      // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
+      // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
         { test: "delf", min: 4 },
         { test: "tcf", min: 400 },
@@ -676,7 +679,10 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 90,
+      // Giriş dosya değerlendirmesi + mülakat, kontenjan sıralaması ile yapılıyor;
+      // üniversite sayısal bir not eşiği YAYINLAMIYOR. Uydurma bir eşik
+      // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
+      // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
         { test: "ielts", min: 6.5 },
         { test: "toefl", min: 90 },
@@ -716,7 +722,10 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 85,
+      // Giriş dosya değerlendirmesi + mülakat ile yapılıyor;
+      // üniversite sayısal bir not eşiği YAYINLAMIYOR. Uydurma bir eşik
+      // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
+      // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
         { test: "ielts", min: 7.0 },
         { test: "toefl", min: 100 },
@@ -736,8 +745,8 @@ export const PROGRAMS: Program[] = [
       tr: "Harç aile gelirine göre kademeli — düşük gelirde ciddi biçimde düşüyor",
       en: "Tuition is income-scaled and drops substantially for lower incomes",
     },
-    sourceUrl: "https://www.sciencespo.fr/college/en/programmes/bachelor-arts.html",
-    facultyUrl: "https://www.sciencespo.fr/college/en.html",
+    sourceUrl: "https://www.sciencespo.fr/college/en/",
+    facultyUrl: "https://www.sciencespo.fr/college/en/",
     lastChecked: CHECKED,
     verification: "ai-extracted",
   },
@@ -753,7 +762,10 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "fr",
     durationYears: 3,
     requirements: {
-      minGpa: 70,
+      // Giriş Campus France (DAP) dosya değerlendirmesi ile yapılıyor;
+      // üniversite sayısal bir not eşiği YAYINLAMIYOR. Uydurma bir eşik
+      // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
+      // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
         { test: "delf", min: 4 },
         { test: "tcf", min: 400 },
@@ -1046,25 +1058,32 @@ export const PROGRAMS: Program[] = [
     name: "Engineering — Computer Science",
     degree: "BSc",
     field: "engineering",
-    teachingLanguage: "en",
+    // DÜZELTME (2026-08-13): katalogda "en" yazıyordu. Program sayfası açıkça
+    // "This programme is taught in Dutch / onderwijstaal Nederlands" diyor.
+    // Türk öğrenci için kritik bir hata: İngilizce sanıp başvururdu.
+    teachingLanguage: "nl",
     durationYears: 3,
     requirements: {
-      minGpa: 76,
-      language: [
-        { test: "ielts", min: 6.5 },
-        { test: "toefl", min: 90 },
-      ],
+      // Sayfa sayısal bir not eşiği vermiyor; yurt dışı diploması bireysel
+      // denklik değerlendirmesine giriyor.
+      minGpa: undefined,
+      // Hollandaca öğretim yapılıyor ama LanguageTest tipinde Hollandaca sınavı
+      // yok, üstelik sayfa da bir seviye belirtmiyor → bilinmiyor.
+      // (Eski değer IELTS 6.5 / TOEFL 90 idi; İngilizce varsayımına dayanıyordu.)
+      language: undefined,
       requiredSubjects: [
         { subject: "math", level: "advanced" },
         { subject: "physics", level: "basic" },
       ],
     },
-    tuitionNonEu: 5800,
+    // Sayfa AB-dışı harcı belirtmiyor, ugent.be/tuitionfee'ye yönlendiriyor.
+    tuitionNonEu: undefined,
     tuitionEu: 1200,
     livingCostPerYear: 10200,
     applicationSystem: "direct",
     deadline: "03-01",
-    sourceUrl: "https://studiekiezer.ugent.be/en",
+    sourceUrl:
+      "https://studiekiezer.ugent.be/2026/bachelor-of-science-in-engineering-computerwetenschappen/programma",
     facultyUrl: "https://www.ugent.be/ea/en",
     lastChecked: CHECKED,
     verification: "ai-extracted",
@@ -1210,7 +1229,10 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 72,
+      // Giriş TOL/TIL giriş sınavı sıralaması ile yapılıyor;
+      // üniversite sayısal bir not eşiği YAYINLAMIYOR. Uydurma bir eşik
+      // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
+      // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
         { test: "ielts", min: 6.0 },
         { test: "toefl", min: 78 },
@@ -1253,7 +1275,10 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 85,
+      // Giriş Bocconi testi / SAT / ACT puanı + son iki yılın ortalaması sıralaması ile yapılıyor;
+      // üniversite sayısal bir not eşiği YAYINLAMIYOR. Uydurma bir eşik
+      // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
+      // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
         { test: "ielts", min: 6.5 },
         { test: "toefl", min: 88 },
@@ -1275,8 +1300,8 @@ export const PROGRAMS: Program[] = [
         { key: "motivation-letter", mandatory: true },
       ],
     },
-    tuitionNonEu: 16600,
-    tuitionEu: 16600,
+    tuitionNonEu: 17000,
+    tuitionEu: 17000,
     livingCostPerYear: 14400,
     applicationSystem: "direct",
     deadline: "01-15",
@@ -1301,7 +1326,10 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 6,
     requirements: {
-      minGpa: 78,
+      // Giriş IMAT ulusal sınav sıralaması ile yapılıyor;
+      // üniversite sayısal bir not eşiği YAYINLAMIYOR. Uydurma bir eşik
+      // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
+      // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
         { test: "ielts", min: 6.0 },
         { test: "toefl", min: 80 },
@@ -1355,7 +1383,10 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 6,
     requirements: {
-      minGpa: 75,
+      // Giriş IMAT ulusal sınav sıralaması ile yapılıyor;
+      // üniversite sayısal bir not eşiği YAYINLAMIYOR. Uydurma bir eşik
+      // yazmak yerine minGpa bilinçli olarak yok — bkz. types.ts eksik
+      // veri sözleşmesi. Motor bunu `unknown` olarak gösterir.
       language: [
         { test: "ielts", min: 6.0 },
         { test: "toefl", min: 80 },

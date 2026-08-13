@@ -58,6 +58,12 @@ Kapsanacak davranışlar — satır kapsamı değil, **karar noktaları**:
   arasındaki fark.
 - **`unknown` cezalandırılmıyor:** eksik veri, karşılanmamış şart gibi
   davranmıyor.
+- **Program tarafındaki eksik veri** — bu davranışı Eda motora ekledi, testi
+  sende: üniversitenin yayınlamadığı alan (`minGpa: undefined`) `unmet` değil
+  `unknown` üretir; zorunlu şartı `unknown` olan program **`safety` bandına
+  düşmez**; ve `language: []` ("sayfa açıkça istenmiyor diyor") ile
+  `language: undefined` ("bilmiyoruz") **farklı** davranır. Bu son ayrım
+  sessizce bozulursa ürün "dil belgesi istenmiyor" diye yanlış iddiada bulunur.
 - **Not çevrimi:** 4'lük, 5'lik ve IB45 → 100'lük dönüşümü; her ölçeğin alt ve
   üst sınırı.
 - **Dil şartı `anyOf`:** listedeki sınavlardan biri yeterli; boş dizi = dil
@@ -144,64 +150,11 @@ Bitti ölçütü:
 - [ ] Anahtarsız/demo modunda çökme yok
 - [ ] Eksik alanlı programla motor `unknown` üretiyor, hata vermiyor
 
-### S2-5 · Program tarafındaki eksik veriyi `unknown` yap ⭐ Eda ile birlikte karar
-
-**Neden acil:** Eda doğrulama turuna başladığında ilk eksik alanda tıkanacak.
-Üniversite sayfalarının çoğu not eşiğini, bazen harcı yayınlamıyor. Şu anki tip
-modeli bunu ifade edemiyor:
-
-```ts
-minGpa: number;                    // zorunlu → bilmiyorsan sayı UYDURMAK zorundasın
-language: LanguageRequirement[];   // boş dizi = "dil belgesi istenmiyor" İDDİASI
-```
-
-`matching.ts:127` `minGpa`'yı her zaman bilinen sayı kabul ediyor. `unknown`
-yalnızca **öğrencinin** verisi eksikken üretiliyor (satır 195, 257) — **program**
-tarafındaki boşluk için yol yok. Sonuç: eşiği bulunamayan programı kataloğa
-eklemek için sayı uydurmak gerekiyor, yani ürünün asla yapmayacağını söylediği şey.
-
-Yapılacak:
-
-1. **`types.ts`** (ortak dosya, sadece ekleme, ayrı commit) — "yok" ile
-   "bilinmiyor" ayrılır: `minGpa?: number`, `language?: LanguageRequirement[]`,
-   `tuitionNonEu?: number`. `undefined` = bilinmiyor · `[]` = sayfa açıkça
-   "istenmiyor" diyor.
-2. **`checkGpa`** — `minGpa === undefined` ise `status: "unknown"`, `unmet`
-   **değil**. Öğrenci, üniversitenin yayınlamadığı bir şey için cezalandırılmaz.
-3. **`checkLanguage`** — `undefined` → `unknown` üret · `[]` → şart üretme
-   (bugünkü davranış korunur).
-4. **Bant kuralı — en kritik parça:** zorunlu bir şart *program tarafından*
-   `unknown` ise o program **`safety` olamaz.** Eşiği bilmediğin yerde
-   "rahatça aşıyorsun" demek yanlış. En fazla `match`, ya da ayrı bir
-   "veri eksik" işareti.
-5. **`overBudget`** — `tuitionNonEu` bilinmiyorsa hesaplama, `unknown` göster.
-
-Bu değişiklik `types.ts`'i etkilediği ve katalog verisini Eda'nın doldurduğu için
-**tek taraflı yapılmaz.** Eda'nın iş listesindeki
-[worklist-student1.md](worklist-student1.md) "Eksik veri nasıl temsil edilir"
-bölümüyle birebir aynı öneri — ikiniz okuyup karara bağlayın.
-
-Bitti ölçütü:
-- [ ] `undefined` alanlar `unknown` üretiyor, `unmet` üretmiyor
-- [ ] Zorunlu şartı `unknown` olan program `safety` bandına **düşmüyor**
-- [ ] `language: []` eski davranışı koruyor (şart üretilmiyor)
-- [ ] `tuitionNonEu` bilinmiyorken `overBudget` uydurmuyor
-- [ ] S2-1'e bu davranışların testi eklendi (aşağıya bak)
-- [ ] Arayüzde *"kaynak sayfa bu şartı belirtmiyor"* metni var, TR/EN
-
-> **S2-1'e ek test vakaları:** program tarafı `unknown` → sonuç `unknown`
-> (`unmet` değil); zorunlu şartı `unknown` olan program `safety` olmuyor;
-> `language: []` ile `language: undefined` **farklı** davranıyor. Bu son ayrım
-> sessizce bozulursa ürün "dil belgesi istenmiyor" diye yanlış iddiada bulunur.
-
 ---
 
 ## Sıra
 
-`S2-1` → **`S2-5`** → `S2-2` → `S2-3` → `S2-4`.
-
-S2-5 öne alındı: Eda'nın doğrulama turu (onun Adım 2b'si) buna bağlı, o tıkanırsa
-demonun en değerli işi durur. Karar 15 dakika, uygulama 1-2 saat.
+`S2-1` → `S2-2` → `S2-3` → `S2-4`.
 
 S2-4 Eda'nın S1-3'üne bağlıydı ama o görev düşmüş olabilir — `/api/extract`
 kaldırıldı, önce Eda'ya sor.

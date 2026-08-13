@@ -86,9 +86,11 @@ export default function ComparePage() {
       render: ({ program }) =>
         program.tuitionNonEu === undefined
           ? t.program.notStated
-          : formatMoney(program.tuitionNonEu, locale),
+          : formatMoney(program.tuitionNonEu, locale, program.tuitionCurrency),
       raw: ({ program }) =>
-        program.tuitionNonEu === undefined ? t.program.notStated : String(program.tuitionNonEu),
+        program.tuitionNonEu === undefined
+          ? t.program.notStated
+          : `${program.tuitionNonEu} ${program.tuitionCurrency ?? "EUR"}`,
       emphasis: true,
     },
     {
@@ -99,17 +101,20 @@ export default function ComparePage() {
     {
       // Harç bilinmiyorsa toplam da bilinmiyor — eksik veriyi yaşam maliyetiyle
       // toplayıp gerçekten daha ucuz bir programmış gibi göstermek, tam olarak
-      // karşılaştırma tahtasının yanıltmaması gereken yer.
+      // karşılaştırma tahtasının yanıltmaması gereken yer. Aynısı para birimi
+      // için de geçerli: yaşam maliyeti EUR, harç £ ise toplam anlamsızdır.
       label: t.program.totalCost,
       render: ({ program }) => (
         <span className="font-semibold">
-          {program.tuitionNonEu === undefined
+          {program.tuitionNonEu === undefined ||
+          (program.tuitionCurrency ?? "EUR") !== "EUR"
             ? t.program.notStated
             : formatMoney(program.tuitionNonEu + program.livingCostPerYear, locale)}
         </span>
       ),
       raw: ({ program }) =>
-        program.tuitionNonEu === undefined
+        program.tuitionNonEu === undefined ||
+        (program.tuitionCurrency ?? "EUR") !== "EUR"
           ? t.program.notStated
           : String(program.tuitionNonEu + program.livingCostPerYear),
       emphasis: true,

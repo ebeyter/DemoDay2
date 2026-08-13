@@ -233,7 +233,7 @@ export default function ProgramDetailPage() {
                   value={
                     program.tuitionNonEu === undefined
                       ? t.program.notStated
-                      : formatMoney(program.tuitionNonEu, locale)
+                      : formatMoney(program.tuitionNonEu, locale, program.tuitionCurrency)
                   }
                   emphasis
                 />
@@ -242,7 +242,7 @@ export default function ProgramDetailPage() {
                   value={
                     program.tuitionEu === undefined
                       ? t.program.notStated
-                      : formatMoney(program.tuitionEu, locale)
+                      : formatMoney(program.tuitionEu, locale, program.tuitionCurrency)
                   }
                   muted
                 />
@@ -251,13 +251,17 @@ export default function ProgramDetailPage() {
                   value={formatMoney(program.livingCostPerYear, locale)}
                 />
                 <div className="pt-3 border-t border-line">
-                  {/* Harç bilinmiyorsa toplam da bilinmiyor. Yaşam maliyetini
-                      tek başına "toplam yıllık" diye göstermek, öğrenciye
-                      gerçek maliyetin çok altında bir sayı vermek olur. */}
+                  {/* Toplam iki koşulda hesaplanır: harç biliniyor OLACAK ve
+                      harç EUR cinsinden OLACAK. Yaşam maliyeti her zaman EUR;
+                      £45.500 ile 20.400 EUR'u toplamak sessizce anlamsız bir
+                      sayı üretir. Harç bilinmiyorsa yaşam maliyetini tek başına
+                      "toplam yıllık" diye göstermek de gerçeğin çok altında
+                      kalır. İkisinde de hesap yapmıyoruz. */}
                   <Row
                     label={t.program.totalCost}
                     value={
-                      program.tuitionNonEu === undefined
+                      program.tuitionNonEu === undefined ||
+                      (program.tuitionCurrency ?? "EUR") !== "EUR"
                         ? t.program.notStated
                         : formatMoney(
                             program.tuitionNonEu + program.livingCostPerYear,
@@ -271,7 +275,9 @@ export default function ProgramDetailPage() {
               <p className="text-[12px] text-ink-faint mt-4 leading-relaxed">
                 {program.tuitionNonEu === undefined
                   ? t.program.notStatedNote
-                  : t.program.tuitionEuNote}
+                  : (program.tuitionCurrency ?? "EUR") !== "EUR"
+                    ? t.program.currencyNote
+                    : t.program.tuitionEuNote}
               </p>
             </Card>
 

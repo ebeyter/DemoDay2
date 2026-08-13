@@ -1794,6 +1794,70 @@ export const PROGRAMS: Program[] = [
     verification: "ai-extracted",
   },
   {
+    // EKLENDİ (2026-08-14). Roma katalogda hiç yoktu. Bu program tamamen
+    // İngilizce veriliyor — İtalya'da Türk öğrenci için en erişilebilir yol,
+    // çünkü diğer İtalyan programlarının çoğu İtalyanca.
+    id: "it-sapienza-acsai",
+    university: "Sapienza University of Rome",
+    universityLocal: "Sapienza Università di Roma",
+    country: "IT",
+    city: "Roma",
+    name: "Applied Computer Science and Artificial Intelligence",
+    degree: "BSc",
+    field: "cs",
+    // Teyit edildi: program kataloğu sayfası eğitim dilini "English" ve süreyi
+    // "3 years" olarak veriyor.
+    teachingLanguage: "en",
+    durationYears: 3,
+    requirements: {
+      minGpa: undefined,
+      // Sayfa "adequate knowledge of English" diyor ama SINAV ya da PUAN
+      // belirtmiyor. Uydurmak yerine boş bırakıldı.
+      language: undefined,
+      extras: [
+        {
+          key: "entrance-exam",
+          mandatory: true,
+          note: {
+            tr: "TOLC-I (CISIA mühendislik sınavı) veya SAT General Test — ikisinden biri zorunlu",
+            en: "TOLC-I (CISIA engineering test) or the SAT General Test — one of the two is required",
+          },
+        },
+        {
+          key: "numerus-fixus",
+          mandatory: true,
+          note: {
+            tr: "Kontenjan sınırlı; İngilizce programlara başvuru MoveIN üzerinden ön seçimle yapılıyor",
+            en: "Restricted access; applications to English-taught programmes go through a MoveIN pre-selection",
+          },
+        },
+      ],
+    },
+    // İTALYA'DA HARÇ VATANDAŞLIĞA/İKAMETE GÖRE DEĞİŞİYOR. Sapienza lisans
+    // harcını "yılda € 300-1.500, ikamet ülkesine göre" olarak veriyor —
+    // yani tek bir sayı yok. Modelimiz "vatandaşlığa göre değişir" diyemiyor,
+    // o yüzden aralığın ortasından bir sayı uydurmak yerine boş bırakıldı.
+    tuitionNonEu: undefined,
+    tuitionEu: undefined,
+    livingCostPerYear: 10800,
+    applicationSystem: "direct",
+    // Bu tarih program sayfasında DEĞİL, üniversitenin uluslararası kabul
+    // duyurusunda: vize gerektiren AB-dışı adaylar için ön seçim penceresi
+    // 22 Aralık - 15 Mayıs, ardından 30 Haziran'a kadar Universitaly kaydı.
+    deadline: "05-15",
+    deadlineNote: {
+      tr: "Vize gerektiren AB-dışı aday için ön seçim 15 Mayıs'ta kapanıyor; kabul edilirsen 30 Haziran'a kadar Universitaly'ye kaydolmalısın. Ayrıca başvuru başına € 30 ücret var ve muafiyeti yok.",
+      en: "For non-EU applicants needing a visa the pre-selection closes on 15 May; if pre-accepted you must register on Universitaly by 30 June. There is also a € 30 fee per application with no waiver.",
+    },
+    sourceUrl: "https://corsidilaurea.uniroma1.it/en/corso/2024/30786/home",
+    facultyUrl: "https://acsai.di.uniroma1.it/",
+    lastChecked: "2026-08-14",
+    // Program sayfası dili, süreyi ve sınav şartını teyit ediyor ama harcı ve
+    // son tarihi vermiyor — o ikisi başka sayfalardan geldiği için rozet
+    // çevrilmedi.
+    verification: "ai-extracted",
+  },
+  {
     id: "it-bocconi-bief",
     university: "Bocconi University",
     universityLocal: "Università Bocconi",

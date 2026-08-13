@@ -120,6 +120,50 @@ export default function ComparePage() {
       emphasis: true,
     },
     {
+      // Burs satırı maliyetin hemen altında: "bu kadar tutuyor" bilgisinin
+      // ardından gelen soru "peki nasıl karşılarım" oluyor.
+      //
+      // Üç durum ayrı gösteriliyor. Özellikle "baktık, yok" ile "bakmadık"
+      // aynı hücreye düşerse karşılaştırma yanıltır: burs verisi olmayan bir
+      // program, bursu olmadığı doğrulanmış bir programdan daha iyi görünür.
+      label: t.scholarships.title,
+      render: ({ program }) => {
+        const list = program.scholarships;
+        if (list === undefined) {
+          return <span className="text-ink-faint">{t.scholarships.notChecked}</span>;
+        }
+        if (list.length === 0) {
+          return <span className="text-ink-faint">— {t.scholarships.noneFound}</span>;
+        }
+        return (
+          <ul className="space-y-1.5">
+            {list.map((sc) => (
+              <li key={sc.name}>
+                <span className="font-medium">{sc.name}</span>
+                {sc.amountPerYear !== undefined && (
+                  <span className="block tabular-nums">
+                    {formatMoney(sc.amountPerYear, locale)}
+                    <span className="text-ink-faint">{t.scholarships.perYear}</span>
+                  </span>
+                )}
+                {!sc.openToNonEu && (
+                  <span className="block text-[11px] text-ink-faint">
+                    {t.scholarships.euOnly}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        );
+      },
+      raw: ({ program }) => {
+        const list = program.scholarships;
+        if (list === undefined) return "bakılmadı";
+        if (list.length === 0) return "yok";
+        return list.map((sc) => `${sc.name}:${sc.amountPerYear ?? "?"}`).join("|");
+      },
+    },
+    {
       label: t.program.teachingLanguage,
       render: ({ program }) => pick(TEACHING_LANGUAGE_LABEL[program.teachingLanguage]),
       raw: ({ program }) => program.teachingLanguage,

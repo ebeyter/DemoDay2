@@ -21,6 +21,7 @@ import { getProgramById } from "@/data/programs";
 import { APPLICATION_SYSTEMS, COUNTRIES, FIELDS, TEACHING_LANGUAGE_LABEL } from "@/data/taxonomy";
 import { formatDeadline, formatMoney, daysUntilDeadline } from "@/lib/format";
 import { FreshnessBadge, FreshnessPanel } from "@/components/FreshnessBadge";
+import { ScholarshipPanel } from "@/components/ScholarshipPanel";
 
 export default function ProgramDetailPage() {
   const params = useParams<{ id: string }>();
@@ -280,6 +281,8 @@ export default function ProgramDetailPage() {
                     : t.program.tuitionEuNote}
               </p>
             </Card>
+
+            <ScholarshipPanel program={program} />
 
             <Card className="p-6">
               <h2 className="text-[16px] text-ink mb-4">{t.program.application}</h2>

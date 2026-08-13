@@ -225,6 +225,15 @@ export interface Program {
   /** ISO tarih (YYYY-MM-DD). */
   lastChecked: string;
   verification: VerificationStatus;
+
+  /**
+   * Bu programa başvuran AB-dışı öğrencinin yararlanabileceği burslar.
+   *
+   * Alanın YOK olması "burs yok" demek DEĞİL, "bakmadık" demek — eksik veri
+   * sözleşmesinin aynısı burada da geçerli. Boş dizi ise "baktık, AB-dışına
+   * açık burs bulamadık" anlamına gelir.
+   */
+  scholarships?: Scholarship[];
 }
 
 // ---------------------------------------------------------------------------
@@ -330,4 +339,34 @@ export interface MatchResult {
   totalMandatory: number;
   /** Harç + yaşam maliyeti, öğrencinin bütçesini aşıyorsa true. */
   overBudget: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Burslar
+// ---------------------------------------------------------------------------
+
+export type ScholarshipKind = "tuition-waiver" | "grant" | "merit" | "need-based";
+
+/**
+ * Tek bir burs kaydı.
+ *
+ * Türk öğrenci için harç + yaşam maliyeti yılda 15-25 bin EUR; burs bilgisi
+ * olmadan maliyet tablosu yarım kalıyor. Bu yüzden her kaydın `sourceUrl`'ü
+ * ZORUNLU — burs bilgisi uydurmanın bedeli, öğrencinin var olmayan bir paraya
+ * güvenerek plan yapması olur.
+ */
+export interface Scholarship {
+  name: string;
+  /**
+   * Yıllık tutar (EUR). Harç muafiyetiyse programın tuitionNonEu değeri kadar
+   * yazılır. Tutar kaynakta belirtilmiyorsa (ör. "kısmi muafiyet") boş bırakılır
+   * — sıfır yazmak "para vermiyor" demek olurdu.
+   */
+  amountPerYear?: number;
+  kind: ScholarshipKind;
+  /** AB-dışı öğrenciye açık mı — hedef kitlemiz için belirleyici alan. */
+  openToNonEu: boolean;
+  /** Bursun ilan edildiği sayfa. Arayüzde tıklanabilir gösterilir. */
+  sourceUrl: string;
+  note?: Bilingual;
 }

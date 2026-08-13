@@ -198,6 +198,13 @@ const tr = {
     addToCompare: "Karşılaştırmaya ekle",
     inCompare: "Karşılaştırmada",
     overBudget: "Bütçeni aşıyor",
+    scenarioSaveLabel: "Bu senaryoyu kaydet",
+    scenarioNamePlaceholder: "Senaryo adı — örn. \"Almanya + düşük bütçe\"",
+    scenarioSaveButton: "Kaydet",
+    savedScenariosTitle: "Kayıtlı senaryolar",
+    scenarioApply: "Uygula",
+    scenarioDelete: "Sil",
+    scenarioNone: "Henüz kayıtlı senaryo yok.",
   },
 
   program: {
@@ -501,6 +508,13 @@ const en: Dictionary = {
     addToCompare: "Add to compare",
     inCompare: "In comparison",
     overBudget: "Over your budget",
+    scenarioSaveLabel: "Save this scenario",
+    scenarioNamePlaceholder: "Scenario name — e.g. \"Germany + lower budget\"",
+    scenarioSaveButton: "Save",
+    savedScenariosTitle: "Saved scenarios",
+    scenarioApply: "Apply",
+    scenarioDelete: "Delete",
+    scenarioNone: "No saved scenarios yet.",
   },
 
   program: {

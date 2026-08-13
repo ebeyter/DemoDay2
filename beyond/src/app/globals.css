@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Beyond — tasarım sistemi
+   Sade edu-SaaS iskeleti: bol beyaz alan, tek güçlü aksan, net tipografi.
+   Motivasyon renk cümbüşünden değil hareketten geliyor (bkz. animasyonlar).
+   --------------------------------------------------------------------------- */
+
+@theme {
+  /* Zemin ve yüzeyler */
+  --color-canvas: #fbfbfd;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f6f6f9;
+
+  /* Kenarlıklar */
+  --color-line: #e6e6ee;
+  --color-line-strong: #d3d3e0;
+
+  /* Metin */
+  --color-ink: #14142b;
+  --color-ink-soft: #55556d;
+  --color-ink-faint: #8a8aa3;
+
+  /* Aksan — koyu indigo */
+  --color-accent: #3730a3;
+  --color-accent-hover: #2f2a8c;
+  --color-accent-soft: #eef0fd;
+  --color-accent-line: #c9caf5;
+
+  /* Bant renkleri — SADECE bantlarda ve şart durumlarında kullanılır */
+  --color-band-safety: #0e7490;
+  --color-band-safety-soft: #e7f5f8;
+  --color-band-match: #15803d;
+  --color-band-match-soft: #e8f6ec;
+  --color-band-reach: #b45309;
+  --color-band-reach-soft: #fdf3e3;
+  --color-band-far: #6b7280;
+  --color-band-far-soft: #f1f2f4;
+
+  /* Uyarı */
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fdecec;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Yumuşak ama abartısız köşeler */
+  --radius-card: 14px;
+  --radius-pill: 999px;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Başlıklar iri ve sıkı aralıklı — edu-SaaS'ın "ciddi ama modern" tonu */
+h1,
+h2,
+h3 {
+  letter-spacing: -0.022em;
+  font-weight: 640;
+}
+
+/* ---------------------------------------------------------------------------
+   Erişilebilir odak halkası — klavye kullanıcısı her yerde nerede olduğunu
+   görebilmeli. Fare tıklamasında görünmüyor (:focus-visible).
+   --------------------------------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------------------------------------------------------------------------
+   Animasyonlar — ürünün "motive edici" tarafı buradan geliyor.
+   Hepsi prefers-reduced-motion ile kapanıyor.
+   --------------------------------------------------------------------------- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes grow-bar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Sonuç kartları ve şart satırları sırayla belirir — "dolan checklist" hissi */
+.animate-rise {
+  animation: rise 0.42s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+
+.animate-fade {
+  animation: fade 0.3s ease both;
+}
+
+.animate-bar {
+  transform-origin: left;
+  animation: grow-bar 0.7s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise,
+  .animate-fade,
+  .animate-bar {
+    animation: none !important;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* İnce kaydırma çubuğu — karşılaştırma tablosu yatay kayıyor */
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}

@@ -7,6 +7,7 @@ import { useLocale } from "@/lib/i18n/context";
 import { fill } from "@/lib/i18n/dictionary";
 import { useStore } from "@/lib/store";
 import { BandPill, Button, Card, ProgressBar, VerificationBadge, cx } from "./ui";
+import { FreshnessBadge } from "./FreshnessBadge";
 import { formatMoney, formatDeadline } from "@/lib/format";
 
 export function ProgramCard({ result, index = 0 }: { result: MatchResult; index?: number }) {
@@ -138,8 +139,9 @@ export function ProgramCard({ result, index = 0 }: { result: MatchResult; index?
         </button>
       </div>
 
-      <div className="mt-3">
+      <div className="mt-3 flex flex-wrap gap-1.5">
         <VerificationBadge status={program.verification} />
+        <FreshnessBadge programId={program.id} />
       </div>
     </Card>
   );

@@ -20,6 +20,7 @@ import { evaluateProgram } from "@/lib/matching";
 import { getProgramById } from "@/data/programs";
 import { APPLICATION_SYSTEMS, COUNTRIES, FIELDS, TEACHING_LANGUAGE_LABEL } from "@/data/taxonomy";
 import { formatDeadline, formatMoney, daysUntilDeadline } from "@/lib/format";
+import { FreshnessBadge, FreshnessPanel } from "@/components/FreshnessBadge";
 
 export default function ProgramDetailPage() {
   const params = useParams<{ id: string }>();
@@ -110,7 +111,10 @@ export default function ProgramDetailPage() {
           >
             {inCompare ? t.results.inCompare : t.results.addToCompare}
           </Button>
-          <VerificationBadge status={program.verification} className="ml-auto" />
+          <div className="ml-auto flex flex-wrap items-center gap-1.5">
+            <FreshnessBadge programId={program.id} />
+            <VerificationBadge status={program.verification} />
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-[1.4fr_1fr] gap-6 items-start">
@@ -308,6 +312,8 @@ export default function ProgramDetailPage() {
                 {pick(country.nonEuNote)}
               </p>
             </Card>
+
+            <FreshnessPanel programId={program.id} />
 
             <p className="text-[12px] text-ink-faint px-1">
               {t.common.lastChecked}: {program.lastChecked}

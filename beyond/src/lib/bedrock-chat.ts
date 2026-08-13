@@ -82,9 +82,11 @@ export async function* streamBedrockChat(
     body: JSON.stringify({
       model: config.modelId,
       messages: [{ role: "system", content: system }, ...normalized],
-      // DİKKAT: `max_tokens` bu uç noktada hata veriyor.
+      // DİKKAT: bu uç noktada iki tuzak var, ikisi de canlı testte yakalandı:
+      //  - `max_tokens` reddediliyor, doğru alan `max_completion_tokens`
+      //  - `temperature` yalnızca varsayılan (1) değerini kabul ediyor,
+      //    farklı bir değer göndermek 400 döndürüyor — o yüzden hiç göndermiyoruz
       max_completion_tokens: 1200,
-      temperature: 0.4,
       stream: true,
     }),
   });

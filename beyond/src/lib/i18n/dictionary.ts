@@ -543,7 +543,7 @@ const tr = {
       accents: {
         indigo: "İndigo",
         teal: "Deniz yeşili",
-        amber: "Kehribar",
+        violet: "Mor",
         rose: "Gül",
       },
       preview: "Önizleme",
@@ -1178,7 +1178,7 @@ const en: Dictionary = {
       accents: {
         indigo: "Indigo",
         teal: "Teal",
-        amber: "Amber",
+        violet: "Violet",
         rose: "Rose",
       },
       preview: "Preview",

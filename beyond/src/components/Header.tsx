@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLocale } from "@/lib/i18n/context";
 import { useStore } from "@/lib/store";
+import { Logo } from "./Logo";
 import { Button, cx } from "./ui";
 
 export function Header() {
@@ -43,12 +44,8 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 bg-surface/85 backdrop-blur-md border-b border-line">
       <div className="mx-auto max-w-6xl px-5 h-16 flex items-center gap-6">
-        <Link
-          href="/"
-          className="text-[17px] font-semibold tracking-[-0.03em] text-ink shrink-0"
-        >
-          {t.brand.name}
-          <span className="text-accent">.</span>
+        <Link href="/" className="shrink-0" aria-label={t.brand.name}>
+          <Logo />
         </Link>
 
         <nav className="hidden sm:flex items-center gap-1 flex-1">
@@ -83,6 +80,40 @@ export function Header() {
               {locale === "tr" ? "yerel mod" : "local mode"}
             </span>
           )}
+
+          {/* Ayarlar SOL NAVİGASYONDA DEĞİL, sağdaki hesap grubunda.
+              Soldaki bağlantılar öğrencinin yolculuğu (eşleşmeler → keşfet →
+              plan → liste); ayarlar o yolculuğun parçası değil, her ekrandan
+              erişilen bir yan kapı. Dil düğmesiyle çıkışın yanında duruyor
+              çünkü aynı işi yapıyor: uygulamayı kendine göre ayarlamak.
+              Girişten bağımsız görünüyor — tema ve gizlilik ayarları hesap
+              olmadan da geçerli. */}
+          <Link
+            href="/settings"
+            aria-label={t.nav.settings}
+            title={t.nav.settings}
+            className={cx(
+              "p-1.5 rounded-lg transition-colors",
+              pathname === "/settings"
+                ? "text-accent bg-accent-soft"
+                : "text-ink-soft hover:text-ink hover:bg-surface-soft"
+            )}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6 1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </Link>
 
           <button
             onClick={toggleLocale}

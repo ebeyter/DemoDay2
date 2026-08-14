@@ -5,6 +5,7 @@ import type {
   FieldId,
   TeachingLanguage,
 } from "@/lib/types";
+import { FIELD_IDS } from "@/lib/types";
 
 export interface CountryMeta {
   code: CountryCode;
@@ -151,7 +152,61 @@ export const FIELDS: Record<FieldId, FieldMeta> = {
     name: { tr: "Fen Bilimleri", en: "Natural Sciences" },
     icon: "✦",
   },
+  "data-science": {
+    id: "data-science",
+    name: { tr: "Veri Bilimi ve Yapay Zekâ", en: "Data Science & AI" },
+    icon: "◈",
+  },
+  mathematics: {
+    id: "mathematics",
+    name: { tr: "Matematik ve İstatistik", en: "Mathematics & Statistics" },
+    icon: "∑",
+  },
+  "political-science": {
+    id: "political-science",
+    name: { tr: "Siyaset Bilimi ve Uluslararası İlişkiler", en: "Politics & International Relations" },
+    icon: "◎",
+  },
+  law: {
+    id: "law",
+    name: { tr: "Hukuk", en: "Law" },
+    icon: "§",
+  },
+  architecture: {
+    id: "architecture",
+    name: { tr: "Mimarlık", en: "Architecture" },
+    icon: "⌂",
+  },
+  design: {
+    id: "design",
+    name: { tr: "Tasarım", en: "Design" },
+    icon: "✧",
+  },
+  communication: {
+    id: "communication",
+    name: { tr: "İletişim ve Medya", en: "Communication & Media" },
+    icon: "◑",
+  },
 };
+
+/**
+ * Her alanda katalogda kaç program var.
+ *
+ * NEDEN GEREKLİ: alan listesi katalogdan bağımsız genişledi — öğrenci hukuk
+ * ya da mimarlık seçebilsin diye. Ama karşılığı olmayan alanı seçince sonuç
+ * ekranı boş kalıyor ve bu tam olarak "formu doldurdum, eşleşme gelmedi"
+ * şikâyetine yol açıyor.
+ *
+ * Sihirbaz bu sayıyı her alanın yanında gösteriyor; sıfır olanı da açıkça
+ * söylüyor. Öğrenci ilgisini yine işaretleyebiliyor ama boş ekranla
+ * karşılaşacağını ÖNCEDEN biliyor. Sayı koddan geliyor, elle yazılmıyor —
+ * katalog büyüdükçe kendiliğinden güncelleniyor.
+ */
+export function fieldProgramCounts(programs: { field: FieldId }[]): Record<FieldId, number> {
+  const counts = Object.fromEntries(FIELD_IDS.map((id) => [id, 0])) as Record<FieldId, number>;
+  for (const program of programs) counts[program.field] += 1;
+  return counts;
+}
 
 export const APPLICATION_SYSTEMS: Record<
   ApplicationSystem,

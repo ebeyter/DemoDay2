@@ -48,7 +48,7 @@ export default function SignInPage() {
 
       <main className="mx-auto max-w-md px-5 py-16">
         <Card className="p-8">
-          <h1 className="text-[24px] text-ink mb-2">
+          <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-ink mb-2">
             {mode === "sign-in" ? t.auth.signInTitle : t.auth.signUpTitle}
           </h1>
           <p className="text-sm text-ink-soft mb-6">
@@ -95,6 +95,18 @@ export default function SignInPage() {
                 disabled={localMode}
               />
             </Field>
+
+            {/* Yalnızca girişte anlamlı — kayıt olurken şifre zaten yeni belirleniyor. */}
+            {mode === "sign-in" && !localMode && (
+              <p className="text-right -mt-1">
+                <Link
+                  href="/reset-password"
+                  className="text-[13px] font-medium text-accent hover:underline"
+                >
+                  {t.authReset.forgotLink}
+                </Link>
+              </p>
+            )}
 
             {error && (
               <p className="text-[13px] text-danger bg-danger-soft rounded-lg px-3 py-2">

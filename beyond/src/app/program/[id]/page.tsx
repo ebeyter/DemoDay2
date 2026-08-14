@@ -86,7 +86,9 @@ export default function ProgramDetailPage() {
               <span aria-hidden>·</span>
               <span>{pick(FIELDS[program.field].name)}</span>
             </div>
-            <h1 className="text-[30px] leading-tight text-ink">{program.name}</h1>
+            <h1 className="text-[26px] sm:text-[30px] font-semibold tracking-[-0.02em] leading-tight text-ink">
+              {program.name}
+            </h1>
             <p className="text-[15px] text-ink-soft mt-1">
               {program.university}
               {program.universityLocal && program.universityLocal !== program.university && (
@@ -147,28 +149,50 @@ export default function ProgramDetailPage() {
 
               {result ? (
                 <ul className="space-y-3">
-                  {result.checks.map((check, index) => (
-                    <li
-                      key={check.id}
-                      className="flex gap-3 animate-rise"
-                      style={{ animationDelay: `${index * 70}ms` }}
-                    >
-                      <CheckIcon status={check.status} />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-baseline gap-x-2">
-                          <span className="text-sm font-medium text-ink">
-                            {pick(check.label)}
-                          </span>
-                          {!check.mandatory && (
-                            <span className="text-[11px] text-ink-faint">
-                              ({t.common.optional})
+                  {result.checks.map((check, index) => {
+                    // Liste zorunlular üstte olacak şekilde sıralı geliyor
+                    // (bkz. matching.ts). İki grubun sınırı, ilk zorunlu
+                    // olmayan satır — başlığı oraya koyuyoruz.
+                    const startsOptionalGroup =
+                      !check.mandatory && (index === 0 || result.checks[index - 1].mandatory);
+
+                    return (
+                      <li
+                        key={check.id}
+                        className="animate-rise"
+                        style={{ animationDelay: `${index * 70}ms` }}
+                      >
+                        {index === 0 && check.mandatory && (
+                          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.07em] text-ink-faint">
+                            {t.program.mandatoryGroup}
+                          </p>
+                        )}
+
+                        {startsOptionalGroup && (
+                          <div className={cx("border-t border-line pt-4", index > 0 && "mt-4")}>
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-ink-faint">
+                              {t.program.optionalGroup}
+                            </p>
+                            <p className="mt-1 mb-2 text-[12px] text-ink-faint">
+                              {t.program.optionalGroupNote}
+                            </p>
+                          </div>
+                        )}
+
+                        <div className="flex gap-3">
+                          <CheckIcon status={check.status} />
+                          <div className="min-w-0 flex-1">
+                            <span className="block text-sm font-medium text-ink">
+                              {pick(check.label)}
                             </span>
-                          )}
+                            <p className="text-[13px] text-ink-soft mt-0.5">
+                              {pick(check.detail)}
+                            </p>
+                          </div>
                         </div>
-                        <p className="text-[13px] text-ink-soft mt-0.5">{pick(check.detail)}</p>
-                      </div>
-                    </li>
-                  ))}
+                      </li>
+                    );
+                  })}
                 </ul>
               ) : (
                 <p className="text-sm text-ink-soft">

@@ -176,6 +176,7 @@ const tr = {
       basics: "Temel bilgiler",
       fields: "İlgi alanların",
       grades: "Not ortalaman",
+      subjects: "Dersler ve sınavlar",
       language: "Dil belgen",
       tests: "Sınavların",
       targets: "Hedeflerin",
@@ -183,16 +184,38 @@ const tr = {
     basics: {
       fullName: "Adın soyadın",
       fullNamePlaceholder: "Örn. Eda Beyter",
-      birthYear: "Doğum yılın",
       gender: "Cinsiyet",
       genderNote: "Eşleştirmede kullanılmaz, sadece profilinde saklanır.",
-      schoolType: "Lise türün",
       graduationYear: "Mezuniyet yılın",
+      highSchoolName: "Lisenin adı",
+      highSchoolPlaceholder: "Örn. Kadıköy Anadolu Lisesi",
+      diplomas: "Aldığın diploma ve programlar",
+      diplomasHint:
+        "Birden fazla seçebilirsin — Türk lise diploman varken AP dersi de almış olabilirsin. Üniversiteler lise türüne değil, aldığın diplomaya göre şart koyuyor.",
+      diplomaOther: "Diğer — hangisi?",
+      diplomaOtherPlaceholder: "Örn. İtalyan Maturità",
     },
     fields: {
       question: "Hangi alanlarda okumayı düşünüyorsun?",
-      hint: "Birden fazla seçebilirsin. Emin değilsen geniş tut — sonradan senaryo modunda değiştirebilirsin.",
+      hint: "Birden fazla seçebilirsin. Yanındaki sayı, katalogda o alanda kaç program olduğunu gösteriyor.",
       empty: "Devam etmek için en az bir alan seç.",
+      noPrograms: "program yok",
+      emptyFieldWarning:
+        "Seçtiğin alanlardan bazılarında katalogda henüz program yok. İlgini işaretli tutabilirsin ama o alanlar için sonuç listesi boş gelecek.",
+    },
+    subjects: {
+      question: "Hangi dersleri ileri düzey aldın?",
+      hint: "İleri düzey / sayısal ağırlıklı olarak aldığın dersleri işaretle.",
+      whyItMatters:
+        "Bu bilgi boş kalırsa, belirli ders şartı koyan programlarda o şart “bilgi eksik” olarak kalıyor ve uyum oranın olduğundan düşük görünüyor. Katalogda 20'den fazla program ders şartı koyuyor.",
+      apCourses: "AP dersleri",
+      apCoursesHint:
+        "Ders ders ekle ve notunu yaz (1-5). Tek bir “en yüksek AP notun” bilgisi profilini temsil etmiyor — Calculus'tan 5, Biology'den 3 almış olabilirsin.",
+      apCoursePlaceholder: "Örn. AP Calculus BC",
+      addApCourse: "AP dersi ekle",
+      yks: "YKS yerleştirme puanın (isteğe bağlı)",
+      yksHint:
+        "Yalnızca Almanya için gerekiyor: Türk lise diploması tek başına yetmiyor, bir üniversiteye yerleşmiş olman ya da Studienkolleg bitirmen isteniyor. Almanya'yı düşünmüyorsan boş bırak.",
     },
     grades: {
       question: "Not ortalaman kaç?",
@@ -200,9 +223,13 @@ const tr = {
       converted: "100'lük sisteme çevrilmiş hali",
       convertedNote:
         "Karşılaştırmalar bu çevrilmiş not üzerinden yapılır. Çevrim yaklaşıktır; üniversiteler kendi tablolarını kullanabilir.",
-      advancedSubjects: "İleri düzey aldığın dersler",
-      advancedSubjectsHint:
-        "Bazı programlar belirli derslerde ileri düzey şartı koyuyor. Aldıklarını işaretle.",
+      overall: "Genel ortalaman",
+      overallDerived: "Girdiğin sınıf ortalamalarından hesaplandı",
+      overallManual: "Sınıf sınıf girmek istemiyorsan doğrudan buraya yazabilirsin",
+      byYear: "Sınıf sınıf ortalaman",
+      byYearHint:
+        "Kaç yıl okuduysan o kadarını gir — boş bıraktığın yıl hesaba katılmıyor. Ondalıklı yazabilirsin (örn. 90,095).",
+      yearLabel: "{year}. sınıf",
     },
     language: {
       question: "Dil belgen var mı?",
@@ -260,6 +287,9 @@ const tr = {
     scenarioReset: "Senaryoyu sıfırla",
     scenarioActive: "Senaryo aktif — bunlar kayıtlı profilin sonuçları değil",
     showOutOfReach: "Uzak olanları da göster",
+    // Gizlenen program sayısını söylüyoruz: sayı olmadan liste tam görünüyor.
+    hiddenOutOfReach: "{count} program ulaşılamaz sayıldı — onları da göster",
+    editTargets: "Hedefimi düzenle",
     addToCompare: "Karşılaştırmaya ekle",
     inCompare: "Karşılaştırmada",
     overBudget: "Bütçeni aşıyor",
@@ -274,6 +304,14 @@ const tr = {
 
   program: {
     requirements: "Şartlar",
+    /**
+     * Şart listesi zorunlu/zorunlu olmayan diye ikiye ayrılıyor (sıralamayı
+     * matching.ts yapıyor). Başlıklar ayrımı görünür kılıyor: sırf sıralamak,
+     * "bu satır neden aşağıda?" sorusunu cevapsız bırakıyordu.
+     */
+    mandatoryGroup: "Zorunlu şartlar",
+    optionalGroup: "Zorunlu olmayanlar",
+    optionalGroupNote: "Karşılamazsan elenmezsin; karşılarsan başvurunu güçlendirir.",
     costs: "Maliyet",
     application: "Başvuru",
     tuitionNonEu: "Harç (AB-dışı)",
@@ -508,7 +546,7 @@ const tr = {
       accents: {
         indigo: "İndigo",
         teal: "Deniz yeşili",
-        amber: "Kehribar",
+        violet: "Mor",
         rose: "Gül",
       },
       preview: "Önizleme",
@@ -799,6 +837,7 @@ const en: Dictionary = {
       basics: "Basics",
       fields: "Your interests",
       grades: "Your grades",
+      subjects: "Subjects & exams",
       language: "Language certificate",
       tests: "Your tests",
       targets: "Your targets",
@@ -806,16 +845,38 @@ const en: Dictionary = {
     basics: {
       fullName: "Full name",
       fullNamePlaceholder: "e.g. Eda Beyter",
-      birthYear: "Year of birth",
       gender: "Gender",
       genderNote: "Never used in matching, only stored on your profile.",
-      schoolType: "School type",
       graduationYear: "Graduation year",
+      highSchoolName: "Name of your high school",
+      highSchoolPlaceholder: "e.g. Kadıköy Anatolian High School",
+      diplomas: "Diplomas and programmes you took",
+      diplomasHint:
+        "Pick more than one — you may hold a Turkish diploma and have taken AP courses. Universities set requirements by the diploma you hold, not by school type.",
+      diplomaOther: "Other — which one?",
+      diplomaOtherPlaceholder: "e.g. Italian Maturità",
     },
     fields: {
       question: "What would you like to study?",
-      hint: "Pick more than one. If you are unsure, stay broad — you can change it later in scenario mode.",
+      hint: "Pick more than one. The number next to each field is how many programmes the catalogue has in it.",
       empty: "Select at least one field to continue.",
+      noPrograms: "no programmes",
+      emptyFieldWarning:
+        "Some fields you picked have no programmes in the catalogue yet. You can keep them selected, but results will be empty for those.",
+    },
+    subjects: {
+      question: "Which subjects did you take at advanced level?",
+      hint: "Tick the subjects you took at advanced or science-track level.",
+      whyItMatters:
+        "If this is left empty, programmes that require specific subjects show that requirement as “missing information” and your fit looks lower than it is. More than 20 programmes in the catalogue set subject requirements.",
+      apCourses: "AP courses",
+      apCoursesHint:
+        "Add each course with its score (1-5). A single “highest AP score” does not represent your profile — you may have a 5 in Calculus and a 3 in Biology.",
+      apCoursePlaceholder: "e.g. AP Calculus BC",
+      addApCourse: "Add AP course",
+      yks: "Your YKS placement score (optional)",
+      yksHint:
+        "Only needed for Germany: a Turkish high school diploma alone is not enough — you need an actual university placement or a completed Studienkolleg. Leave empty if Germany is not on your list.",
     },
     grades: {
       question: "What is your grade average?",
@@ -823,9 +884,13 @@ const en: Dictionary = {
       converted: "Converted to the 100-point scale",
       convertedNote:
         "Comparisons use this converted grade. The conversion is approximate; universities may apply their own tables.",
-      advancedSubjects: "Subjects you took at advanced level",
-      advancedSubjectsHint:
-        "Some programs require advanced coursework in specific subjects. Tick the ones you took.",
+      overall: "Your overall average",
+      overallDerived: "Calculated from the year averages you entered",
+      overallManual: "If you would rather not enter each year, type it here directly",
+      byYear: "Year-by-year average",
+      byYearHint:
+        "Enter as many years as you have studied — a year left blank is not counted. Decimals are fine (e.g. 90.095).",
+      yearLabel: "Year {year}",
     },
     language: {
       question: "Do you have a language certificate?",
@@ -883,6 +948,8 @@ const en: Dictionary = {
     scenarioReset: "Reset scenario",
     scenarioActive: "Scenario active — these are not your saved profile's results",
     showOutOfReach: "Also show out-of-reach",
+    hiddenOutOfReach: "{count} programs were classed out of reach — show them too",
+    editTargets: "Edit my targets",
     addToCompare: "Add to compare",
     inCompare: "In comparison",
     overBudget: "Over your budget",
@@ -897,6 +964,9 @@ const en: Dictionary = {
 
   program: {
     requirements: "Requirements",
+    mandatoryGroup: "Required",
+    optionalGroup: "Not required",
+    optionalGroupNote: "Missing these will not rule you out; meeting them strengthens your application.",
     costs: "Costs",
     application: "Application",
     tuitionNonEu: "Tuition (non-EU)",
@@ -1113,7 +1183,7 @@ const en: Dictionary = {
       accents: {
         indigo: "Indigo",
         teal: "Teal",
-        amber: "Amber",
+        violet: "Violet",
         rose: "Rose",
       },
       preview: "Preview",

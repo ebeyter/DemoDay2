@@ -24,23 +24,47 @@ export const COUNTRY_CODES: CountryCode[] = [
   "IT",
 ];
 
+/**
+ * İlgi alanları.
+ *
+ * DİKKAT: bu liste katalogdan BAĞIMSIZ genişletilebilir — öğrenci ilgi
+ * duyduğu alanı dürüstçe seçebilmeli. Ama karşılığı olmayan alanı seçince
+ * ekranın boş kalması, tam olarak "formu doldurdum eşleşme gelmedi"
+ * şikâyetine yol açıyor. Bu yüzden sihirbaz her alanın yanında katalogdaki
+ * program sayısını gösteriyor ve sıfır olanı açıkça söylüyor
+ * (bkz. `fieldProgramCounts`, src/data/taxonomy.ts).
+ */
 export type FieldId =
   | "cs"
+  | "data-science"
   | "engineering"
   | "business"
   | "economics"
+  | "political-science"
+  | "law"
   | "medicine"
   | "psychology"
-  | "natural-sciences";
+  | "natural-sciences"
+  | "mathematics"
+  | "architecture"
+  | "design"
+  | "communication";
 
 export const FIELD_IDS: FieldId[] = [
   "cs",
+  "data-science",
   "engineering",
-  "business",
-  "economics",
+  "mathematics",
+  "natural-sciences",
   "medicine",
   "psychology",
-  "natural-sciences",
+  "business",
+  "economics",
+  "political-science",
+  "law",
+  "architecture",
+  "design",
+  "communication",
 ];
 
 /** Başvurunun hangi merkezi sistem üzerinden yapıldığı. */
@@ -240,6 +264,71 @@ export interface Program {
 // Öğrenci profili
 // ---------------------------------------------------------------------------
 
+/**
+ * Aldığı diploma / program türleri. Çoktan seçmeli.
+ *
+ * `SchoolType`'ın ("Anadolu Lisesi" gibi) yerine geçti. Sebep: üniversiteler
+ * lise TÜRÜNE göre şart koymuyor, aldığın DİPLOMAYA göre koyuyor — "IB 38
+ * puan", "A-level A*AA", "Abitur 2,5" hepsi diploma şartı. Lise türü ise
+ * yalnızca Türkiye içinde anlamlı bir ayrım.
+ */
+export type DiplomaId =
+  | "turkish-high-school"
+  | "ib-diploma"
+  | "ib-courses"
+  | "ap-courses"
+  | "a-level"
+  | "abitur"
+  | "french-bac"
+  | "american-diploma"
+  | "other";
+
+export const DIPLOMA_IDS: DiplomaId[] = [
+  "turkish-high-school",
+  "ib-diploma",
+  "ib-courses",
+  "ap-courses",
+  "a-level",
+  "abitur",
+  "french-bac",
+  "american-diploma",
+  "other",
+];
+
+/** Bir sınıfın yıl sonu ortalaması. */
+export interface GradeYearAverage {
+  /** Lise kaçıncı sınıf: 9, 10, 11, 12. */
+  year: 9 | 10 | 11 | 12;
+  /** Ondalıklı olabilir (örn. 90.095). Ölçek `gpaScale` ile aynı. */
+  average: number;
+}
+
+export const GRADE_YEARS: GradeYearAverage["year"][] = [9, 10, 11, 12];
+
+/** Tek bir AP dersi ve notu. */
+export interface ApCourseScore {
+  /** Ders adı — AP ders listesi çok uzun ve değişken, serbest metin. */
+  course: string;
+  /** AP ölçeği 1-5. */
+  score: number;
+}
+
+/**
+ * Girilen sınıf ortalamalarından genel ortalama.
+ *
+ * DÜZ ORTALAMA, ağırlıklı değil: sınıfların kredi ağırlığını bilmiyoruz ve
+ * uydurmak istemiyoruz. Girilmeyen yıl hesaba katılmıyor — öğrenci kaç yıl
+ * okuduysa o kadarı üzerinden ortalama alınıyor.
+ *
+ * Hiç yıl girilmemişse `undefined` döner; çağıran taraf o zaman kullanıcının
+ * doğrudan girdiği genel ortalamayı kullanır.
+ */
+export function overallAverage(years: GradeYearAverage[] | undefined): number | undefined {
+  if (!years || years.length === 0) return undefined;
+  const sum = years.reduce((total, entry) => total + entry.average, 0);
+  return sum / years.length;
+}
+
 export type SchoolType =
   | "anatolian"
   | "science-high-school"
@@ -264,13 +353,41 @@ export interface StudentProfile {
   /** Supabase auth kullanıcı kimliği — yerel taslakta boş olabilir. */
   userId?: string;
   fullName: string;
-  /** Brief'te istenen temel bilgiler. Eşleştirmede KULLANILMAZ, sadece kayıt. */
-  birthYear?: number;
   gender?: "female" | "male" | "other" | "prefer-not-to-say";
 
-  schoolType: SchoolType;
+  /**
+   * Lisenin adı. Eşleştirmede KULLANILMAZ — üniversiteler lise adına göre
+   * eşik koymuyor, o yüzden bir şart üretmiyor. Profilde duruyor çünkü
+   * öğrencinin kendi kaydını tanıması ve danışmanla konuşurken referans
+   * vermesi için gerekiyor.
+   */
+  highSchoolName: string;
+  /**
+   * Aldığı diploma ve programlar. `schoolType`'ın yerine geçti: "Anadolu
+   * Lisesi" bilgisi başvuruda işe yaramıyor, "IB Diploma aldım" ya da
+   * "3 AP dersi aldım" yarıyor. Çoktan seçmeli, çünkü öğrenci aynı anda
+   * Türk lise diploması + AP dersleri taşıyabiliyor.
+   */
+  diplomas: DiplomaId[];
+  /** `diplomas` içinde "other" seçiliyse serbest metin. */
+  diplomaOther?: string;
   graduationYear: number;
 
+  /**
+   * Sınıf sınıf not ortalaması. HER YIL İSTEĞE BAĞLI — öğrenci kaç yıl
+   * okuduysa o kadarını giriyor; 11. sınıftaki bir öğrenciden 12. sınıf notu
+   * istemek anlamsız.
+   */
+  gradeYears?: GradeYearAverage[];
+
+  /**
+   * Karşılaştırmada kullanılan genel ortalama.
+   *
+   * `gradeYears` doluysa ONDAN TÜRETİLİR (bkz. overallAverage). Ayrı alan
+   * olarak duruyor çünkü eşleştirme motoru tek bir sayı ile çalışıyor ve
+   * ölçek çevrimi de burada yapılıyor; motoru sınıf sınıf veriye bağlamak
+   * her kontrolü karmaşıklaştırırdı.
+   */
   gpa: number;
   gpaScale: GpaScale;
 
@@ -279,8 +396,20 @@ export interface StudentProfile {
 
   languageTests: LanguageTestScore[];
   standardizedTests: StandardizedTestScore[];
-  /** Öğrencinin ileri düzey aldığını beyan ettiği dersler. */
+  /**
+   * Öğrencinin ileri düzey aldığını beyan ettiği dersler.
+   *
+   * Bu alan MOTORUN GİRDİSİ: katalogdaki 20+ programda `requiredSubjects`
+   * var (TU Delft matematik ileri düzey, DTU kimya gibi) ve kontrol buradan
+   * okunuyor. Sihirbazda artık kendi adımında sorulyor.
+   */
   advancedSubjects: Subject[];
+  /**
+   * AP dersleri, ders ders ve notuyla. `standardizedTests` içindeki tek
+   * "ap" puanının yerine geçiyor: bir öğrenci AP Calculus'tan 5, AP
+   * Biology'den 3 alabilir ve tek bir sayı bunu temsil etmiyor.
+   */
+  apCourses?: ApCourseScore[];
 
   /** Boş dizi = ülke kısıtı yok, hepsine bak. */
   targetCountries: CountryCode[];

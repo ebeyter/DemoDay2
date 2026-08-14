@@ -182,6 +182,21 @@ const BAND_STYLES: Record<Band, string> = {
   "out-of-reach": "bg-band-far-soft text-band-far",
 };
 
+/**
+ * Bant başlıkları için SADECE metin rengi (zeminsiz).
+ *
+ * Rozetin dolgulu hâli tek bir programı işaretliyor; bir bant BAŞLIĞI ise
+ * bölümün tamamını adlandırıyor ve orada dolgu, altındaki kartlarla renk
+ * yarışına girerdi. Aynı token'ları kullanıyor, o yüzden tema veya aksan
+ * değiştiğinde rozetle başlık asla birbirinden ayrı düşmüyor.
+ */
+export const BAND_TEXT: Record<Band, string> = {
+  safety: "text-band-safety",
+  match: "text-band-match",
+  reach: "text-band-reach",
+  "out-of-reach": "text-band-far",
+};
+
 export function BandPill({ band, className }: { band: Band; className?: string }) {
   const { t } = useLocale();
   return (
@@ -306,13 +321,44 @@ export function SectionTitle({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-4 mb-5">
+    <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
       <div>
-        <h2 className="text-[22px] text-ink">{title}</h2>
-        {subtitle && <p className="text-sm text-ink-soft mt-1">{subtitle}</p>}
+        {/* SAYFA BAŞLIĞI — ölçek ve kalınlık BURADA tanımlı, sayfalarda değil.
+            Önceden 22px ve normal kalınlıktaydı; altındaki bölüm başlıkları ise
+            17px semibold olduğu için küçük olan daha güçlü görünüyordu, göz
+            önce nereye bakacağını bilemiyordu. Artık sayfada en güçlü öğe
+            başlık. Negatif harf aralığı iri puntoda kelimelerin dağılmasını
+            engelliyor; mobilde 26px'e düşüyor ki "Eşleşmelerin" tek satırda
+            kalsın. h1: her sayfada bir kez ve sayfanın adı olarak kullanılıyor
+            (tek istisnası yok — bkz. kullanımlar). */}
+        <h1 className="text-[26px] sm:text-[30px] font-semibold tracking-[-0.02em] leading-tight text-ink">
+          {title}
+        </h1>
+        {subtitle && <p className="text-sm text-ink-soft mt-1.5">{subtitle}</p>}
       </div>
       {action}
     </div>
+  );
+}
+
+/**
+ * Bölüm üst-etiketi (TEMEL BİLGİLER, ÖNİZLEME…).
+ *
+ * Aynı görünüm dört ekranda elle tekrarlanıyordu ve puntosu bölüm
+ * başlıklarına fazla yakındı. Küçültüp harf aralığını açmak onu bir
+ * BAŞLIK gibi değil, bir ETİKET gibi okutuyor — hiyerarşide başlıkla
+ * yarışmıyor.
+ */
+export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <p
+      className={cx(
+        "text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-faint",
+        className
+      )}
+    >
+      {children}
+    </p>
   );
 }
 

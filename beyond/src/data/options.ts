@@ -3,6 +3,7 @@ import type {
   ExtraRequirementKey,
   GpaScale,
   LanguageTest,
+  DiplomaId,
   SchoolType,
   StandardizedTest,
   Subject,
@@ -34,23 +35,31 @@ export const LANGUAGE_TEST_SCALES: Record<LanguageTest, TestScale> = {
   toefl: { label: "TOEFL iBT", min: 0, max: 120, step: 1 },
   duolingo: { label: "Duolingo English Test", min: 10, max: 160, step: 5 },
   cambridge: { label: "Cambridge C1/C2", min: 100, max: 230, step: 1 },
+  // DELF ile DALF AYNI ÖLÇEĞİN İKİ FARKLI PARÇASI, ikisi de 1-6 değil:
+  // DELF sınavı A1-B2 seviyelerini, DALF ise C1-C2'yi belgeliyor. Önceden
+  // ikisi de 1-6 tanımlıydı ve "DALF A1" gibi var olmayan bir kombinasyon
+  // seçilebiliyordu. Aralıklar gerçek sınav kapsamına çekildi.
   delf: {
-    label: "DELF (Fransızca)",
+    label: "DELF (A1–B2)",
     min: 1,
+    max: 4,
+    step: 1,
+    levels: CEFR_LEVELS,
+    hint: {
+      tr: "Fransa'daki Fransızca programlar genelde B2 istiyor — DELF'in en üst seviyesi",
+      en: "French-taught programs in France usually ask for B2 — the top DELF level",
+    },
+  },
+  dalf: {
+    label: "DALF (C1–C2)",
+    min: 5,
     max: 6,
     step: 1,
     levels: CEFR_LEVELS,
     hint: {
-      tr: "Fransa'daki Fransızca programlar genelde B2 istiyor",
-      en: "French-taught programs in France usually ask for B2",
+      tr: "B2 ve altı için DELF'i kullan; DALF yalnızca C1 ve C2'yi belgeliyor",
+      en: "Use DELF for B2 and below; DALF only certifies C1 and C2",
     },
-  },
-  dalf: {
-    label: "DALF (Fransızca, ileri)",
-    min: 1,
-    max: 6,
-    step: 1,
-    levels: CEFR_LEVELS,
   },
   tcf: {
     label: "TCF (Fransızca)",
@@ -120,6 +129,41 @@ export const LANGUAGE_TEST_GROUPS: { language: Bilingual; tests: LanguageTest[] 
   { language: { tr: "Fransızca", en: "French" }, tests: ["delf", "dalf", "tcf"] },
   { language: { tr: "Almanca", en: "German" }, tests: ["testdaf", "goethe"] },
   { language: { tr: "İtalyanca", en: "Italian" }, tests: ["cnasvt"] },
+];
+
+/**
+ * Alınan diploma ve programlar. `SCHOOL_TYPES`'ın yerine geçti.
+ *
+ * Neden değişti: üniversiteler lise TÜRÜNE göre şart koymuyor. "Anadolu
+ * Lisesi" bilgisi başvuruda hiçbir kapıyı açıp kapatmıyor; "IB Diploma"
+ * ya da "3 AP dersi" açıyor. Çoktan seçmeli olması da bu yüzden — bir
+ * öğrenci aynı anda Türk lise diploması taşıyıp AP dersi de almış olabilir.
+ *
+ * `SCHOOL_TYPES` şimdilik duruyor; eski profillerin okunabilmesi için
+ * `SchoolType` tipi henüz kaldırılmadı.
+ */
+export const DIPLOMAS: { id: DiplomaId; label: Bilingual; hint?: Bilingual }[] = [
+  {
+    id: "turkish-high-school",
+    label: { tr: "Türk lise diploması", en: "Turkish high school diploma" },
+  },
+  {
+    id: "ib-diploma",
+    label: { tr: "IB Diploma (tam program)", en: "IB Diploma (full programme)" },
+  },
+  {
+    id: "ib-courses",
+    label: { tr: "IB dersleri (tam diploma değil)", en: "IB courses (not full diploma)" },
+  },
+  { id: "ap-courses", label: { tr: "AP dersleri", en: "AP courses" } },
+  { id: "a-level", label: { tr: "A-Level", en: "A-Level" } },
+  { id: "abitur", label: { tr: "Abitur", en: "Abitur" } },
+  { id: "french-bac", label: { tr: "Fransız Bakaloryası", en: "French Baccalauréat" } },
+  {
+    id: "american-diploma",
+    label: { tr: "Amerikan lise diploması", en: "US high school diploma" },
+  },
+  { id: "other", label: { tr: "Diğer", en: "Other" } },
 ];
 
 export const SCHOOL_TYPES: { id: SchoolType; label: Bilingual }[] = [

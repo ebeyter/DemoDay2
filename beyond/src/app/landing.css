@@ -10,11 +10,216 @@
    bu dosyada değişecek bir şey olmasın diye.
    --------------------------------------------------------------------------- */
 
-/* Rota bacakları — `strokeDashoffset` her karede JS'ten geliyor. Kısa bir
-   geçiş, React'in render gecikmesini yumuşatıyor; uzun olsaydı kaydırmanın
-   gerisinde sürüklenirdi. */
+/* ---------------------------------------------------------------------------
+   TAM SAYFA BÖLÜMLER
+
+   Kaydırma bağlamı `main`de kuruluyor, `html`de değil: tutturma yalnızca
+   landing'i ilgilendiriyor, uygulamanın geri kalanı normal aksın.
+
+   `proximity`, `mandatory` DEĞİL. Zorunlu tutturma bir bölüm ekrandan uzun
+   olduğunda (küçük telefon, büyük yazı tipi, uzun çeviri) alt kısmı
+   erişilemez hale getiriyor. Yakınlık modu aynı "yerine oturma" hissini
+   veriyor ama içeriği kilitlemiyor.
+   --------------------------------------------------------------------------- */
+.landing-scroll {
+  height: calc(100dvh - 4rem); /* 4rem = yapışkan başlık yüksekliği */
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y proximity;
+  scroll-behavior: smooth;
+}
+
+.landing-page {
+  position: relative;
+  scroll-snap-align: start;
+  min-height: calc(100dvh - 4rem);
+  display: flex;
+  align-items: center;
+  padding: 3.5rem 0;
+}
+
+.landing-inner {
+  position: relative;
+  z-index: 1;
+  margin-inline: auto;
+  width: 100%;
+  max-width: 72rem;
+  padding-inline: 1.25rem;
+}
+
+/* --- Koyu bölümler ---------------------------------------------------------
+   Açılış ve rota bölümü her iki temada da koyu. Renkler `--color-hero-*`
+   tokenlarından; burada sabit renk yok. */
+.landing-dark {
+  background: var(--color-hero-bg);
+  color: var(--color-hero-ink);
+  overflow: hidden;
+
+  /* Bölümün içindeki her şey — harita, kart, yazı — koyu zemine göre
+     boyansın. Başlık çubuğundaki ile aynı yöntem: rengi değil, o kapsamdaki
+     tema DEĞİŞKENLERİNİ yeniden bağlıyoruz. RouteMap'in tek satırı bile
+     değişmeden koyu paletine dönüyor. */
+  --color-surface: color-mix(in oklab, var(--color-hero-ink) 5%, transparent);
+  --color-surface-soft: color-mix(in oklab, var(--color-hero-ink) 8%, transparent);
+  --color-line: var(--color-hero-line);
+  --color-line-strong: var(--color-hero-line);
+  --color-ink: var(--color-hero-ink);
+  --color-ink-soft: var(--color-hero-ink-soft);
+  --color-ink-faint: var(--color-hero-ink-soft);
+  --color-accent: var(--color-hero-glow);
+  --color-accent-soft: color-mix(in oklab, var(--color-hero-glow) 12%, transparent);
+  --color-accent-line: color-mix(in oklab, var(--color-hero-glow) 26%, transparent);
+
+  --color-map-sea: var(--map-dark-sea);
+  --color-map-land: var(--map-dark-land);
+  --color-map-coast: var(--map-dark-coast);
+}
+
+/* --- Başlık çubuğu landing'de koyu -------------------------------------------
+   Açık bir başlık çubuğunun altında koyu bir açılış, ortada bir dikiş
+   bırakıyordu.
+
+   Header.tsx'e DOKUNMADAN çözülüyor: burada rengi değil, o kapsamdaki tema
+   DEĞİŞKENLERİNİ yeniden bağlıyoruz. Başlıktaki `bg-surface`, `text-ink`,
+   `border-line` sınıflarının hepsi zaten bu değişkenleri okuyor, dolayısıyla
+   tek satır bileşen kodu değişmeden çubuk koyu temaya dönüyor. Tasarım
+   sisteminin amacı tam olarak bu.
+
+   `:has()` seçicisi landing dışındaki sayfalarda eşleşmiyor; uygulamanın geri
+   kalanı etkilenmiyor. */
+body:has(.landing-scroll) header {
+  --color-surface: var(--color-hero-bg);
+  --color-surface-soft: color-mix(in oklab, var(--color-hero-ink) 10%, transparent);
+  --color-line: var(--color-hero-line);
+  --color-line-strong: var(--color-hero-line);
+  --color-ink: var(--color-hero-ink);
+  --color-ink-soft: var(--color-hero-ink-soft);
+  --color-ink-faint: var(--color-hero-ink-soft);
+  --color-accent: var(--color-hero-glow);
+  --color-accent-soft: color-mix(in oklab, var(--color-hero-glow) 14%, transparent);
+}
+
+.landing-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-hero-glow);
+}
+
+/* Işık lekeleri — sayfanın "renksiz" olmaktan çıktığı yer.
+   Tamamen dekoratif; `aria-hidden` ve tıklanamaz. */
+.landing-aurora {
+  position: absolute;
+  inset: -20% -10%;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      42% 38% at 18% 22%,
+      color-mix(in oklab, var(--color-hero-glow) 42%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      38% 42% at 82% 30%,
+      color-mix(in oklab, var(--color-accent) 55%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      46% 40% at 60% 92%,
+      color-mix(in oklab, var(--color-hero-glow) 26%, transparent),
+      transparent 70%
+    );
+  filter: blur(28px);
+  opacity: 0.5;
+  animation: landing-drift 22s ease-in-out infinite alternate;
+}
+
+@keyframes landing-drift {
+  from {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(3%, 2%, 0) scale(1.08);
+  }
+}
+
+/* Koyu zeminde ikincil buton: `secondary` varyantı açık yüzey varsayıyor. */
+.landing-ghost-button {
+  background: transparent;
+  color: var(--color-hero-ink);
+  border-color: var(--color-hero-line);
+}
+
+.landing-ghost-button:hover {
+  color: var(--color-hero-glow);
+  border-color: var(--color-hero-glow);
+}
+
+/* Aşağı iniş ipucu — bölümlerin devam ettiğini söylüyor. */
+.landing-scroll-cue {
+  position: absolute;
+  bottom: 1.75rem;
+  left: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-left: -1.25rem;
+  border: 1px solid var(--color-hero-line);
+  border-radius: 999px;
+  color: var(--color-hero-ink-soft);
+  animation: landing-bob 2.6s ease-in-out infinite;
+}
+
+.landing-scroll-cue:hover {
+  color: var(--color-hero-glow);
+  border-color: var(--color-hero-glow);
+}
+
+@keyframes landing-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+/* Kartların sırayla belirmesi. */
+.landing-reveal {
+  animation: rise 0.5s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+
+/* Rota bölümündeki durak düğmeleri. */
+.journey-stop {
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease;
+}
+
+.journey-stop:hover {
+  border-color: var(--color-hero-line);
+}
+
+.journey-stop-active {
+  border-color: var(--color-hero-line);
+  background: color-mix(in oklab, var(--color-hero-glow) 8%, transparent);
+}
+
+/* Başlangıç ülkesi — dolgu çok soluk, sınırı belirgin. Ülkeyi kapatmadan
+   "buradan başlıyorsun" demenin yolu. */
+.route-origin {
+  fill-opacity: 0.18;
+  stroke-opacity: 0.85;
+}
+
+/* Rota bacakları — `strokeDashoffset` adım adım değişiyor (bkz. Journey.tsx).
+   Geçiş süresi yayın çizilme süresi: kaydırmaya bağlıyken 120ms gerekiyordu,
+   adım bazlı çizimde o kadar kısa süre yayı "birden belirmiş" gösteriyor. */
 .route-leg {
-  transition: stroke-dashoffset 120ms linear;
+  transition: stroke-dashoffset 900ms cubic-bezier(0.33, 0.85, 0.4, 1);
   will-change: stroke-dashoffset;
 }
 
@@ -87,16 +292,28 @@
   .route-leg,
   .route-node,
   .route-label span,
-  .route-stop {
+  .route-stop,
+  .journey-stop {
     transition: none !important;
   }
 
   .route-halo,
-  .route-marker {
+  .route-marker,
+  .landing-aurora,
+  .landing-scroll-cue,
+  .landing-reveal {
     animation: none !important;
   }
 
   .route-stop {
     opacity: 1 !important;
+  }
+
+  /* Tutturmayı da kapatıyoruz: kaydırmanın kullanıcının bıraktığı yerden
+     başka bir yere kayması, hareket hassasiyeti olan biri için tam olarak
+     istenmeyen şey. */
+  .landing-scroll {
+    scroll-snap-type: none;
+    scroll-behavior: auto;
   }
 }

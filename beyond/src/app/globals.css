@@ -45,7 +45,26 @@
      açık renge dönüyor ve perde beyazlardı. Ayrı token olmak zorunda. */
   --color-scrim: rgba(20, 20, 43, 0.45);
 
+  /* Harita katmanı — deniz, kara, kıyı. Yüzey tokenlarından türetilseydi
+     kara ile kart zemini aynı tona düşer, kıyı çizgisi kaybolurdu. */
+  --color-map-sea: #eceff8;
+  --color-map-land: #ffffff;
+  --color-map-coast: #cfd3e6;
+
+  /* Landing açılışı — HER İKİ TEMADA DA KOYU.
+     Bilinçli bir sahne: ürün "sınırların ötesi" diyor, açılış da gece göğü
+     gibi duruyor ve rota orada parlıyor. Tema tokenlarından türetilemez,
+     çünkü açık temada da koyu kalmak zorunda. */
+  --color-hero-bg: #0a0a12;
+  --color-hero-ink: #f4f4fc;
+  --color-hero-ink-soft: #a9a9c4;
+  --color-hero-line: #26263c;
+  /* Aksanın parlak tonu; seçilen aksana göre aşağıda yeniden bağlanıyor. */
+  --color-hero-glow: #a5b4fc;
+
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Başlık yazı tipi — `font-display` yardımcı sınıfı buradan üretiliyor. */
+  --font-display: var(--font-bricolage), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   /* Yumuşak ama abartısız köşeler */
   --radius-card: 14px;
@@ -106,6 +125,10 @@
 
   --color-scrim: rgba(20, 20, 43, 0.45);
 
+  --color-map-sea: #eceff8;
+  --color-map-land: #ffffff;
+  --color-map-coast: #cfd3e6;
+
   /* Dolgu rengi üzerine gelen yazının rengi — bkz. aşağıdaki `.text-white` kuralı. */
   --color-on-fill: #ffffff;
 }
@@ -143,6 +166,12 @@
 
   --color-scrim: rgba(3, 3, 8, 0.66);
 
+  /* Koyu temada deniz zeminden biraz daha koyu, kara biraz daha açık:
+     kontrast ters çevrilmezse kıyı çizgisi tamamen kaybolur. */
+  --color-map-sea: var(--map-dark-sea);
+  --color-map-land: var(--map-dark-land);
+  --color-map-coast: var(--map-dark-coast);
+
   --color-on-fill: #12121c;
 }
 
@@ -157,21 +186,36 @@
    ayarlardaki renk seçicinin dört örneği aynı anda gösterebilmesi gerekiyor.
    Bileşen bu değişkeni adıyla okuyor, sabit renk yazmıyor. */
 :root {
+  /* Haritanın koyu paleti — TEMADAN BAĞIMSIZ. Landing'in koyu bölümleri
+     açık temada da bunu kullanıyor (bkz. landing.css `.landing-dark`). */
+  --map-dark-sea: #0e0e18;
+  --map-dark-land: #1c1c2b;
+  --map-dark-coast: #3a3a52;
+
+  /* Aksanın parlak tonu — TEMADAN BAĞIMSIZ. Koyu zeminler (koyu tema ve
+     landing açılışı) bunu kullanıyor; landing açık temada da koyu olduğu için
+     aksanın parlak hâline her koşulda erişebilmek gerekiyor. */
+  --accent-bright-indigo: #a5b4fc;
+  --accent-bright-teal: #5eead4;
+  --accent-bright-violet: #c4b5fd;
+  --accent-bright-rose: #fda4c4;
+
   --accent-indigo: #3730a3;
   --accent-teal: #0f766e;
   --accent-violet: #7c3aed;
   --accent-rose: #be185d;
 }
 :root[data-theme="dark"] {
-  --accent-indigo: #a5b4fc;
-  --accent-teal: #5eead4;
-  --accent-violet: #c4b5fd;
-  --accent-rose: #fda4c4;
+  --accent-indigo: var(--accent-bright-indigo);
+  --accent-teal: var(--accent-bright-teal);
+  --accent-violet: var(--accent-bright-violet);
+  --accent-rose: var(--accent-bright-rose);
 }
 
 /* indigo — varsayılan */
 :root[data-accent="indigo"] {
   --color-accent: var(--accent-indigo);
+  --color-hero-glow: var(--accent-bright-indigo);
   --color-accent-hover: #2f2a8c;
   --color-accent-soft: #eef0fd;
   --color-accent-line: #c9caf5;
@@ -186,6 +230,7 @@
 /* deniz yeşili */
 :root[data-accent="teal"] {
   --color-accent: var(--accent-teal);
+  --color-hero-glow: var(--accent-bright-teal);
   --color-accent-hover: #115e59;
   --color-accent-soft: #e6f4f2;
   --color-accent-line: #a5d6cf;
@@ -200,6 +245,7 @@
 /* mor */
 :root[data-accent="violet"] {
   --color-accent: var(--accent-violet);
+  --color-hero-glow: var(--accent-bright-violet);
   --color-accent-hover: #6d28d9;
   --color-accent-soft: #f3ecfe;
   --color-accent-line: #d5c2fb;
@@ -214,6 +260,7 @@
 /* gül */
 :root[data-accent="rose"] {
   --color-accent: var(--accent-rose);
+  --color-hero-glow: var(--accent-bright-rose);
   --color-accent-hover: #9f1239;
   --color-accent-soft: #fdeaf2;
   --color-accent-line: #f6c2d8;

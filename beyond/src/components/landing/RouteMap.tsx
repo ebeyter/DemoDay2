@@ -6,7 +6,11 @@ import { fill } from "@/lib/i18n/dictionary";
 import { useLocale } from "@/lib/i18n/context";
 import { cx } from "@/components/ui";
 import {
+  COMPACT_BOX,
+  FULL_BOX,
+  LAND_PATHS,
   LEGS,
+  ORIGIN_PATHS,
   MERIDIANS,
   PARALLELS,
   STOPS,
@@ -16,7 +20,9 @@ import {
   bezierPoint,
   clamp,
   programCountFor,
+  viewBoxAttr,
 } from "./route";
+import { useCompactMap } from "./use-route-progress";
 
 /**
  * İstanbul'dan Avrupa üniversite şehirlerine rota — tamamen SVG.
@@ -53,6 +59,18 @@ export function RouteMap({
   const active = STOPS[activeStop];
   const activeCountry = active.country ? COUNTRIES[active.country] : null;
 
+  // Dar ekranda çerçeve rotaya kırpılıyor. Aynı genişlikte daha az alan
+  // gösterildiği için her şey büyür; kalınlıkları geri küçültmek gerekiyor,
+  // yoksa çizgiler kabalaşır.
+  const compact = useCompactMap();
+  // Çerçeve ve etiket konumları AYNI kutudan türüyor. Ayrı kaynaklardan
+  // gelseydi, biri kırpılmış çerçeveyi diğeri tam çerçeveyi kullanır ve
+  // etiketler düğümlerden kayardı.
+  const box = compact ? COMPACT_BOX : FULL_BOX;
+  const size = compact
+    ? { leg: 2.4, ghost: 1.6, node: 4.6, active: 6, marker: 3.6, halo: 10, grid: 0.8 }
+    : { leg: 3, ghost: 2, node: 6.5, active: 8, marker: 5, halo: 14, grid: 1 };
+
   // İlerleme işaretçisi yalnızca yarısı çizilmiş bacakta anlamlı.
   const legFraction = reduced ? 1 : clamp(progress - activeLeg, 0, 1);
   const marker =
@@ -62,9 +80,9 @@ export function RouteMap({
 
   return (
     <figure className={cx("m-0", className)}>
-      <div className="relative overflow-hidden rounded-card border border-line bg-surface">
+      <div className="relative overflow-hidden rounded-card border border-line bg-map-sea">
         <svg
-          viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
+          viewBox={viewBoxAttr(box)}
           className="block h-auto w-full"
           role="img"
           aria-labelledby={`${titleId} ${descId}`}
@@ -72,9 +90,32 @@ export function RouteMap({
           <title id={titleId}>{copy.mapTitle}</title>
           <desc id={descId}>{copy.mapDesc}</desc>
 
+          {/* Kara parçaları — Natural Earth verisinden, rota ile AYNI
+              izdüşümle çiziliyor (bkz. route.ts LAND_PATHS). Haritanın
+              "Avrupa" dediği yer burası; bu katman olmadan geriye sadece
+              etiket serpilmiş bir ızgara kalıyor. */}
+          <g
+            className="fill-map-land stroke-map-coast"
+            strokeWidth={size.grid}
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            {LAND_PATHS.map((d, index) => (
+              <path key={`land${index}`} d={d} />
+            ))}
+          </g>
+
+          {/* Başlangıç ülkesi. Rota tek bir şehirden değil ülkeden çıkıyor:
+              öğrenci nerede olursa olsun yolculuk aynı yerden başlıyor. */}
+          <g className="fill-accent stroke-accent route-origin" strokeWidth={size.grid} aria-hidden>
+            {ORIGIN_PATHS.map((d, index) => (
+              <path key={`origin${index}`} d={d} />
+            ))}
+          </g>
+
           {/* Enlem/boylam ızgarası — gerçek meridyen ve paraleller.
               Kesik çizgi, düz çizginin tablo gibi görünmemesi için. */}
-          <g className="stroke-line" strokeWidth={1} strokeDasharray="3 7" aria-hidden>
+          <g className="stroke-map-coast" strokeWidth={size.grid} strokeDasharray="3 7" aria-hidden>
             {MERIDIANS.map((x) => (
               <line key={`m${x}`} x1={x} y1={0} x2={x} y2={VIEW_H} />
             ))}
@@ -87,7 +128,7 @@ export function RouteMap({
           <g
             className="stroke-line-strong"
             fill="none"
-            strokeWidth={2}
+            strokeWidth={size.ghost}
             strokeLinecap="round"
             strokeDasharray="1 9"
             aria-hidden
@@ -103,7 +144,7 @@ export function RouteMap({
           <g
             className="stroke-accent"
             fill="none"
-            strokeWidth={3}
+            strokeWidth={size.leg}
             strokeLinecap="round"
             aria-hidden
           >
@@ -127,7 +168,7 @@ export function RouteMap({
               className="fill-accent route-marker"
               cx={marker.x}
               cy={marker.y}
-              r={5}
+              r={size.marker}
               aria-hidden
             />
           )}
@@ -146,7 +187,7 @@ export function RouteMap({
                       className="fill-accent route-halo"
                       cx={point.x}
                       cy={point.y}
-                      r={14}
+                      r={size.halo}
                     />
                   )}
                   <circle
@@ -160,8 +201,8 @@ export function RouteMap({
                     )}
                     cx={point.x}
                     cy={point.y}
-                    r={isActive ? 8 : 6.5}
-                    strokeWidth={3}
+                    r={isActive ? size.active : size.node}
+                    strokeWidth={size.ghost * 1.5}
                   />
                 </g>
               );
@@ -187,8 +228,8 @@ export function RouteMap({
                     : "-translate-x-[calc(100%+0.75rem)] -translate-y-1/2 text-right"
                 )}
                 style={{
-                  left: `${(point.x / VIEW_W) * 100}%`,
-                  top: `${((point.y + stop.label.dy) / VIEW_H) * 100}%`,
+                  left: `${((point.x - box.x) / box.width) * 100}%`,
+                  top: `${((point.y + stop.label.dy - box.y) / box.height) * 100}%`,
                 }}
               >
                 <span

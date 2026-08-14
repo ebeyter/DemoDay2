@@ -98,18 +98,18 @@ const tr = {
    * bir iddiayı landing'e yazmıyoruz.
    */
   landingJourney: {
-    eyebrow: "İstanbul'dan Avrupa'ya",
-    title: "Yolun İstanbul'da başlıyor. Nerede biteceğine veriyle karar ver.",
+    eyebrow: "Türkiye'den Avrupa'ya",
+    title: "Nereden başladığın değil, nereye gidebileceğin önemli.",
     body: "Beyond profilini alır, katalogdaki her programı şart şart değerlendirir ve üç şey verir: karşıladığın şartların dürüst dökümü, eksikler için somut bir plan ve hepsi tek takvimde toplanmış başvuru tarihleri.",
     ctaPrimary: "Profilimi oluştur",
     ctaSecondary: "Rotayı gör",
 
     /** Haritanın erişilebilir adı ve açıklaması (SVG title/desc). */
-    mapTitle: "İstanbul'dan Avrupa üniversite şehirlerine uzanan rota",
+    mapTitle: "Türkiye'den Avrupa üniversite şehirlerine uzanan rota",
     mapDesc:
-      "Şematik bir rota haritası: İstanbul'dan başlayıp Delft, Oxford, Paris ve Milano'ya uzanan dört durak. Sayfayı kaydırdıkça rotalar sırayla çiziliyor. Haritanın taşıdığı bilgilerin tamamı yanındaki metinde de yazıyor.",
-    originLabel: "İstanbul",
-    originNote: "Başlangıç noktan",
+      "Avrupa haritası: Türkiye vurgulanmış ve oradan Delft, Oxford, Paris ve Milano'ya dört rota uzanıyor. Rotalar sırayla çiziliyor. Haritanın taşıdığı bilgilerin tamamı yanındaki durak listesinde de yazıyor.",
+    originLabel: "Türkiye",
+    originNote: "Türkiye'nin neresinde olursan ol",
     /**
      * Durak etiketindeki alt satır — {count} katalogdan geliyor.
      * Kısa tutuluyor: harita üzerinde sola dayalı etiketlerin sığacağı yer dar,
@@ -142,13 +142,22 @@ const tr = {
       },
     ],
 
+    /** Sağdaki bölüm göstergesinin etiketleri — kısa tutuluyor, ipucu balonuna sığmalı. */
+    navSections: {
+      hero: "Başlangıç",
+      route: "Rota",
+      problem: "Neden zor?",
+      honesty: "Sözümüz",
+      close: "Başla",
+    },
+
     statPrograms: "program",
     statCountries: "ülke",
     statSystems: "başvuru sistemi",
 
     closingTitle: "Bir dakikanı ayır, tercihini veriyle yap.",
     closingBody:
-      "Profil sihirbazı yaklaşık altmış saniye sürüyor. Hesap açman gerekmiyor — anahtar yoksa profilin bu tarayıcıda kalır.",
+      "Profil sihirbazı yaklaşık altmış saniye sürüyor. Hesabın profilini ve kısa listeni saklıyor; istediğin cihazdan kaldığın yerden devam ediyorsun.",
     footerNote: "Veriler bilgilendirme amaçlıdır; başvurmadan önce kaynağından teyit et.",
   },
 
@@ -728,17 +737,17 @@ const en: Dictionary = {
   },
 
   landingJourney: {
-    eyebrow: "From Istanbul to Europe",
-    title: "Your route starts in Istanbul. Let the evidence decide where it ends.",
+    eyebrow: "From Türkiye to Europe",
+    title: "Where you start matters less than where you could go.",
     body: "Beyond takes your profile, walks every program in the catalogue requirement by requirement, and gives you three things: an honest account of what you meet, a concrete plan for what you do not, and every application date in one calendar.",
     ctaPrimary: "Build my profile",
     ctaSecondary: "See the route",
 
-    mapTitle: "A route from Istanbul to university cities across Europe",
+    mapTitle: "A route from Türkiye to university cities across Europe",
     mapDesc:
-      "A schematic route map: four stops starting in Istanbul and running through Delft, Oxford, Paris and Milan. The routes are drawn one by one as you scroll. Everything the map shows is also written out in the text beside it.",
-    originLabel: "Istanbul",
-    originNote: "Your starting point",
+      "A map of Europe with Türkiye highlighted and four routes running from it to Delft, Oxford, Paris and Milan. The routes are drawn one after another. Everything the map shows is also written out in the stop list beside it.",
+    originLabel: "Türkiye",
+    originNote: "Wherever in Türkiye you are",
     stopPrograms: "{count} programs",
 
     stopsTitle: "What happens along the route?",
@@ -765,13 +774,21 @@ const en: Dictionary = {
       },
     ],
 
+    navSections: {
+      hero: "Start",
+      route: "Route",
+      problem: "Why it's hard",
+      honesty: "Our promise",
+      close: "Begin",
+    },
+
     statPrograms: "programs",
     statCountries: "countries",
     statSystems: "application systems",
 
     closingTitle: "Give it a minute, then decide on evidence.",
     closingBody:
-      "The profile wizard takes about sixty seconds. No account needed — without keys your profile simply stays in this browser.",
+      "The profile wizard takes about sixty seconds. Your account keeps your profile and shortlist, so you pick up where you left off on any device.",
     footerNote: "Data is informational — always confirm at the source before applying.",
   },
 

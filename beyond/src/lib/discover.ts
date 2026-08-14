@@ -53,6 +53,25 @@ export interface FitSummary {
   unknownOnly: boolean;
 }
 
+/**
+ * null-aware yüzde gösterimi — bestPercent/averagePercent hem ülke hem
+ * üniversite kartlarında aynı iki kuralla gösteriliyor (metin: "—" ya da
+ * "%N"; renk: null/< 50 soluk, >= 50 "reach", >= 80 "match"). İki sayfa da
+ * bu ikisini tekrar tekrar yazmak yerine buradan alıyor.
+ */
+export function formatFitPercent(percent: number | null): string {
+  return percent === null ? "—" : `%${percent}`;
+}
+
+export type FitTone = "match" | "reach" | "faint";
+
+export function fitPercentTone(percent: number | null): FitTone {
+  if (percent === null) return "faint";
+  if (percent >= 80) return "match";
+  if (percent >= 50) return "reach";
+  return "faint";
+}
+
 export function fitSummary(result: MatchResult): FitSummary {
   const mandatory = result.checks.filter((c) => c.mandatory);
 
@@ -172,6 +191,21 @@ export function groupByCountry(results: MatchResult[]): CountryGroup[] {
   const average = (values: number[]): number | null =>
     values.length === 0 ? null : Math.round(values.reduce((a, b) => a + b, 0) / values.length);
 
+  // bestPercent null olanlar (hiçbir programı hesaplanamayan üniversite/ülke)
+  // her zaman en sona — hem üniversite hem ülke sıralaması bunu paylaşıyor,
+  // tek yerde tutuyoruz ki ikisi ileride birbirinden sapmasın.
+  const compareByBestPercent = <T extends { bestPercent: number | null }>(
+    a: T,
+    b: T,
+    tiebreak: (a: T, b: T) => number = () => 0
+  ): number => {
+    if (a.bestPercent === null || b.bestPercent === null) {
+      if (a.bestPercent === b.bestPercent) return 0;
+      return a.bestPercent === null ? 1 : -1;
+    }
+    return b.bestPercent !== a.bestPercent ? b.bestPercent - a.bestPercent : tiebreak(a, b);
+  };
+
   const countries: CountryGroup[] = [];
 
   for (const [country, universityMap] of byCountry) {
@@ -205,15 +239,9 @@ export function groupByCountry(results: MatchResult[]): CountryGroup[] {
     // Aynı gerekçe program sıralamasındaki gibi: eşit uyumda hakkında daha çok
     // şey bildiğimiz üniversite önce. bestPercent null olanlar (hiçbir programı
     // hesaplanamayan üniversiteler) compareByFit'teki unknownOnly gibi en sona.
-    universities.sort((a, b) => {
-      if (a.bestPercent === null || b.bestPercent === null) {
-        if (a.bestPercent === b.bestPercent) return 0;
-        return a.bestPercent === null ? 1 : -1;
-      }
-      return b.bestPercent !== a.bestPercent
-        ? b.bestPercent - a.bestPercent
-        : b.knownAtBest - a.knownAtBest;
-    });
+    universities.sort((a, b) =>
+      compareByBestPercent(a, b, (a, b) => b.knownAtBest - a.knownAtBest)
+    );
 
     const allResults = universities.flatMap((u) => u.results);
     const allPercents = allResults
@@ -235,12 +263,6 @@ export function groupByCountry(results: MatchResult[]): CountryGroup[] {
 
   // bestPercent null olan ülkeler (hiçbir programı hesaplanamayan) en sona —
   // universities.sort'taki null muamelesiyle aynı gerekçe.
-  countries.sort((a, b) => {
-    if (a.bestPercent === null || b.bestPercent === null) {
-      if (a.bestPercent === b.bestPercent) return 0;
-      return a.bestPercent === null ? 1 : -1;
-    }
-    return b.bestPercent - a.bestPercent;
-  });
+  countries.sort((a, b) => compareByBestPercent(a, b));
   return countries;
 }

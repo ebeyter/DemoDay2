@@ -10,7 +10,7 @@ import { useLocale } from "@/lib/i18n/context";
 import { fill } from "@/lib/i18n/dictionary";
 import { useStore } from "@/lib/store";
 import { matchAll } from "@/lib/matching";
-import { groupByCountry } from "@/lib/discover";
+import { fitPercentTone, formatFitPercent, groupByCountry } from "@/lib/discover";
 import { PROGRAMS } from "@/data/programs";
 import { COUNTRIES } from "@/data/taxonomy";
 
@@ -71,6 +71,7 @@ export default function DiscoverPage() {
           <div className="grid sm:grid-cols-2 gap-4">
             {countries.map((group, index) => {
               const meta = COUNTRIES[group.country];
+              const bestTone = fitPercentTone(group.bestPercent);
               return (
                 <Link key={group.country} href={`/discover/${group.country}`} className="block">
                   <Card
@@ -102,16 +103,14 @@ export default function DiscoverPage() {
                           title={group.bestPercent === null ? t.discover.fitUncomputableHint : undefined}
                           className={cx(
                             "text-[22px] font-bold tabular-nums leading-none",
-                            group.bestPercent === null
-                              ? "text-ink-faint"
-                              : group.bestPercent >= 80
-                                ? "text-band-match"
-                                : group.bestPercent >= 50
-                                  ? "text-band-reach"
-                                  : "text-ink-faint"
+                            bestTone === "match"
+                              ? "text-band-match"
+                              : bestTone === "reach"
+                                ? "text-band-reach"
+                                : "text-ink-faint"
                           )}
                         >
-                          {group.bestPercent === null ? "—" : `%${group.bestPercent}`}
+                          {formatFitPercent(group.bestPercent)}
                         </div>
                         <div className="text-[11px] text-ink-faint mt-1">
                           {t.discover.bestFit}
@@ -121,7 +120,7 @@ export default function DiscoverPage() {
 
                     <div className="flex items-center gap-3 text-[12px] text-ink-faint pt-3 border-t border-line">
                       <span className="tabular-nums" title={group.averagePercent === null ? t.discover.fitUncomputableHint : undefined}>
-                        {t.discover.averageFit} {group.averagePercent === null ? "—" : `%${group.averagePercent}`}
+                        {t.discover.averageFit} {formatFitPercent(group.averagePercent)}
                       </span>
                       {group.verifiedCount > 0 && (
                         <span>

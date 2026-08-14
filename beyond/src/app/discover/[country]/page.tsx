@@ -10,7 +10,7 @@ import { useLocale } from "@/lib/i18n/context";
 import { fill } from "@/lib/i18n/dictionary";
 import { useStore } from "@/lib/store";
 import { matchAll } from "@/lib/matching";
-import { fitSummary, groupByCountry } from "@/lib/discover";
+import { fitPercentTone, fitSummary, formatFitPercent, groupByCountry } from "@/lib/discover";
 import { PROGRAMS } from "@/data/programs";
 import { COUNTRIES, FIELDS } from "@/data/taxonomy";
 import type { CountryCode } from "@/lib/types";
@@ -110,6 +110,7 @@ export default function DiscoverCountryPage() {
         <div className="space-y-3">
           {group.universities.map((uni) => {
             const open = effectiveOpen === uni.university;
+            const bestTone = fitPercentTone(uni.bestPercent);
             return (
               <Card key={uni.university} className="overflow-hidden">
                 <button
@@ -136,16 +137,14 @@ export default function DiscoverCountryPage() {
                         title={uni.bestPercent === null ? t.discover.fitUncomputableHint : undefined}
                         className={cx(
                           "text-[18px] font-bold tabular-nums",
-                          uni.bestPercent === null
-                            ? "text-ink-faint"
-                            : uni.bestPercent >= 80
-                              ? "text-band-match"
-                              : uni.bestPercent >= 50
-                                ? "text-band-reach"
-                                : "text-ink-faint"
+                          bestTone === "match"
+                            ? "text-band-match"
+                            : bestTone === "reach"
+                              ? "text-band-reach"
+                              : "text-ink-faint"
                         )}
                       >
-                        {uni.bestPercent === null ? "—" : `%${uni.bestPercent}`}
+                        {formatFitPercent(uni.bestPercent)}
                       </span>
                       <span aria-hidden className="text-ink-faint text-[12px]">
                         {open ? "▲" : "▼"}

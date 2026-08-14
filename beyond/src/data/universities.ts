@@ -260,6 +260,56 @@ export const UNIVERSITIES: University[] = [
       en: "Central London, broad in health sciences and humanities. It expresses the language requirement as a band rather than a score; which band maps to which score is in a separate table.",
     },
   },
+  {
+    name: "University of Bristol",
+    country: "GB",
+    city: "Bristol",
+    officialUrl: "https://www.bristol.ac.uk/",
+    description: {
+      tr: "İngiltere'nin güneybatısında, şehir merkezli bir araştırma üniversitesi. Mühendislik programlarında standart adaylara mülakat uygulanmıyor; kararlar çoğunlukla akademik notlara dayanıyor.",
+      en: "A city-centre research university in south-west England. Engineering courses don't routinely interview standard applicants; decisions are mostly based on academic grades.",
+    },
+  },
+  {
+    name: "University of Warwick",
+    country: "GB",
+    city: "Coventry",
+    officialUrl: "https://warwick.ac.uk/",
+    description: {
+      tr: "Coventry yakınında bir kampüs üniversitesi. Ekonomi bölümü İngiltere'nin en rekabetçilerinden; TMUA sınavı isteğe bağlı ama yüksek puan alanlara indirimli teklif sunulabiliyor.",
+      en: "A campus university near Coventry. Its Economics department is one of the UK's most competitive; the TMUA test is optional but a high score can lead to a reduced offer.",
+    },
+  },
+  {
+    name: "Durham University",
+    country: "GB",
+    city: "Durham",
+    officialUrl: "https://www.durham.ac.uk/",
+    description: {
+      tr: "Kolej sistemiyle çalışan, kuzey İngiltere'de küçük bir şehirde kurulu bir araştırma üniversitesi. Fen Bilimleri programı esnek: öğrenci hangi bilim dallarını çalışacağını kendisi seçiyor, her dalın kendi ders şartı var.",
+      en: "A collegiate research university in a small city in the north of England. Its Natural Sciences programme is flexible: students choose which science subjects to study, each with its own subject requirement.",
+    },
+  },
+  {
+    name: "University of St Andrews",
+    country: "GB",
+    city: "St Andrews",
+    officialUrl: "https://www.st-andrews.ac.uk/",
+    description: {
+      tr: "İskoçya'da küçük bir sahil kasabasında, İskoç sistemine özgü 4 yıllık onur derecesi (Honours) veriyor. Psikoloji hem BSc hem MA olarak sunuluyor, ikisinin şartları eşit.",
+      en: "A small coastal-town university in Scotland offering a 4-year Honours degree per the Scottish system. Psychology is offered as both BSc and MA, with equal entry requirements.",
+    },
+  },
+  {
+    name: "University of Bath",
+    country: "GB",
+    city: "Bath",
+    officialUrl: "https://www.bath.ac.uk/",
+    description: {
+      tr: "İngiltere'nin güneybatısında, işletme ve yönetim alanında ülke çapında en üst sıralarda yer alan bir üniversite. Türk öğrenciler için ayrı bir denklik tablosu ve matematik notu şartı yayınlıyor.",
+      en: "A university in south-west England consistently ranked among the UK's top for business and management. It publishes a separate equivalency table and a mathematics-grade requirement specifically for Turkish applicants.",
+    },
+  },
 
   // -------------------------------------------------------------------------
   // 🇫🇷 FRANSA

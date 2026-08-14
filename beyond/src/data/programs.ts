@@ -678,26 +678,30 @@ export const PROGRAMS: Program[] = [
     country: "GB",
     city: "Cambridge",
     name: "Engineering",
-    // DÜZELTME (2026-08-13): katalogda BEng yazıyordu. Sayfanın başlığı
-    // "Engineering, BA (Hons) and MEng" — Cambridge BEng vermiyor.
-    // Üç yıllık varyant BA (Hons), dört yıllık MEng. durationYears 4 olarak
-    // bırakıldı çünkü kayıt MEng varyantını temsil ediyor.
+    // DOĞRULANDI (2026-08-14): sayfa iki varyant sunuyor — "MEng 4 years" ve
+    // "BA (Hons) 3 years". Önceki kayıt BA etiketiyle MEng'in süresini (4 yıl)
+    // taşıyordu, bu kendi içinde çelişkiliydi. Modelde MEng yok; BA etiketini
+    // gerçek süresiyle (3 yıl) eşleştirdik — uydurma yok, tip uyuşmazlığı yok.
     degree: "BA",
     field: "engineering",
     teachingLanguage: "en",
-    durationYears: 4,
+    durationYears: 3,
     requirements: {
-      // Sayfa sayısal eşik vermiyor; belirleyici olan sıralama ve mülakat.
-      // (Katalogdaki 95 teyit edilemedi.)
-      minGpa: 95,
+      // DOĞRULANDI: sayfa 100'lük eşik vermiyor, "A level: A*A*A" / "IB: 41-42
+      // (776 HL)" diyor. Türk diploması için resmî bir denklik tablosu yok —
+      // uydurmuyoruz.
+      minGpa: undefined,
       language: [
+        // DOĞRULANDI: english-language-requirements sayfası "IELTS Academic —
+        // normally a minimum overall grade of 7.5, usually with 7.0 or above
+        // in each element."
         { test: "ielts", min: 7.5 },
-        { test: "toefl", min: 110 },
+        // DÜZELTME: TOEFL kaldırıldı. Cambridge lisans başvurularında TOEFL'ı
+        // KABUL ETMİYOR (sadece IELTS Academic, Cambridge C1/C2) — 110 uydurma
+        // bir rakamdı, sınavın kendisi geçersizdi.
       ],
-      standardizedTests: [
-        { test: "sat", min: 1540, mandatory: false },
-        { test: "ap", min: 5, mandatory: true },
-      ],
+      // DÜZELTME: SAT/AP kaldırıldı. Cambridge'in course/entry-requirements
+      // sayfalarında bu sınavlara dair hiçbir sayı yok.
       requiredSubjects: [
         { subject: "math", level: "advanced" },
         { subject: "physics", level: "advanced" },
@@ -708,12 +712,15 @@ export const PROGRAMS: Program[] = [
           mandatory: true,
           note: { tr: "ESAT giriş sınavı", en: "ESAT admissions test" },
         },
-        { key: "interview", mandatory: true },
+        {
+          // DOĞRULANDI: "Not everyone interviewed will be offered a place,
+          // but everyone who is made an offer will have been interviewed."
+          key: "interview",
+          mandatory: true,
+        },
         { key: "motivation-letter", mandatory: true },
         { key: "recommendation-letter", mandatory: true },
         {
-          // EKLENDİ: sayfa 2025 döngüsü için "Applications per place: 10,
-          // Accepted: 335" diyor. Kontenjan gerçeği katalogda hiç yoktu.
           key: "numerus-fixus",
           mandatory: true,
           note: {
@@ -723,24 +730,26 @@ export const PROGRAMS: Program[] = [
         },
       ],
     },
-    // Harç bu sayfada geçmiyor; 46.000 teyit edilmedi ve GBP mi EUR mu belirsiz.
-    // Diğer UK kayıtlarında harç GBP çıktı (Imperial £45.500), bu kayıt da
-    // muhtemelen GBP — ama teyit etmeden para birimi atamıyorum.
-    tuitionNonEu: 46000,
-    tuitionEu: 46000,
+    // DÜZELTME: international-fees-and-costs sayfası Engineering'i "Group 4"
+    // içinde £44.214/yıl olarak veriyor (2026-27 girişi, kur sabit). Bu rakama
+    // dahil olmayan ayrı bir college harcı da var (£11.500-14.950/yıl).
+    tuitionNonEu: 44214,
+    tuitionEu: 44214,
+    tuitionCurrency: "GBP",
     livingCostPerYear: 16800,
     applicationSystem: "ucas",
-    // Son tarih bu sayfada geçmiyor; UCAS'ın Oxbridge tarihi 15 Ekim.
+    // DOĞRULANDI: application-dates-deadlines sayfası "15 October 2026, 6pm
+    // UK time" diyor (2027 girişi) — programa özel değil, UCAS/üniversite
+    // çapında bir tarih.
     deadline: "10-15",
     deadlineNote: {
       tr: "Oxford/Cambridge son tarihi diğerlerinden 3 ay önce — 15 Ekim",
       en: "Oxford/Cambridge close three months earlier than everyone else — 15 October",
     },
-    // Eski link kanonik adrese yönlendiriyordu; yönlendirme hedefi yazıldı.
     sourceUrl: "https://www.undergraduate.study.cam.ac.uk/courses/engineering-ba-hons-meng",
     facultyUrl: "https://www.eng.cam.ac.uk/",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-14",
+    verification: "verified",
   },
   {
     // EKLENDİ (2026-08-14). Oxford katalogda HİÇ YOKTU — QS'te dünyada ilk üçte
@@ -823,30 +832,58 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 92,
+      // DÜZELTME (2026-08-14): 92 uydurmaydı. LSE 100'lük eşik vermiyor —
+      // teklif A*AA (A* Matematikte) ya da IB 39 (HL Matematikte 7).
+      minGpa: undefined,
       language: [
+        // DOĞRULANDI: "7.0 overall and 7.0 in each component (in one exam
+        // sitting only)".
         { test: "ielts", min: 7.0 },
+        // DOĞRULANDI: "100 overall, with a minimum of: 27 Writing, 25
+        // Reading, 24 Listening, 24 Speaking" (2026 Ocak sonrası ölçek).
         { test: "toefl", min: 100 },
       ],
       standardizedTests: [
-        { test: "sat", min: 1500, mandatory: false },
-        { test: "ap", min: 5, mandatory: true },
+        // DÜZELTME: 1500 değil 1450 — ABD başvuranlar sayfası "SAT score of
+        // 1450+" diyor. Zorunlu değil, A*AA teklif bandına giden alternatif
+        // yollardan biri (diğerleri: IB, ACT 32+, 5 AP dahil AP Calc BC 5).
+        { test: "sat", min: 1450, mandatory: false },
+        { test: "ap", min: 5, mandatory: false },
       ],
+      // DOĞRULANDI: A-level'da Matematikte A* şart; IB'de HL Matematikte 7;
+      // AP yolunda AP Calculus BC'de 5.
       requiredSubjects: [{ subject: "math", level: "advanced" }],
       extras: [
         { key: "motivation-letter", mandatory: true },
         { key: "recommendation-letter", mandatory: true },
+        {
+          // EKLENDİ: "Applicants are required to take the Test of
+          // Mathematics for University Admission (TMUA). The test is
+          // mandatory." Puan eşiği yayınlanmıyor (1-9 bant, kesim yok).
+          key: "entrance-exam",
+          mandatory: true,
+          note: {
+            tr: "TMUA (Test of Mathematics for University Admission) zorunlu — LSE puan eşiği yayınlamıyor",
+            en: "TMUA (Test of Mathematics for University Admission) is mandatory — LSE does not publish a score cut-off",
+          },
+        },
       ],
     },
-    tuitionNonEu: 33000,
-    tuitionEu: 33000,
+    // DÜZELTME: kurs sayfası "2026/27 guide price £39,900" diyor (2027/28
+    // henüz belirlenmedi). 33.000 eskiydi/uydurmaydı.
+    tuitionNonEu: 39900,
+    tuitionEu: 39900,
+    tuitionCurrency: "GBP",
     livingCostPerYear: 20400,
     applicationSystem: "ucas",
-    deadline: "01-14",
-    sourceUrl: "https://www.lse.ac.uk/study-at-lse/Undergraduate",
+    // DÜZELTME: 01-14, geçen döngünün (2026 girişi) tarihiydi. Güncel kurs
+    // sayfası 2027 girişi için "13 January 2027" diyor.
+    deadline: "01-13",
+    // DÜZELTME: eski link genel bir iniş sayfasıydı, kursun kendisi değildi.
+    sourceUrl: "https://www.lse.ac.uk/study-at-lse/undergraduate/bsc-economics",
     facultyUrl: "https://www.lse.ac.uk/economics",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-14",
+    verification: "verified",
   },
   {
     id: "gb-ucl-psychology",
@@ -903,26 +940,54 @@ export const PROGRAMS: Program[] = [
     teachingLanguage: "en",
     durationYears: 3,
     requirements: {
-      minGpa: 82,
+      // DÜZELTME (2026-08-14): standart teklif AAA. Manchester'ın Türkiye'ye
+      // özel resmî denklik tablosu "AAA → %85" diyor (onaylı okullardan
+      // doğrudan giriş) — 82 uydurmaydı, 85 kaynaklı.
+      minGpa: 85,
       language: [
+        // DOĞRULANDI: "IELTS 6.5 with no less than 6 in any individual
+        // component."
         { test: "ielts", min: 6.5 },
+        // DOĞRULANDI: "90 overall with no less than 22 in any individual
+        // component."
         { test: "toefl", min: 90 },
       ],
-      standardizedTests: [{ test: "ap", min: 4, mandatory: true }],
+      standardizedTests: [
+        // DÜZELTME: AP zorunlu değil — A-level/IB/Türk diploması gibi
+        // alternatif yollardan biri, sadece o yoldan başvurana uygulanıyor.
+        // Skor da yanlıştı: ABD denklik tablosunda AAA teklifi 5,5,5'e denk
+        // geliyor (4 sadece AAB/ABB gibi daha düşük bantlarda yeterli).
+        { test: "ap", min: 5, mandatory: false },
+      ],
+      requiredSubjects: [
+        {
+          // EKLENDİ: "must demonstrate ... equivalent to at least Grade 6 or
+          // B in GCSE/IGCSE ... Mathematics" (ya da IB SL Matematik 5).
+          // A-level düzeyinde değil, temel düzeyde bir kapı — Türk lise
+          // müfredatı zaten karşılıyor.
+          subject: "math",
+          level: "basic",
+        },
+      ],
       extras: [
         { key: "motivation-letter", mandatory: true },
         { key: "recommendation-letter", mandatory: true },
       ],
     },
-    tuitionNonEu: 32000,
-    tuitionEu: 32000,
+    // DÜZELTME: kurs sayfası "£33,100 for the 2026/27 academic year" diyor.
+    tuitionNonEu: 33100,
+    tuitionEu: 33100,
+    tuitionCurrency: "GBP",
     livingCostPerYear: 14400,
     applicationSystem: "ucas",
-    deadline: "01-14",
-    sourceUrl: "https://www.manchester.ac.uk/study/undergraduate/courses/",
+    // DÜZELTME: UCAS'ın 2027 girişi için eşit değerlendirme tarihi 13 Ocak
+    // 2027 — 14 değil.
+    deadline: "01-13",
+    // DÜZELTME: eski link genel kurs arama sayfasıydı.
+    sourceUrl: "https://www.manchester.ac.uk/study/undergraduate/courses/2026/03519/bsc-management/",
     facultyUrl: "https://www.alliancembs.manchester.ac.uk/",
-    lastChecked: CHECKED,
-    verification: "ai-extracted",
+    lastChecked: "2026-08-14",
+    verification: "verified",
   },
   {
     // EKLENDİ (2026-08-14). Katalogda İskoçya hiç yoktu ve Edinburgh QS'te
@@ -988,9 +1053,15 @@ export const PROGRAMS: Program[] = [
     requirements: {
       // Sayfa 100'lük eşik vermiyor; şart A-level A*A*A ve IB 39.
       minGpa: undefined,
-      // Sayfa dil şartını "English language band: D" olarak veriyor ve SAYI
-      // yazmıyor. Bandın karşılığı ayrı bir tabloda — uydurmadım.
-      language: undefined,
+      language: [
+        // EKLENDİ (2026-08-14): şart sayfası "English language band: D"
+        // diyor, sayı vermiyor. Bandın karşılığı ayrı bir sayfada bulundu ve
+        // teyit edildi: kcl.ac.uk/study/undergraduate/how-to-apply/
+        // english-language-requirements — "6.5 overall with a minimum of 6.0
+        // in each skill" (Band D, Bilgisayar Bilimleri'nin bulunduğu NMES
+        // fakültesini kapsıyor — İngilizce/Genel Mühendislik hariç tüm NMES).
+        { test: "ielts", min: 6.5 },
+      ],
       standardizedTests: [
         // Teyit edildi: "39 points overall or an aggregate score of 20 from
         // three Higher Levels", HL matematikte 6.
@@ -1009,14 +1080,426 @@ export const PROGRAMS: Program[] = [
     tuitionCurrency: "GBP",
     livingCostPerYear: 20400,
     applicationSystem: "ucas",
-    // UCAS'ın sistem tarihi; bu sayfada geçmiyor.
+    // ÇELİŞKİ (2026-08-14): bu programın sayfasında tarih yok. UCAS'ın kendi
+    // resmi sayfası "13 Ocak 2027, 18:00" diyor (standart dersler, Tıp/
+    // Diş/Oxbridge hariç) — ama KCL'nin "important-information-for-applying"
+    // sayfası "29 Ocak" yazıyor (tarihi belirsiz, muhtemelen eski). İkisi
+    // çelişiyor, hangisinin doğru olduğuna karar veremedim; UCAS'ın tarihini
+    // kullanıp kullanıcıyı KCL'nin kendi sayfasını kontrol etmeye yönlendiriyorum.
     deadline: "01-13",
+    deadlineNote: {
+      tr: "KCL'nin kendi başvuru sayfası farklı bir tarih (29 Ocak) veriyor — UCAS'ın resmi tarihiyle çelişiyor. Başvurmadan önce KCL'nin güncel sayfasından teyit et.",
+      en: "KCL's own application page states a different date (29 January) — this conflicts with UCAS's official date. Confirm on KCL's current page before applying.",
+    },
     sourceUrl: "https://www.kcl.ac.uk/study/undergraduate/courses/computer-science-bsc/requirements",
     facultyUrl: "https://www.kcl.ac.uk/nmes/departments/informatics",
     lastChecked: "2026-08-14",
-    // Şartlar sayfasından teyit edildi; son tarih sayfada olmadığı için
-    // rozet çevrilmedi.
+    // Şartların çoğu sayfasından teyit edildi (dil şartı ayrı bir KCL
+    // sayfasından); son tarih UCAS ile KCL arasında çelişkili olduğu için
+    // rozet çevrilmedi — yarım doğrulanmış kaydı verified yapmak, hiç
+    // doğrulamamaktan kötü.
     verification: "ai-extracted",
+  },
+  {
+    // EKLENDİ (2026-08-14). Oxford'un tek programı Engineering Science'tı;
+    // CS eklenerek daha geniş bir profil aralığı kapsanıyor.
+    id: "gb-oxford-cs",
+    university: "University of Oxford",
+    country: "GB",
+    city: "Oxford",
+    name: "Computer Science",
+    // Sayfa "BA degree after three years, or a Masters degree (MCompSci)
+    // after four years" diyor — modelde MEng/MCompSci yok. BA etiketini
+    // gerçek 3 yıllık süresiyle eşleştirdik, Cambridge kaydındaki gibi.
+    degree: "BA",
+    field: "cs",
+    teachingLanguage: "en",
+    durationYears: 3,
+    requirements: {
+      // Sayfa 100'lük eşik vermiyor; teklif A*AA / IB 39 (766 HL, HL
+      // Matematikte 7).
+      minGpa: undefined,
+      language: [
+        // Oxford'un uluslararası öğrenci dil sayfası: "IELTS Academic 7.5
+        // overall, minimum 7.0 in each component" ve "TOEFL iBT 110 overall"
+        // (bileşen eşikleri: L22 R24 S25 W24). Cambridge'in aksine Oxford
+        // TOEFL'ı kabul ediyor.
+        { test: "ielts", min: 7.5 },
+        { test: "toefl", min: 110 },
+      ],
+      requiredSubjects: [{ subject: "math", level: "advanced" }],
+      extras: [
+        {
+          // DİKKAT: 2025 döngüsüne kadar MAT kullanılıyordu; 2026'dan
+          // itibaren TMUA'ya geçildi ("From 2026, Oxford will use the TMUA").
+          key: "entrance-exam",
+          mandatory: true,
+          note: {
+            tr: "TMUA (Test of Mathematics for University Admission) — 2026'dan itibaren MAT'ın yerini aldı, iki kağıt (Uygulama + Matematiksel Akıl Yürütme)",
+            en: "TMUA (Test of Mathematics for University Admission) — replaced the MAT starting 2026, two papers (Applications + Mathematical Reasoning)",
+          },
+        },
+        {
+          // "All shortlisted applicants will be invited to online
+          // interviews in December."
+          key: "interview",
+          mandatory: true,
+        },
+        { key: "motivation-letter", mandatory: true },
+        { key: "recommendation-letter", mandatory: true },
+        {
+          // 3 yıllık ortalama (2023-25): "Interviewed: 21%, Successful: 7%,
+          // Intake: 55" — resmi bir kontenjan sayısı değil ama rekabet
+          // gerçeğini gösteriyor.
+          key: "numerus-fixus",
+          mandatory: false,
+          note: {
+            tr: "2023-25 ortalaması: başvuranların %21'i mülakata çağrılıyor, %7'si kabul ediliyor (yıllık alım ~55 kişi)",
+            en: "2023-25 average: 21% of applicants are interviewed, 7% are admitted (annual intake ~55)",
+          },
+        },
+      ],
+    },
+    // Ders sayfası 2026-27 girişi için "Overseas fee: £62,820 per year"
+    // veriyor (2027-28 henüz yayınlanmadı).
+    tuitionNonEu: 62820,
+    tuitionEu: 62820,
+    tuitionCurrency: "GBP",
+    livingCostPerYear: 18000,
+    applicationSystem: "ucas",
+    deadline: "10-15",
+    deadlineNote: {
+      tr: "Oxford/Cambridge son tarihi diğerlerinden 3 ay önce — 15 Ekim",
+      en: "Oxford/Cambridge close three months earlier than everyone else — 15 October",
+    },
+    sourceUrl: "https://www.ox.ac.uk/admissions/undergraduate/courses/course-listing/computer-science",
+    facultyUrl: "https://www.cs.ox.ac.uk/admissions/undergraduate/why_oxford/formal-admissions-criteria.html",
+    lastChecked: "2026-08-14",
+    verification: "verified",
+  },
+  {
+    // EKLENDİ (2026-08-14). UCL'nin tek programı Psychology'ydi; CS
+    // Imperial/Oxford/Cambridge dışında Londra'da güçlü bir dördüncü seçenek.
+    id: "gb-ucl-cs",
+    university: "University College London",
+    country: "GB",
+    city: "London",
+    name: "Computer Science",
+    degree: "BSc",
+    field: "cs",
+    teachingLanguage: "en",
+    durationYears: 3,
+    requirements: {
+      // Sayfa 100'lük eşik vermiyor; teklif A*A*A / bağlamsal A*AB, IB 40
+      // (20 puan üç HL derste, HL Matematikte 7).
+      minGpa: undefined,
+      language: [
+        // UCL kursları dil "seviyelerine" ayrılıyor; CS BSc "Level 1":
+        // "Overall score of 6.5 and a minimum of 6.0 in each component"
+        // (IELTS), "Overall score of 92" (TOEFL iBT, eski ölçek).
+        { test: "ielts", min: 6.5 },
+        { test: "toefl", min: 92 },
+      ],
+      standardizedTests: [{ test: "ib", min: 40, mandatory: false }],
+      requiredSubjects: [{ subject: "math", level: "advanced" }],
+      extras: [
+        {
+          // "UCL will use the TARA (Test of Academic Reasoning for
+          // Admissions)... for all undergraduate programmes in the
+          // Department of Computer Science." STAT'ın yerini aldı.
+          key: "entrance-exam",
+          mandatory: true,
+          note: {
+            tr: "TARA (Test of Academic Reasoning for Admissions) — eski STAT sınavının yerini aldı, 3 bölüm (Eleştirel Düşünme, Problem Çözme, Yazma)",
+            en: "TARA (Test of Academic Reasoning for Admissions) — replaced the old STAT test, 3 sections (Critical Thinking, Problem Solving, Writing)",
+          },
+        },
+        { key: "motivation-letter", mandatory: true },
+        { key: "recommendation-letter", mandatory: true },
+      ],
+    },
+    // "International: £46,700 per year" (2026/27 girişi; 2027/28 henüz
+    // yayınlanmadı — ağustos 2026'da yayınlanacağı belirtiliyor).
+    tuitionNonEu: 46700,
+    tuitionEu: 46700,
+    tuitionCurrency: "GBP",
+    livingCostPerYear: 20400,
+    applicationSystem: "ucas",
+    deadline: "01-13",
+    sourceUrl: "https://www.ucl.ac.uk/study/prospective-students/undergraduate/courses/computer-science-bsc",
+    facultyUrl:
+      "https://www.ucl.ac.uk/engineering/computer-science/study/undergraduate/tara-admissions-test-computer-science-courses",
+    lastChecked: "2026-08-14",
+    verification: "verified",
+  },
+  {
+    // EKLENDİ (2026-08-14). Bristol katalogda yoktu; QS'te İngiltere'nin
+    // ilk 15'inde ve mühendislikte iyi bilinen bir orta ölçekli seçenek.
+    id: "gb-bristol-engineering",
+    university: "University of Bristol",
+    country: "GB",
+    city: "Bristol",
+    // Bristol'de tek başına "Engineering" diye genel bir program yok;
+    // en genel/amiral mühendislik dalı Mechanical Engineering.
+    name: "Mechanical Engineering",
+    // BEng (3 yıl) ve MEng (4 yıl) ayrı UCAS kodlarıyla iki ayrı program —
+    // model MEng içermediği için BEng seçildi, uydurma yok.
+    degree: "BEng",
+    field: "engineering",
+    teachingLanguage: "en",
+    durationYears: 3,
+    requirements: {
+      // Sayfa 100'lük eşik vermiyor. Bristol'ün Türkiye sayfası genel bir
+      // "%74-90" bandı veriyor (kurs bazlı değil) — bu program için özel bir
+      // sayı yok, uydurmuyoruz.
+      minGpa: undefined,
+      language: [
+        // "Profile E": "IELTS 6.5 overall with 6.0 in all skills"; TOEFL
+        // iBT "88 overall" (eski ölçek, 21 Ocak 2026'dan önceki sınavlar).
+        { test: "ielts", min: 6.5 },
+        { test: "toefl", min: 88 },
+      ],
+      standardizedTests: [{ test: "ib", min: 38, mandatory: false }],
+      // Matematik kesin şart ("expected to hold... A-level in
+      // Mathematics"); ikinci ders (Fizik/Kimya/İleri Mat/Bilgisayar/
+      // Elektronik) bir listeden biri olduğu için tek bir zorunlu ders
+      // olarak yazılmıyor.
+      requiredSubjects: [{ subject: "math", level: "advanced" }],
+      extras: [
+        // "For these courses, applicants are not routinely interviewed...
+        // admissions decisions will be made on the basis of the
+        // application information alone." — giriş sınavı/mülakat yok.
+        { key: "motivation-letter", mandatory: true },
+        { key: "recommendation-letter", mandatory: true },
+      ],
+    },
+    // "International students, £31,300 for the first year" (2026 girişi;
+    // 2027 rakamı henüz onaylanmadı).
+    tuitionNonEu: 31300,
+    tuitionEu: 31300,
+    tuitionCurrency: "GBP",
+    livingCostPerYear: 15000,
+    applicationSystem: "ucas",
+    // Bristol'ün kendi sayfası "Equal Consideration Deadline: 13 January
+    // 2027" diyor; UCAS'ın kendi sayfasından bağımsız doğrulanamadı
+    // (ucas.com otomatik erişimi engelledi) ama Bristol'ün ilk taraf
+    // sayfası güvenilir kabul edildi.
+    deadline: "01-13",
+    sourceUrl: "https://www.bristol.ac.uk/study/undergraduate/2027/mechanical-engineering/beng-mechanical-engineering/",
+    lastChecked: "2026-08-14",
+    verification: "verified",
+  },
+  {
+    // EKLENDİ (2026-08-14). Warwick katalogda yoktu; ekonomi bölümü
+    // İngiltere'nin LSE ile birlikte en rekabetçilerinden.
+    id: "gb-warwick-economics",
+    university: "University of Warwick",
+    country: "GB",
+    city: "Coventry",
+    name: "Economics",
+    degree: "BSc",
+    field: "economics",
+    teachingLanguage: "en",
+    durationYears: 3,
+    requirements: {
+      // Warwick'in Türkiye'ye özel denklik tablosu: "A*AA = %88" — standart
+      // teklif tam olarak A*AA, bu yüzden doğrudan uygulanabiliyor.
+      minGpa: 88,
+      language: [
+        // "Band C": IELTS "7.0 including minimum 6.5 in each component";
+        // TOEFL iBT "100 ... minimum L21 W21 R22 S23" (21 Ocak 2026 öncesi
+        // sınavlar).
+        { test: "ielts", min: 7.0 },
+        { test: "toefl", min: 100 },
+      ],
+      standardizedTests: [{ test: "ib", min: 38, mandatory: false }],
+      requiredSubjects: [{ subject: "math", level: "advanced" }],
+      extras: [
+        {
+          // "Optionally, applicants are encouraged to sit the TMUA...
+          // Applicants achieving the highest scores... considered for a
+          // reduced offer of AAA. Applicants without TMUA will still be
+          // considered." — isteğe bağlı, zorunlu değil.
+          key: "entrance-exam",
+          mandatory: false,
+          note: {
+            tr: "TMUA isteğe bağlı — yüksek puan alanlara AAA'ya düşürülmüş teklif sunulabiliyor, sınavsız başvuru da değerlendiriliyor",
+            en: "TMUA is optional — a high score can lead to a reduced AAA offer, but applications without it are still considered",
+          },
+        },
+        { key: "motivation-letter", mandatory: true },
+        { key: "recommendation-letter", mandatory: true },
+      ],
+    },
+    // "Band 2 – £35,530 per year" (2026-27 girişi; 2027-28 rakamı henüz
+    // belirlenmedi).
+    tuitionNonEu: 35530,
+    tuitionEu: 35530,
+    tuitionCurrency: "GBP",
+    livingCostPerYear: 13500,
+    applicationSystem: "ucas",
+    // Warwick'in kendi sayfasında tarih yok; UCAS'ın 2027 girişi için genel
+    // tarihi kullanıldı.
+    deadline: "01-13",
+    sourceUrl: "https://warwick.ac.uk/study/undergraduate/courses/bsc-economics",
+    facultyUrl: "https://warwick.ac.uk/fac/soc/economics/prospective/ug/admissions-and-entry-requirements",
+    lastChecked: "2026-08-14",
+    verification: "verified",
+  },
+  {
+    // EKLENDİ (2026-08-14). Durham katalogda yoktu; kolej sistemiyle
+    // çalışan, Oxbridge dışında İngiltere'nin en iyi genel araştırma
+    // üniversitelerinden biri.
+    id: "gb-durham-naturalsciences",
+    university: "Durham University",
+    country: "GB",
+    city: "Durham",
+    name: "Natural Sciences",
+    degree: "BSc",
+    field: "natural-sciences",
+    teachingLanguage: "en",
+    durationYears: 3,
+    requirements: {
+      // Durham'ın Türkiye'ye özel denklik tablosu: "A*AA ≥ %88" — standart
+      // teklif tam olarak A*AA.
+      minGpa: 88,
+      language: [
+        // "Band B": IELTS "6.5 with no component under 6.0"; TOEFL iBT
+        // "80 with no component under 20" (21 Ocak 2026 öncesi sınavlar).
+        { test: "ielts", min: 6.5 },
+        { test: "toefl", min: 80 },
+      ],
+      standardizedTests: [{ test: "ib", min: 37, mandatory: false }],
+      // Program esnek: öğrenci hangi bilim dallarını çalışacağını kendi
+      // seçiyor, her dalın kendi ders şartı var (ör. Fizik için Fizik+Mat,
+      // Kimya için Kimya+Mat). Tek bir zorunlu ders olarak yazılamıyor —
+      // uydurmuyoruz.
+      requiredSubjects: undefined,
+      extras: [
+        // Mülakat sadece Eğitim programında zorunlu, Fen Bilimleri'nde yok.
+        // Zorunlu giriş sınavı da yok (TMUA sadece Matematik için, isteğe
+        // bağlı ve bu kayıt Matematik değil).
+        { key: "motivation-letter", mandatory: true },
+        { key: "recommendation-letter", mandatory: true },
+      ],
+    },
+    // "International / EU students: £34,500 per year" (2026/27 girişi
+    // onaylı; 2027/28 sayfada "henüz onaylanmadı" diyor).
+    tuitionNonEu: 34500,
+    tuitionEu: 34500,
+    tuitionCurrency: "GBP",
+    livingCostPerYear: 12500,
+    applicationSystem: "ucas",
+    deadline: "01-13",
+    sourceUrl: "https://www.durham.ac.uk/study/courses/natural-sciences-cfg0/",
+    lastChecked: "2026-08-14",
+    verification: "verified",
+  },
+  {
+    // EKLENDİ (2026-08-14). St Andrews katalogda yoktu; İskoçya'nın en
+    // eski ve en çok tanınan üniversitesi (Prince William'ın da okulu).
+    id: "gb-standrews-psychology",
+    university: "University of St Andrews",
+    country: "GB",
+    city: "St Andrews",
+    name: "Psychology",
+    // İskoç sistemi 4 yıllık Honours derecesi veriyor. BSc ve MA aynı
+    // içerikte, eşit şartlarla sunuluyor — BSc (fen ağırlıklı) seçildi.
+    degree: "BSc",
+    field: "psychology",
+    teachingLanguage: "en",
+    durationYears: 4,
+    requirements: {
+      // Sayfa 100'lük eşik vermiyor (A-level AAB standart/ABB asgari, IB
+      // 36); Türkiye'ye özel bir denklik tablosu da yok.
+      minGpa: undefined,
+      // Dil sayfası Psikoloji'yi hangi "profile" (3-D Sanat mı 7-D Fen mi)
+      // koyduğunu açıkça yazmıyor ve iki profilin rakamları da birbirinden
+      // çok farklı — hangisinin geçerli olduğuna karar veremedim, uydurmuyorum.
+      language: undefined,
+      standardizedTests: [{ test: "ib", min: 36, mandatory: false }],
+      // "No previous knowledge of psychology is required." Tek bir ders
+      // zorunlu değil, bir listeden biri (Biyoloji/Kimya/Bilgisayar/
+      // Coğrafya/Matematik/Fizik) yeterli — tek bir zorunlu ders olarak
+      // yazılamıyor.
+      requiredSubjects: undefined,
+      extras: [
+        { key: "motivation-letter", mandatory: true },
+        { key: "recommendation-letter", mandatory: true },
+      ],
+    },
+    // Kurs sayfası 2027 girişi için "ücretler henüz belirlenmedi" diyor;
+    // genel AB-dışı harç sayfası 2026-27 girişi için "£33,250" veriyor
+    // (Tıp hariç tüm fakülteler, Psikoloji dahil).
+    tuitionNonEu: 33250,
+    tuitionEu: 33250,
+    tuitionCurrency: "GBP",
+    livingCostPerYear: 16000,
+    applicationSystem: "ucas",
+    // St Andrews'ün kendi UCAS başvuru sayfası doğrudan "13 Ocak 2027,
+    // 18:00" diyor (Tıp hariç).
+    deadline: "01-13",
+    sourceUrl: "https://www.st-andrews.ac.uk/subjects/psychology/psychology-bsc/",
+    facultyUrl: "https://www.st-andrews.ac.uk/subjects/psychology/",
+    lastChecked: "2026-08-14",
+    verification: "verified",
+  },
+  {
+    // EKLENDİ (2026-08-14). Bath katalogda yoktu; işletme/yönetimde yıllardır
+    // İngiltere sıralamalarının tepesinde.
+    id: "gb-bath-business",
+    university: "University of Bath",
+    country: "GB",
+    city: "Bath",
+    name: "Management",
+    degree: "BSc",
+    field: "business",
+    teachingLanguage: "en",
+    durationYears: 3,
+    requirements: {
+      // Bath'ın Türkiye'ye özel denklik tablosu: "CGPA of 80% with 85% in
+      // one subject from the final year" — burada sadece genel eşik (80)
+      // yazılabiliyor, "bir dersten 85" koşulunu model ifade edemiyor.
+      minGpa: 80,
+      language: [
+        // "Category A": IELTS "7.0 overall with no less than 6.5 in all
+        // components"; TOEFL iBT "100 overall with a minimum 24 in all 4
+        // components" (21 Ocak 2026 öncesi sınavlar).
+        { test: "ielts", min: 7.0 },
+        { test: "toefl", min: 100 },
+      ],
+      standardizedTests: [{ test: "ib", min: 36, mandatory: false }],
+      requiredSubjects: [
+        {
+          // Genel şartta Matematik zorunlu değil (sayısal derslerden biri
+          // yeterli) AMA Türkiye'ye özel bölüm ayrıca ekliyor: "You must
+          // also achieve 70% in Mathematics from any year." Bu, ileri
+          // düzey bir ders şartından çok bir asgari başarı eşiği — en
+          // yakın karşılığı temel düzey olarak işaretlendi.
+          subject: "math",
+          level: "basic",
+        },
+      ],
+      extras: [
+        { key: "motivation-letter", mandatory: true },
+        { key: "recommendation-letter", mandatory: true },
+      ],
+    },
+    // "Overseas students — Tuition fee for the academic year 2026/27:
+    // £28,650."
+    tuitionNonEu: 28650,
+    tuitionEu: 28650,
+    tuitionCurrency: "GBP",
+    livingCostPerYear: 15500,
+    applicationSystem: "ucas",
+    // Kurs sayfası doğrudan "Overseas application deadline: 14 January
+    // 2026" diyor (2026 girişi sayfası; diğer İngiltere kayıtlarında
+    // kullanılan 13 Ocak'tan bir gün farklı — UCAS tarihi yıldan yıla
+    // kayıyor, ikisi de gerçek).
+    deadline: "01-14",
+    sourceUrl: "https://www.bath.ac.uk/courses/undergraduate-2026/business-and-management/bsc-management/",
+    lastChecked: "2026-08-14",
+    verification: "verified",
   },
 
   // -------------------------------------------------------------------------

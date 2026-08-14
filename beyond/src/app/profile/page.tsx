@@ -5,10 +5,14 @@ import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Button, Card, cx } from "@/components/ui";
 import {
-  PROFILE_STEPS,
-  ProfileStep,
+  BasicsFields,
+  GradeFields,
+  InterestFields,
+  LanguageFields,
+  SubjectFields,
+  TargetFields,
+  TestFields,
   emptyProfile,
-  type ProfileStepId,
 } from "@/components/ProfileFields";
 import { useLocale } from "@/lib/i18n/context";
 import { fill } from "@/lib/i18n/dictionary";
@@ -18,11 +22,21 @@ import { overallAverage, type StudentProfile } from "@/lib/types";
 /**
  * Kayıt sihirbazı — yedi adım.
  *
- * Soruların kendisi `src/components/ProfileFields.tsx` içinde; bu dosya
- * yalnızca adım yönetimi, ilerleme çubuğu ve kaydetmeyi yapıyor. Aynı sorular
- * ayarlardaki "Profilim" sekmesinde de kullanılıyor — tek kaynak olduğu için
- * yeni bir alan eklendiğinde iki ekranda birden görünüyor.
+ * Soruların KENDİSİ burada değil, `src/components/ProfileFields.tsx` içinde.
+ * Aynı sorular ayarlardaki "Profilim" sekmesinde de kullanılıyor; tek kaynak
+ * olduğu için yeni bir alan eklendiğinde iki ekranda birden görünüyor. Bu
+ * dosyada yalnızca adım yönetimi, ilerleme çubuğu ve kaydetme var.
+ *
+ * "subjects" AYRI BİR ADIM.
+ *
+ * Önceden ileri düzey ders seçimi not ortalaması adımının altına sıkışmıştı ve
+ * gözden kaçıyordu. Oysa katalogdaki 20+ programda `requiredSubjects` var
+ * (TU Delft matematik ileri düzey, DTU kimya gibi) ve bu kutu boş kalınca o
+ * şartlar "bilgi eksik" olarak duruyor — öğrenci farkında olmadan uyumunu
+ * düşürüyor. Kendi adımı olunca hem görünür hem açıklanabilir oluyor.
  */
+const STEPS = ["basics", "fields", "grades", "subjects", "language", "tests", "targets"] as const;
+type StepId = (typeof STEPS)[number];
 
 export default function ProfilePage() {
   const { t } = useLocale();
@@ -33,8 +47,8 @@ export default function ProfilePage() {
   const [stepIndex, setStepIndex] = useState(0);
   const [saving, setSaving] = useState(false);
 
-  const step: ProfileStepId = PROFILE_STEPS[stepIndex];
-  const progress = ((stepIndex + 1) / PROFILE_STEPS.length) * 100;
+  const step: StepId = STEPS[stepIndex];
+  const progress = ((stepIndex + 1) / STEPS.length) * 100;
 
   const update = (patch: Partial<StudentProfile>) =>
     setDraft((prev) => ({ ...prev, ...patch }));
@@ -63,7 +77,7 @@ export default function ProfilePage() {
     return true;
   }, [step, draft, derivedAverage]);
 
-  const isLast = stepIndex === PROFILE_STEPS.length - 1;
+  const isLast = stepIndex === STEPS.length - 1;
 
   async function handleNext() {
     if (!isLast) {
@@ -87,9 +101,11 @@ export default function ProfilePage() {
         {/* İlerleme — "az kaldı" hissini veren asıl öğe */}
         <div className="mb-8">
           <div className="flex items-baseline justify-between mb-3">
-            <h1 className="text-[24px] text-ink">{t.wizard.title}</h1>
+            <h1 className="text-[26px] sm:text-[30px] font-semibold tracking-[-0.02em] leading-tight text-ink">
+              {t.wizard.title}
+            </h1>
             <span className="text-[13px] text-ink-faint tabular-nums">
-              {fill(t.wizard.stepOf, { current: stepIndex + 1, total: PROFILE_STEPS.length })}
+              {fill(t.wizard.stepOf, { current: stepIndex + 1, total: STEPS.length })}
             </span>
           </div>
           <div className="h-1.5 rounded-full bg-surface-soft overflow-hidden">
@@ -99,7 +115,7 @@ export default function ProfilePage() {
             />
           </div>
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
-            {PROFILE_STEPS.map((id, index) => (
+            {STEPS.map((id, index) => (
               <button
                 key={id}
                 type="button"
@@ -121,7 +137,21 @@ export default function ProfilePage() {
         </div>
 
         <Card key={step} className="p-6 sm:p-8 animate-rise">
-          <ProfileStep step={step} draft={draft} update={update} />
+          {/* Adım başlığı burada, soru gövdeleri ProfileFields'ta: ayarlar
+              ekranı aynı gövdeleri kendi bölüm başlıklarıyla kullanıyor. */}
+          {step !== "basics" && step !== "targets" && (
+            <h2 className="text-[19px] font-semibold tracking-[-0.01em] text-ink mb-1.5">
+              {t.wizard[step].question}
+            </h2>
+          )}
+
+          {step === "basics" && <BasicsFields draft={draft} update={update} />}
+          {step === "fields" && <InterestFields draft={draft} update={update} />}
+          {step === "grades" && <GradeFields draft={draft} update={update} />}
+          {step === "subjects" && <SubjectFields draft={draft} update={update} />}
+          {step === "language" && <LanguageFields draft={draft} update={update} />}
+          {step === "tests" && <TestFields draft={draft} update={update} />}
+          {step === "targets" && <TargetFields draft={draft} update={update} />}
         </Card>
 
         {/* Gezinme */}
@@ -143,4 +173,3 @@ export default function ProfilePage() {
     </>
   );
 }
-

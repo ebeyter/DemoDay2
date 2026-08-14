@@ -226,11 +226,44 @@ function checkLanguage(program: Program, profile: StudentProfile): RequirementCh
 
   // anyOf: kabul edilen sınavlardan herhangi biri eşiği geçerse şart sağlanır.
   let best: { req: LanguageRequirement; score: number; gap: number } | null = null;
+  let ownedWithoutScore: LanguageRequirement | null = null;
   for (const req of reqs) {
     const owned = profile.languageTests.find((t) => t.test === req.test);
     if (!owned) continue;
+    // PUANSIZ BELGE (`score: 0`) = "belgem var, puanını girmedim".
+    //
+    // Sihirbaz artık dil sınavı puanı istemiyor; sekiz sınavın ölçeğini
+    // hatırlamak formu terk etme sebebiydi. Ama 0'ı gerçek puan sayıp şartı
+    // BAŞARISIZ göstermek öğrenci hakkında yanlış bir iddia olurdu — eşiği
+    // geçip geçmediğini bilmiyoruz. Bu yüzden aşağıda "eksik bilgi" olarak
+    // işleniyor: ne geçmiş ne kalmış sayılıyor, eylem listesinde puanı
+    // girmesi isteniyor.
+    if (owned.score <= 0) {
+      ownedWithoutScore ??= req;
+      continue;
+    }
     const gap = req.min - owned.score;
     if (!best || gap < best.gap) best = { req, score: owned.score, gap };
+  }
+
+  // Belge var ama puan yok → eksik bilgi (öğrenci tarafı).
+  if (!best && ownedWithoutScore) {
+    const label = TEST_LABEL[ownedWithoutScore.test];
+    return {
+      id: "language",
+      label: { tr: "Dil belgesi", en: "Language certificate" },
+      status: "unknown",
+      unknownReason: "student",
+      mandatory: true,
+      detail: {
+        tr: `${label} var ama puanını girmedin · istenen: ${accepted}`,
+        en: `You have ${label} but no score entered · required: ${accepted}`,
+      },
+      action: {
+        tr: `${label} puanını profiline gir — bu program ${accepted} istiyor ve eşiği geçip geçmediğini ancak puanla söyleyebiliriz.`,
+        en: `Add your ${label} score to your profile — this program asks for ${accepted}, and only the score tells us whether you clear it.`,
+      },
+    };
   }
 
   // Öğrenci kabul edilen sınavlardan hiçbirine sahip değil → eksik bilgi.

@@ -50,7 +50,7 @@ export default function ResetPasswordPage() {
         <Card className="p-8">
           {sent ? (
             <div className="animate-rise">
-              <h1 className="text-[24px] text-ink mb-2">{t.authReset.sentTitle}</h1>
+              <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-ink mb-2">{t.authReset.sentTitle}</h1>
               <p className="text-sm text-ink-soft leading-relaxed mb-6">
                 {fill(t.authReset.sentBody, { email })}
               </p>
@@ -62,7 +62,7 @@ export default function ResetPasswordPage() {
             </div>
           ) : (
             <>
-              <h1 className="text-[24px] text-ink mb-2">{t.authReset.requestTitle}</h1>
+              <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-ink mb-2">{t.authReset.requestTitle}</h1>
               <p className="text-sm text-ink-soft mb-6">{t.authReset.requestBody}</p>
 
               {localMode && (

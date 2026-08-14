@@ -48,7 +48,7 @@ export default function SignInPage() {
 
       <main className="mx-auto max-w-md px-5 py-16">
         <Card className="p-8">
-          <h1 className="text-[24px] text-ink mb-2">
+          <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-ink mb-2">
             {mode === "sign-in" ? t.auth.signInTitle : t.auth.signUpTitle}
           </h1>
           <p className="text-sm text-ink-soft mb-6">

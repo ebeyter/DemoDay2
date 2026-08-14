@@ -19,6 +19,7 @@ import {
 } from "./persistent-state";
 import type { CountryCode, FieldId, StudentProfile } from "./types";
 import { reconcileLocalProfile } from "./profile-reconcile";
+import { normalizeProfile } from "./profile-migrate";
 
 /**
  * Beyond — tek veri katmanı.
@@ -162,7 +163,22 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const localMode = !isSupabaseConfigured;
 
   // Kalıcı durum doğrudan localStorage'dan okunuyor (bkz. persistent-state.ts).
-  const profile = usePersistent<StudentProfile | null>(PROFILE_KEY, null);
+  const storedProfile = usePersistent<StudentProfile | null>(PROFILE_KEY, null);
+
+  /**
+   * ESKİ ŞEMAYLA KAYDEDİLMİŞ PROFİL BURADA ONARILIYOR.
+   *
+   * Depodaki JSON tipe uymak zorunda değil: şema `schoolType`'tan
+   * `diplomas`'a geçtiğinde eski kayıtlarda o alan hiç yoktu ve ayarlar
+   * ekranı `draft.diplomas.includes(...)` satırında çöküyordu. Onarımın
+   * yeri burası — profil uygulamaya TEK BU NOKTADAN giriyor, dolayısıyla
+   * hiçbir ekran eksik alanla karşılaşmıyor. Her ekranda ayrı `?? []`
+   * yazmak, biri unutulduğunda yine çökmek demekti.
+   *
+   * `useMemo`: her render'da yeni nesne üretmek, referansa bakan
+   * `useMemo`/`useEffect` bağımlılıklarını boşuna tetiklerdi.
+   */
+  const profile = useMemo(() => normalizeProfile(storedProfile), [storedProfile]);
   const shortlist = usePersistent<string[]>(SHORTLIST_KEY, EMPTY_STRING_ARRAY);
   const compare = usePersistent<string[]>(COMPARE_KEY, EMPTY_STRING_ARRAY);
   const scenarios = usePersistent<SavedScenario[]>(SCENARIOS_KEY, EMPTY_SCENARIOS);
@@ -279,6 +295,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
       if (!active) return;
 
+      // İKİ AKIŞ BİRLEŞTİRİLDİ (merge, 2026-08-14):
+      //   - uzlaştırma kuralı: başkasının verisi asla sızmasın
+      //   - taşıma teklifi: cihazdaki hesapsız profil sessizce silinmesin
+      // İkisi çelişmiyor; sıra önemli. Önce güvenlik kararı veriliyor, sonra
+      // silinen şeyin YERİNE açık onaylı taşıma teklif ediliyor. Teklifin
+      // verisi `localSnapshot` — sağlayıcı kurulurken alınmış anlık görüntü,
+      // yani temizlemeden etkilenmiyor.
       const action = reconcileLocalProfile({
         currentUserId: user.id,
         hasLocalProfile: Boolean(readPersistent<StudentProfile | null>(PROFILE_KEY, null)),
@@ -289,7 +312,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       });
 
       if (action === "adopt-server" && data?.profile) {
-        // Dış kaynağa yazıyoruz; abone bileşenler kendiliğinden güncellenir.
+        // Hesapta profil VAR — kaynak odur. Dış kaynağa yazıyoruz; abone
+        // bileşenler kendiliğinden güncellenir.
         writePersistent(PROFILE_KEY, data.profile as StudentProfile);
         writePersistent(SHORTLIST_KEY, Array.isArray(data.shortlist) ? data.shortlist : []);
         writePersistent(
@@ -297,6 +321,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           Array.isArray(data.compare_list) ? data.compare_list : []
         );
       } else if (action === "clear") {
+        // Bu hesaba ait olduğu kanıtlanmayan veri ekranda kalmıyor.
         clearLocal();
 
         /**
@@ -340,6 +365,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           );
         }
       }
+
+      // Hesapta profil yoksa ve cihazda HESAPSIZ (damgasız) bir profil
+      // duruyorsa taşımayı teklif ediyoruz. `localSnapshot` yalnızca damgasız
+      // profil için doluyor (bkz. yukarıdaki useState guard'ı), yani başka bir
+      // hesabın verisi buraya hiç girmiyor — teklif ile gizlilik kuralı
+      // birbirine karışmıyor.
+      if (!error && !data?.profile && localSnapshot) setHandoff(localSnapshot);
 
       // Uzlaştırma bitti; sayfalar artık render edebilir. Bu satır olmadan
       // durum "loading"de kalır ve uygulama hiç açılmaz.

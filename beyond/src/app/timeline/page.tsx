@@ -200,7 +200,7 @@ export default function TimelinePage() {
                   <span className="text-lg" aria-hidden>
                     🛂
                   </span>
-                  <h2 className="text-[17px] font-semibold text-ink">{t.timeline.visaTitle}</h2>
+                  <h2 className="text-[19px] font-semibold tracking-[-0.01em] text-ink">{t.timeline.visaTitle}</h2>
                 </div>
                 <p className="text-[13px] text-ink-soft mb-6 leading-relaxed max-w-2xl">
                   {t.timeline.visaSubtitle}

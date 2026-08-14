@@ -168,6 +168,42 @@ describe("Dil şartı — close vs unknown ayrımı", () => {
     expect(result.checks.find((c) => c.id === "language")).toBeUndefined();
   });
 
+  // Sihirbaz dil sınavı PUANI istemiyor; işaretlenen belge `score: 0` ile
+  // kaydediliyor. 0'ı gerçek puan sayıp şartı "unmet" göstermek öğrenci
+  // hakkında yanlış bir iddia olurdu — eşiği geçip geçmediğini bilmiyoruz.
+  it("puansız belge (score 0) unmet DEĞİL, unknown/student döner", () => {
+    const result = evaluateProgram(
+      makeProgram({ requirements: { language: [{ test: "ielts", min: 6.5 }] } }),
+      makeProfile({ languageTests: [{ test: "ielts", score: 0 }] })
+    );
+    const langCheck = result.checks.find((c) => c.id === "language")!;
+    expect(langCheck.status).toBe("unknown");
+    expect(langCheck.unknownReason).toBe("student");
+    // Eylem listesine giriyor: eksik olan bizim verimiz değil, öğrencinin puanı.
+    expect(langCheck.action?.en).toContain("score");
+  });
+
+  it("puansız belge, PUANLI bir belgeyi gölgelemez: anyOf'ta puanlı olan kazanır", () => {
+    const result = evaluateProgram(
+      makeProgram({
+        requirements: {
+          language: [
+            { test: "ielts", min: 6.5 },
+            { test: "toefl", min: 90 },
+          ],
+        },
+      }),
+      makeProfile({
+        languageTests: [
+          { test: "ielts", score: 0 },
+          { test: "toefl", score: 95 },
+        ],
+      })
+    );
+    const langCheck = result.checks.find((c) => c.id === "language")!;
+    expect(langCheck.status).toBe("met");
+  });
+
   it("undefined (kaynak sayfa sessiz) [] ile AYNI DEĞİL: unknown/source üretir, şartı yok saymaz", () => {
     const result = evaluateProgram(
       makeProgram({ requirements: { language: undefined } }),

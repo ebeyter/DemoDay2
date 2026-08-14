@@ -688,6 +688,18 @@ export function buildGapPlan(results: MatchResult[]): GapAction[] {
     for (const check of result.checks) {
       if (check.status === "met" || !check.action) continue;
 
+      // BİZİM veri boşluğumuz öğrencinin aksiyon listesine GİRMEZ.
+      //
+      // "Bu programın not eşiği kaynak sayfada yazmıyor" cümlesi eksik planında
+      // hiçbir işe yaramıyor: öğrencinin kapatabileceği bir açık değil, bizim
+      // katalogumuzun boşluğu. Eksik planı "hangi sınava gir, kaç puan al"
+      // listesi; oraya karışınca liste anlamsızlaşıyor ve tek madde buysa
+      // ekran bozuk görünüyor.
+      //
+      // Şart yine program detayında görünüyor ("kaynak sayfa belirtmiyor" +
+      // başvuru ofisine sor önerisiyle) — sadece aksiyon listesine girmiyor.
+      if (check.unknownReason === "source") continue;
+
       const key = `${check.id}:${check.action.tr}`;
       const existing = bucket.get(key);
       if (existing) {

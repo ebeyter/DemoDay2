@@ -8,14 +8,15 @@ import { useLocale } from "@/lib/i18n/context";
 import { fill } from "@/lib/i18n/dictionary";
 import { useStore } from "@/lib/store";
 import { toHundredScale } from "@/lib/matching";
-import { COUNTRIES, FIELDS } from "@/data/taxonomy";
+import { COUNTRIES, FIELDS, fieldProgramCounts } from "@/data/taxonomy";
+import { PROGRAMS } from "@/data/programs";
 import {
+  DIPLOMAS,
   EXTRAS,
   GENDERS,
   GPA_SCALES,
   LANGUAGE_TEST_GROUPS,
   LANGUAGE_TEST_SCALES,
-  SCHOOL_TYPES,
   STANDARDIZED_TEST_SCALES,
   SUBJECTS,
   formatTestScore,
@@ -23,6 +24,8 @@ import {
 import {
   COUNTRY_CODES,
   FIELD_IDS,
+  GRADE_YEARS,
+  overallAverage,
   type CountryCode,
   type ExtraRequirementKey,
   type FieldId,
@@ -32,22 +35,42 @@ import {
   type Subject,
 } from "@/lib/types";
 
-const STEPS = ["basics", "fields", "grades", "language", "tests", "targets"] as const;
+/**
+ * "subjects" AYRI BİR ADIM olarak eklendi.
+ *
+ * Önceden ileri düzey ders seçimi not ortalaması adımının altına sıkışmıştı ve
+ * gözden kaçıyordu. Oysa katalogdaki 20+ programda `requiredSubjects` var
+ * (TU Delft matematik ileri düzey, DTU kimya gibi) ve bu kutu boş kalınca o
+ * şartlar "bilgi eksik" olarak duruyor — öğrenci farkında olmadan uyumunu
+ * düşürüyor. Kendi adımı olunca hem görünür hem açıklanabilir oluyor.
+ */
+const STEPS = ["basics", "fields", "grades", "subjects", "language", "tests", "targets"] as const;
 type StepId = (typeof STEPS)[number];
 
-const CURRENT_YEAR = 2026;
+/**
+ * Mezuniyet yılı seçenekleri.
+ *
+ * 2027'den başlıyor: katalogdaki son tarihler 2026-27 başvuru dönemine ait,
+ * yani şu an lisede olan ve 2027 ve sonrasında mezun olacak öğrenciler için
+ * anlamlı. Daha eski bir yıl seçilebilse öğrenci geçmiş bir dönemin
+ * tarihlerine göre plan yapardı.
+ */
+const GRADUATION_YEARS = [2027, 2028, 2029, 2030, 2031];
 
 function emptyProfile(): StudentProfile {
   return {
     fullName: "",
-    schoolType: "anatolian",
-    graduationYear: CURRENT_YEAR,
-    gpa: 80,
+    highSchoolName: "",
+    diplomas: [],
+    graduationYear: GRADUATION_YEARS[0],
+    gradeYears: [],
+    gpa: 0,
     gpaScale: "100",
     fields: [],
     languageTests: [],
     standardizedTests: [],
     advancedSubjects: [],
+    apCourses: [],
     targetCountries: [],
     extrasReady: [],
   };
@@ -68,12 +91,32 @@ export default function ProfilePage() {
   const update = (patch: Partial<StudentProfile>) =>
     setDraft((prev) => ({ ...prev, ...patch }));
 
+  /** Katalogda her alanda kaç program var — sıfır olanı önceden söylemek için. */
+  const fieldCounts = useMemo(() => fieldProgramCounts(PROGRAMS), []);
+
+  /**
+   * Sınıf ortalamalarından türetilen genel ortalama. Hiç sınıf girilmemişse
+   * `undefined` — o zaman öğrencinin elle yazdığı `gpa` kullanılıyor.
+   */
+  const derivedAverage = useMemo(() => overallAverage(draft.gradeYears), [draft.gradeYears]);
+
   const canContinue = useMemo(() => {
-    if (step === "basics") return draft.fullName.trim().length > 0;
+    if (step === "basics") {
+      // Lise adı ve diploma da isteniyor: diploma olmadan hangi şart
+      // sistemine göre değerlendirileceği belirsiz kalıyor.
+      return (
+        draft.fullName.trim().length > 0 &&
+        draft.highSchoolName.trim().length > 0 &&
+        draft.diplomas.length > 0
+      );
+    }
     if (step === "fields") return draft.fields.length > 0;
-    if (step === "grades") return draft.gpa > 0;
+    // Sınıf ortalaması ya da elle girilmiş genel ortalama — biri yeterli.
+    if (step === "grades") return (derivedAverage ?? draft.gpa) > 0;
+    // "subjects" adımı tamamen isteğe bağlı: ders almamış ya da AP'si olmayan
+    // öğrenciyi burada tutmak anlamsız.
     return true;
-  }, [step, draft]);
+  }, [step, draft, derivedAverage]);
 
   const isLast = stepIndex === STEPS.length - 1;
 
@@ -83,7 +126,11 @@ export default function ProfilePage() {
       return;
     }
     setSaving(true);
-    await saveProfile(draft);
+    // Türetilmiş ortalamayı KAYIT ANINDA yazıyoruz, state'te yansıtmıyoruz.
+    // Motor tek bir sayıyla çalışıyor ve profilde iki farklı "ortalama"
+    // tutmak hangisinin doğru olduğu belirsiz bir kayıt üretirdi. Effect
+    // içinde setState ile aynaya yazmak da gereksiz bir render turuydu.
+    await saveProfile(derivedAverage !== undefined ? { ...draft, gpa: derivedAverage } : draft);
     router.push("/results");
   }
 
@@ -144,17 +191,11 @@ export default function ProfilePage() {
               </Field>
 
               <div className="grid sm:grid-cols-2 gap-4">
-                <Field label={t.wizard.basics.birthYear}>
+                <Field label={t.wizard.basics.highSchoolName}>
                   <Input
-                    type="number"
-                    inputMode="numeric"
-                    value={draft.birthYear ?? ""}
-                    onChange={(e) =>
-                      update({
-                        birthYear: e.target.value ? Number(e.target.value) : undefined,
-                      })
-                    }
-                    placeholder="2008"
+                    value={draft.highSchoolName}
+                    onChange={(e) => update({ highSchoolName: e.target.value })}
+                    placeholder={t.wizard.basics.highSchoolPlaceholder}
                   />
                 </Field>
 
@@ -163,31 +204,48 @@ export default function ProfilePage() {
                     value={draft.graduationYear}
                     onChange={(e) => update({ graduationYear: Number(e.target.value) })}
                   >
-                    {[CURRENT_YEAR, CURRENT_YEAR + 1, CURRENT_YEAR + 2, CURRENT_YEAR - 1].map(
-                      (year) => (
-                        <option key={year} value={year}>
-                          {year}
-                        </option>
-                      )
-                    )}
+                    {GRADUATION_YEARS.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
                   </Select>
                 </Field>
               </div>
 
-              <Field label={t.wizard.basics.schoolType}>
-                <Select
-                  value={draft.schoolType}
-                  onChange={(e) =>
-                    update({ schoolType: e.target.value as StudentProfile["schoolType"] })
-                  }
-                >
-                  {SCHOOL_TYPES.map((school) => (
-                    <option key={school.id} value={school.id}>
-                      {pick(school.label)}
-                    </option>
+              {/* Lise TÜRÜ değil, alınan DİPLOMA. Üniversiteler "Anadolu Lisesi"
+                  bilgisine göre şart koymuyor; "IB 38 puan", "A-level A*AA"
+                  diye koyuyor. Çoktan seçmeli, çünkü bir öğrenci aynı anda
+                  Türk lise diploması + AP dersleri taşıyabiliyor. */}
+              <Field label={t.wizard.basics.diplomas} hint={t.wizard.basics.diplomasHint}>
+                <div className="flex flex-wrap gap-2">
+                  {DIPLOMAS.map((option) => (
+                    <Chip
+                      key={option.id}
+                      selected={draft.diplomas.includes(option.id)}
+                      onClick={() =>
+                        update({
+                          diplomas: draft.diplomas.includes(option.id)
+                            ? draft.diplomas.filter((d) => d !== option.id)
+                            : [...draft.diplomas, option.id],
+                        })
+                      }
+                    >
+                      {pick(option.label)}
+                    </Chip>
                   ))}
-                </Select>
+                </div>
               </Field>
+
+              {draft.diplomas.includes("other") && (
+                <Field label={t.wizard.basics.diplomaOther}>
+                  <Input
+                    value={draft.diplomaOther ?? ""}
+                    onChange={(e) => update({ diplomaOther: e.target.value })}
+                    placeholder={t.wizard.basics.diplomaOtherPlaceholder}
+                  />
+                </Field>
+              )}
 
               <Field label={t.wizard.basics.gender} hint={t.wizard.basics.genderNote}>
                 <div className="flex flex-wrap gap-2">
@@ -216,26 +274,51 @@ export default function ProfilePage() {
                 {t.wizard.fields.question}
               </h2>
               <p className="text-sm text-ink-soft mb-5">{t.wizard.fields.hint}</p>
+              {/* Her alanın yanında KATALOGDAKİ PROGRAM SAYISI yazıyor.
+                  Sebep: alan listesi katalogdan bağımsız genişletildi (hukuk,
+                  mimarlık, tasarım…) ve karşılığı olmayan bir alanı seçen
+                  öğrenci boş sonuç ekranıyla karşılaşıyor — "formu doldurdum,
+                  eşleşme gelmedi" şikâyetinin sebebi tam olarak bu. Sayıyı
+                  önceden göstermek o sürprizi kaldırıyor. Sayı koddan geliyor,
+                  katalog büyüdükçe kendiliğinden güncelleniyor. */}
               <div className="flex flex-wrap gap-2">
-                {FIELD_IDS.map((id: FieldId) => (
-                  <Chip
-                    key={id}
-                    selected={draft.fields.includes(id)}
-                    onClick={() =>
-                      update({
-                        fields: draft.fields.includes(id)
-                          ? draft.fields.filter((f) => f !== id)
-                          : [...draft.fields, id],
-                      })
-                    }
-                  >
-                    <span className="mr-1.5 opacity-60" aria-hidden>
-                      {FIELDS[id].icon}
-                    </span>
-                    {pick(FIELDS[id].name)}
-                  </Chip>
-                ))}
+                {FIELD_IDS.map((id: FieldId) => {
+                  const count = fieldCounts[id];
+                  return (
+                    <Chip
+                      key={id}
+                      selected={draft.fields.includes(id)}
+                      onClick={() =>
+                        update({
+                          fields: draft.fields.includes(id)
+                            ? draft.fields.filter((f) => f !== id)
+                            : [...draft.fields, id],
+                        })
+                      }
+                    >
+                      <span className="mr-1.5 opacity-60" aria-hidden>
+                        {FIELDS[id].icon}
+                      </span>
+                      {pick(FIELDS[id].name)}
+                      <span
+                        className={cx(
+                          "ml-1.5 text-[11px]",
+                          count === 0 ? "text-danger" : "opacity-60"
+                        )}
+                      >
+                        {count === 0 ? t.wizard.fields.noPrograms : count}
+                      </span>
+                    </Chip>
+                  );
+                })}
               </div>
+
+              {/* Sıfır programlı bir alan seçildiyse, sonuç ekranına gitmeden
+                  söylüyoruz. Sürpriz boş ekran yerine önceden uyarı. */}
+              {draft.fields.some((id) => fieldCounts[id] === 0) && (
+                <p className="text-[13px] text-danger mt-4">{t.wizard.fields.emptyFieldWarning}</p>
+              )}
+
               {draft.fields.length === 0 && (
                 <p className="text-[13px] text-ink-faint mt-4">{t.wizard.fields.empty}</p>
               )}
@@ -267,15 +350,78 @@ export default function ProfilePage() {
                     </Select>
                   </Field>
 
-                  <Field label={t.wizard.grades.question}>
+                  <Field
+                    label={t.wizard.grades.overall}
+                    hint={
+                      derivedAverage !== undefined
+                        ? t.wizard.grades.overallDerived
+                        : t.wizard.grades.overallManual
+                    }
+                  >
                     <Input
                       type="number"
-                      step="0.01"
-                      value={draft.gpa}
+                      step="0.001"
+                      value={derivedAverage !== undefined ? derivedAverage.toFixed(3) : draft.gpa || ""}
+                      // Sınıf ortalamaları girildiyse bu alan onlardan
+                      // TÜRETİLİYOR ve elle değiştirilemiyor: iki farklı sayı
+                      // tutmak, hangisinin doğru olduğu belirsiz bir profil
+                      // üretir. Hiç sınıf girilmediyse öğrenci genel
+                      // ortalamasını doğrudan yazabiliyor.
+                      readOnly={derivedAverage !== undefined}
                       onChange={(e) => update({ gpa: Number(e.target.value) })}
                     />
                   </Field>
                 </div>
+
+                {/* SINIF SINIF ORTALAMA — her yıl İSTEĞE BAĞLI.
+                    Öğrenci kaç yıl okuduysa o kadarını giriyor; 11. sınıftaki
+                    birinden 12. sınıf notu istemek anlamsız. Genel ortalama
+                    girilenlerin düz ortalaması (kredi ağırlığını bilmiyoruz,
+                    uydurmuyoruz). */}
+                <Field
+                  label={t.wizard.grades.byYear}
+                  hint={t.wizard.grades.byYearHint}
+                  className="mt-5"
+                >
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-1">
+                    {GRADE_YEARS.map((year) => {
+                      const entry = draft.gradeYears?.find((g) => g.year === year);
+                      return (
+                        <div key={year}>
+                          <label
+                            htmlFor={`grade-${year}`}
+                            className="block text-[12px] text-ink-faint mb-1"
+                          >
+                            {fill(t.wizard.grades.yearLabel, { year })}
+                          </label>
+                          <Input
+                            id={`grade-${year}`}
+                            type="number"
+                            step="0.001"
+                            inputMode="decimal"
+                            placeholder="—"
+                            value={entry?.average ?? ""}
+                            onChange={(e) => {
+                              const raw = e.target.value;
+                              const others = (draft.gradeYears ?? []).filter(
+                                (g) => g.year !== year
+                              );
+                              // Boş bırakmak = "bu yılı okumadım/girmiyorum".
+                              // Kaydı diziden çıkarıyoruz ki ortalamaya 0
+                              // olarak katılmasın.
+                              const next =
+                                raw === ""
+                                  ? others
+                                  : [...others, { year, average: Number(raw) }];
+                              next.sort((a, b) => a.year - b.year);
+                              update({ gradeYears: next });
+                            }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </Field>
 
                 {/* Çevrilmiş notu anında göstermek güven veriyor —
                     öğrenci neyle karşılaştırıldığını görüyor. */}
@@ -295,11 +441,26 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <Field
-                label={t.wizard.grades.advancedSubjects}
-                hint={t.wizard.grades.advancedSubjectsHint}
-              >
-                <div className="flex flex-wrap gap-2 mt-1">
+            </div>
+          )}
+
+          {/* -------------------------------------------------------------
+              4 — Dersler ve sınavlar (kendi adımı)
+
+              Önceden ileri düzey ders seçimi not adımının altına sıkışmıştı ve
+              gözden kaçıyordu. Oysa katalogdaki 20+ programda `requiredSubjects`
+              var; bu kutu boş kalınca o şartlar "bilgi eksik" olarak duruyor ve
+              öğrenci farkında olmadan uyumunu düşürüyor.
+              ------------------------------------------------------------- */}
+          {step === "subjects" && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-[17px] font-semibold text-ink mb-1.5">
+                  {t.wizard.subjects.question}
+                </h2>
+                <p className="text-sm text-ink-soft mb-5">{t.wizard.subjects.hint}</p>
+
+                <div className="flex flex-wrap gap-2">
                   {SUBJECTS.map((subject) => (
                     <Chip
                       key={subject.id}
@@ -316,6 +477,89 @@ export default function ProfilePage() {
                     </Chip>
                   ))}
                 </div>
+                <p className="text-[12px] text-ink-faint mt-3 leading-relaxed">
+                  {t.wizard.subjects.whyItMatters}
+                </p>
+              </div>
+
+              {/* AP DERSLERİ TEK TEK. Önceden tek bir "AP (en yüksek notun)"
+                  puanı vardı; bir öğrenci AP Calculus'tan 5, AP Biology'den 3
+                  alabiliyor ve tek sayı bunu temsil etmiyor. */}
+              <Field label={t.wizard.subjects.apCourses} hint={t.wizard.subjects.apCoursesHint}>
+                <div className="space-y-2 mt-1">
+                  {(draft.apCourses ?? []).map((course, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        value={course.course}
+                        placeholder={t.wizard.subjects.apCoursePlaceholder}
+                        onChange={(e) => {
+                          const next = [...(draft.apCourses ?? [])];
+                          next[index] = { ...next[index], course: e.target.value };
+                          update({ apCourses: next });
+                        }}
+                      />
+                      <Input
+                        type="number"
+                        min={1}
+                        max={5}
+                        step={1}
+                        className="w-20 shrink-0"
+                        value={course.score || ""}
+                        placeholder="5"
+                        onChange={(e) => {
+                          const next = [...(draft.apCourses ?? [])];
+                          next[index] = { ...next[index], score: Number(e.target.value) };
+                          update({ apCourses: next });
+                        }}
+                      />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          update({
+                            apCourses: (draft.apCourses ?? []).filter((_, i) => i !== index),
+                          })
+                        }
+                      >
+                        {t.common.remove}
+                      </Button>
+                    </div>
+                  ))}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() =>
+                      update({ apCourses: [...(draft.apCourses ?? []), { course: "", score: 0 }] })
+                    }
+                  >
+                    + {t.wizard.subjects.addApCourse}
+                  </Button>
+                </div>
+              </Field>
+
+              {/* YKS SİHİRBAZIN ÖNÜNDEN KALKTI ama silinmedi: Almanya'nın kapı
+                  şartı bu. `de-tum-informatics` ve `de-rwth-mechanical`
+                  kayıtlarında zorunlu ve COUNTRIES.DE notu da bunu söylüyor.
+                  Tamamen kaldırsak öğrenci Almanya'nın en kritik detayını hiç
+                  görmezdi; burada isteğe bağlı duruyor. */}
+              <Field label={t.wizard.subjects.yks} hint={t.wizard.subjects.yksHint}>
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="—"
+                  value={
+                    draft.standardizedTests.find((test) => test.test === "yks")?.score ?? ""
+                  }
+                  onChange={(e) => {
+                    const others = draft.standardizedTests.filter((s) => s.test !== "yks");
+                    update({
+                      standardizedTests:
+                        e.target.value === ""
+                          ? others
+                          : [...others, { test: "yks", score: Number(e.target.value) }],
+                    });
+                  }}
+                />
               </Field>
             </div>
           )}
@@ -373,8 +617,14 @@ export default function ProfilePage() {
               </h2>
               <p className="text-sm text-ink-soft mb-5">{t.wizard.tests.hint}</p>
 
+              {/* YKS ve AP bu listeden ÇIKARILDI, silinmedi:
+                  - YKS "Dersler ve sınavlar" adımına taşındı (Almanya kapı
+                    şartı olduğu için orada bağlamıyla duruyor)
+                  - AP artık ders ders giriliyor, tek "en yüksek notun" puanı
+                    bir öğrencinin AP profilini temsil etmiyordu
+                  Burada SAT ve IB toplam puanı kalıyor. */}
               <div className="space-y-2">
-                {(Object.keys(STANDARDIZED_TEST_SCALES) as StandardizedTest[]).map((test) => (
+                {(["sat", "ib"] as StandardizedTest[]).map((test) => (
                   <ScoreRow
                     key={test}
                     testId={test}

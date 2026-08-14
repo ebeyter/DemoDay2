@@ -27,9 +27,17 @@ import type { StudentProfile } from "@/lib/types";
  */
 export const DEMO_PROFILE: StudentProfile = {
   fullName: "Demo Öğrenci",
-  schoolType: "anatolian",
+  highSchoolName: "Demo Anadolu Lisesi",
+  diplomas: ["turkish-high-school"],
   graduationYear: 2027,
 
+  // Sınıf sınıf girilmiş ortalama; genel ortalama bunlardan türetiliyor
+  // (9+10+11 → 86). `gpa` alanı motorun kullandığı değer olarak duruyor.
+  gradeYears: [
+    { year: 9, average: 84 },
+    { year: 10, average: 86 },
+    { year: 11, average: 88 },
+  ],
   gpa: 86,
   gpaScale: "100",
 

@@ -43,7 +43,8 @@ export function makeProgram(overrides: {
 export function makeProfile(overrides: Partial<StudentProfile> = {}): StudentProfile {
   return {
     fullName: "Test Student",
-    schoolType: "anatolian",
+    highSchoolName: "Test High School",
+    diplomas: ["turkish-high-school"],
     graduationYear: 2027,
     gpa: 70,
     gpaScale: "100",

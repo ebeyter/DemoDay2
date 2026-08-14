@@ -35,6 +35,20 @@ const SCENARIOS_KEY = "beyond.scenarios";
 
 export const MAX_COMPARE = 4;
 
+/**
+ * Bu tarayıcıdaki öğrenciye ait her şeyi siler.
+ *
+ * Çıkışta ve hesap silmede çağrılıyor. Dil, tema ve aksan tercihleri BİLİNÇLİ
+ * olarak dışarıda: onlar kişiye değil cihaza ait ayarlar ve çıkış yapınca
+ * arayüzün diline/temasına dönmek kimseye faydası olmayan bir sürpriz olurdu.
+ */
+function clearLocalData(): void {
+  writePersistent<StudentProfile | null>(PROFILE_KEY, null);
+  writePersistent<string[]>(SHORTLIST_KEY, []);
+  writePersistent<string[]>(COMPARE_KEY, []);
+  writePersistent<SavedScenario[]>(SCENARIOS_KEY, []);
+}
+
 export type AuthStatus = "loading" | "signed-in" | "signed-out" | "local";
 
 /** Senaryo modunun (bkz. results/page.tsx) geçici olarak ezdiği profil alanları. */
@@ -49,6 +63,41 @@ export interface SavedScenario {
 }
 
 const EMPTY_SCENARIOS: SavedScenario[] = [];
+
+/**
+ * Cihazda duran, henüz hiçbir hesaba bağlanmamış veri.
+ *
+ * Hesap zorunlu olmadan önce profil yalnızca localStorage'da tutuluyordu.
+ * Zorunluluk gelince o kullanıcıların verisini yok saymak, uygulamayı bir
+ * gecede "her şeyini kaybettin" ekranına çevirirdi; ilk girişte taşımayı
+ * teklif ediyoruz.
+ */
+export interface HandoffCandidate {
+  profile: StudentProfile;
+  shortlist: string[];
+  compare: string[];
+  scenarios: SavedScenario[];
+}
+
+/** "Verilerimi indir" çıktısı — gizlilik ekranındaki JSON dosyasının şeması. */
+export interface AccountExport {
+  exportedAt: string;
+  account: { id: string | null; email: string | null };
+  profile: StudentProfile | null;
+  shortlist: string[];
+  compare: string[];
+  scenarios: SavedScenario[];
+}
+
+/**
+ * Hesap silme sonucu.
+ * `partial` = veriler silindi ama auth kaydı sunucuda kaldı (service_role yok).
+ * Bunu "silindi" diye göstermek yalan olurdu; arayüz ayrı bir mesaj basıyor.
+ */
+export interface DeleteAccountResult {
+  error?: string;
+  partial?: boolean;
+}
 
 interface StoreValue {
   status: AuthStatus;
@@ -83,6 +132,26 @@ interface StoreValue {
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signUp: (email: string, password: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
+
+  /** Sıfırlama bağlantısını e-postayla gönderir (bkz. /reset-password). */
+  requestPasswordReset: (email: string) => Promise<{ error?: string }>;
+  /**
+   * Yeni şifre belirler. Hem sıfırlama bağlantısıyla açılan oturumda hem de
+   * ayarlardaki "şifre değiştir" akışında aynı çağrı kullanılıyor.
+   */
+  updatePassword: (password: string) => Promise<{ error?: string }>;
+
+  /** Cihazda hesapsız veri varsa ilk girişte doldurulur; yoksa null. */
+  handoff: HandoffCandidate | null;
+  /** Cihazdaki veriyi hesaba taşır. */
+  adoptHandoff: () => Promise<{ error?: string }>;
+  /** Cihazdaki veriyi siler — kullanıcı "yeni profille başla" dedi. */
+  discardHandoff: () => void;
+  /** Teklifi bu oturum için erteler; veriye dokunmaz. */
+  postponeHandoff: () => void;
+
+  exportData: () => AccountExport;
+  deleteAccount: () => Promise<DeleteAccountResult>;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -99,6 +168,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const [status, setStatus] = useState<AuthStatus>(localMode ? "local" : "loading");
   const [user, setUser] = useState<User | null>(null);
+
+  /**
+   * Sağlayıcı ilk kurulduğu andaki YEREL verinin fotoğrafı.
+   *
+   * Neden anlık görüntü: aşağıdaki iki efekt, giriş yapılır yapılmaz sunucudaki
+   * veriyi localStorage'ın üzerine yazıyor. Taşıma teklifini o yazımdan sonra
+   * hazırlamaya kalksaydık taşınacak veri çoktan silinmiş olurdu.
+   *
+   * `profile.userId` doluysa profil zaten bir hesaba ait; taşınacak bir şey yok.
+   */
+  const [localSnapshot] = useState<HandoffCandidate | null>(() => {
+    if (typeof window === "undefined") return null;
+    const stored = readPersistent<StudentProfile | null>(PROFILE_KEY, null);
+    if (!stored || stored.userId) return null;
+    return {
+      profile: stored,
+      shortlist: readPersistent<string[]>(SHORTLIST_KEY, EMPTY_STRING_ARRAY),
+      compare: readPersistent<string[]>(COMPARE_KEY, EMPTY_STRING_ARRAY),
+      scenarios: readPersistent<SavedScenario[]>(SCENARIOS_KEY, EMPTY_SCENARIOS),
+    };
+  });
+
+  const [handoff, setHandoff] = useState<HandoffCandidate | null>(null);
 
   // --- Supabase oturumu --------------------------------------------------
   useEffect(() => {
@@ -137,18 +229,27 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         .eq("user_id", user.id)
         .maybeSingle();
 
-      if (!active || error || !data) return;
+      if (!active || error) return;
 
-      // Dış kaynağa yazıyoruz; abone bileşenler kendiliğinden güncellenir.
-      if (data.profile) writePersistent(PROFILE_KEY, data.profile as StudentProfile);
-      if (Array.isArray(data.shortlist)) writePersistent(SHORTLIST_KEY, data.shortlist);
-      if (Array.isArray(data.compare_list)) writePersistent(COMPARE_KEY, data.compare_list);
+      if (data?.profile) {
+        // Hesapta profil VAR — kaynak odur. Dış kaynağa yazıyoruz; abone
+        // bileşenler kendiliğinden güncellenir.
+        writePersistent(PROFILE_KEY, data.profile as StudentProfile);
+        if (Array.isArray(data.shortlist)) writePersistent(SHORTLIST_KEY, data.shortlist);
+        if (Array.isArray(data.compare_list)) writePersistent(COMPARE_KEY, data.compare_list);
+        return;
+      }
+
+      // Hesapta profil YOK. Cihazda hesapsız bir profil duruyorsa taşımayı
+      // teklif et — sessizce ne üzerine yazıyoruz ne de siliyoruz, kararı
+      // kullanıcı veriyor.
+      if (localSnapshot) setHandoff(localSnapshot);
     })();
 
     return () => {
       active = false;
     };
-  }, [supabase, user]);
+  }, [supabase, user, localSnapshot]);
 
   // --- Giriş yapılınca kayıtlı senaryoları çek ----------------------------
   useEffect(() => {
@@ -163,6 +264,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         .order("created_at", { ascending: false });
 
       if (!active || error || !data) return;
+
+      // Sunucu boş ve cihazda taşınmayı bekleyen senaryolar varsa üzerine
+      // yazma: kullanıcı henüz "taşı" mı "sil" mi demedi.
+      if (data.length === 0 && localSnapshot?.scenarios.length) return;
 
       writePersistent<SavedScenario[]>(
         SCENARIOS_KEY,
@@ -180,7 +285,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
-  }, [supabase, user]);
+  }, [supabase, user, localSnapshot]);
 
   // --- Sunucuya yazma ----------------------------------------------------
   const syncLists = useCallback(
@@ -338,9 +443,169 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     if (supabase) await supabase.auth.signOut();
+    // Yerel kopyayı da temizle: aynı tarayıcıyı paylaşan bir sonraki kişinin
+    // önceki kullanıcının profilini, kısa listesini ve senaryolarını görmesi
+    // kabul edilebilir değil. Veriler hesapta durmaya devam ediyor.
+    clearLocalData();
+    setHandoff(null);
     setUser(null);
     setStatus("signed-out");
   }, [supabase]);
+
+  // --- Şifre ---------------------------------------------------------------
+  // Şifre hiçbir yerde log'lanmıyor ve hiçbir URL'e yazılmıyor; yalnızca
+  // Supabase istemcisine gövde içinde geçiyor.
+
+  const requestPasswordReset = useCallback(
+    async (email: string) => {
+      if (!supabase) return { error: "not-configured" };
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password/confirm`,
+      });
+      return error ? { error: error.message } : {};
+    },
+    [supabase]
+  );
+
+  const updatePassword = useCallback(
+    async (password: string) => {
+      if (!supabase) return { error: "not-configured" };
+      const { error } = await supabase.auth.updateUser({ password });
+      return error ? { error: error.message } : {};
+    },
+    [supabase]
+  );
+
+  // --- Cihazdaki hesapsız verinin hesaba taşınması -------------------------
+
+  const adoptHandoff = useCallback(async () => {
+    if (!supabase || !user) return { error: "not-configured" };
+    if (!handoff) return {};
+
+    const stamped: StudentProfile = {
+      ...handoff.profile,
+      userId: user.id,
+      updatedAt: new Date().toISOString(),
+    };
+
+    const { error } = await supabase.from("beyond_profiles").upsert(
+      {
+        user_id: user.id,
+        profile: stamped,
+        shortlist: handoff.shortlist,
+        compare_list: handoff.compare,
+        updated_at: stamped.updatedAt,
+      },
+      { onConflict: "user_id" }
+    );
+    if (error) return { error: error.message };
+
+    if (handoff.scenarios.length > 0) {
+      const { error: scenarioError } = await supabase.from("beyond_scenarios").insert(
+        handoff.scenarios.map((scenario) => ({
+          id: scenario.id,
+          user_id: user.id,
+          name: scenario.name,
+          fields: scenario.fields,
+          countries: scenario.countries,
+          max_tuition: scenario.maxTuition,
+          created_at: scenario.createdAt,
+        }))
+      );
+      // Profil taşındı ama senaryolar takıldı: profili geri almıyoruz, çünkü
+      // asıl veri o. Hatayı yutmuyoruz da — arayüz uyarı gösteriyor.
+      if (scenarioError) {
+        writePersistent(PROFILE_KEY, stamped);
+        setHandoff(null);
+        return { error: scenarioError.message };
+      }
+    }
+
+    writePersistent(PROFILE_KEY, stamped);
+    writePersistent(SHORTLIST_KEY, handoff.shortlist);
+    writePersistent(COMPARE_KEY, handoff.compare);
+    writePersistent(SCENARIOS_KEY, handoff.scenarios);
+    setHandoff(null);
+    return {};
+  }, [supabase, user, handoff]);
+
+  const discardHandoff = useCallback(() => {
+    clearLocalData();
+    setHandoff(null);
+  }, []);
+
+  const postponeHandoff = useCallback(() => {
+    setHandoff(null);
+  }, []);
+
+  // --- Verilerimi indir / hesabımı sil -------------------------------------
+
+  const exportData = useCallback(
+    (): AccountExport => ({
+      exportedAt: new Date().toISOString(),
+      account: { id: user?.id ?? null, email: user?.email ?? null },
+      profile: readPersistent<StudentProfile | null>(PROFILE_KEY, null),
+      shortlist: readPersistent<string[]>(SHORTLIST_KEY, EMPTY_STRING_ARRAY),
+      compare: readPersistent<string[]>(COMPARE_KEY, EMPTY_STRING_ARRAY),
+      scenarios: readPersistent<SavedScenario[]>(SCENARIOS_KEY, EMPTY_SCENARIOS),
+    }),
+    [user]
+  );
+
+  /**
+   * Hesabı ve ona bağlı her şeyi siler.
+   *
+   * İki aşama, bu sırayla:
+   *  1. Kullanıcının kendi satırları — RLS sayesinde tarayıcıdan güvenle
+   *     silinebiliyor (yalnızca kendi kaydına erişebiliyor).
+   *  2. auth.users kaydı — bunu tarayıcı silemez, `service_role` gerekiyor.
+   *     Sunucudaki /api/account/delete rotası yapıyor.
+   *
+   * Sunucuda service_role tanımlı değilse ikinci aşama başarısız olur; o
+   * durumda `partial: true` dönüyoruz ve arayüz "veriler silindi ama hesap
+   * kaydı kaldı" diyor. "Silindi" demek yalan olurdu.
+   */
+  const deleteAccount = useCallback(async (): Promise<DeleteAccountResult> => {
+    if (!supabase || !user) return { error: "not-configured" };
+
+    const { error: scenarioError } = await supabase
+      .from("beyond_scenarios")
+      .delete()
+      .eq("user_id", user.id);
+    if (scenarioError) return { error: scenarioError.message };
+
+    const { error: profileError } = await supabase
+      .from("beyond_profiles")
+      .delete()
+      .eq("user_id", user.id);
+    if (profileError) return { error: profileError.message };
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+
+    let partial = false;
+    if (!token) {
+      partial = true;
+    } else {
+      const response = await fetch("/api/account/delete", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) {
+        // 503 = sunucuda service_role yok. Diğer her şey gerçek bir hata.
+        if (response.status !== 503) return { error: "delete-failed" };
+        partial = true;
+      }
+    }
+
+    clearLocalData();
+    setHandoff(null);
+    await supabase.auth.signOut();
+    setUser(null);
+    setStatus("signed-out");
+
+    return { partial };
+  }, [supabase, user]);
 
   const value = useMemo<StoreValue>(
     () => ({
@@ -362,6 +627,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       signIn,
       signUp,
       signOut,
+      requestPasswordReset,
+      updatePassword,
+      handoff,
+      adoptHandoff,
+      discardHandoff,
+      postponeHandoff,
+      exportData,
+      deleteAccount,
     }),
     [
       status,
@@ -380,6 +653,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       signIn,
       signUp,
       signOut,
+      requestPasswordReset,
+      updatePassword,
+      handoff,
+      adoptHandoff,
+      discardHandoff,
+      postponeHandoff,
+      exportData,
+      deleteAccount,
     ]
   );
 

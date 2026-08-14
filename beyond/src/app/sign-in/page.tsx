@@ -96,6 +96,18 @@ export default function SignInPage() {
               />
             </Field>
 
+            {/* Yalnızca girişte anlamlı — kayıt olurken şifre zaten yeni belirleniyor. */}
+            {mode === "sign-in" && !localMode && (
+              <p className="text-right -mt-1">
+                <Link
+                  href="/reset-password"
+                  className="text-[13px] font-medium text-accent hover:underline"
+                >
+                  {t.authReset.forgotLink}
+                </Link>
+              </p>
+            )}
+
             {error && (
               <p className="text-[13px] text-danger bg-danger-soft rounded-lg px-3 py-2">
                 {error}

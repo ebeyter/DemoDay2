@@ -8,7 +8,9 @@ import { cx } from "@/components/ui";
 import {
   COMPACT_BOX,
   FULL_BOX,
+  LAND_PATHS,
   LEGS,
+  ORIGIN_PATHS,
   MERIDIANS,
   PARALLELS,
   STOPS,
@@ -78,7 +80,7 @@ export function RouteMap({
 
   return (
     <figure className={cx("m-0", className)}>
-      <div className="relative overflow-hidden rounded-card border border-line bg-surface">
+      <div className="relative overflow-hidden rounded-card border border-line bg-map-sea">
         <svg
           viewBox={viewBoxAttr(box)}
           className="block h-auto w-full"
@@ -88,9 +90,32 @@ export function RouteMap({
           <title id={titleId}>{copy.mapTitle}</title>
           <desc id={descId}>{copy.mapDesc}</desc>
 
+          {/* Kara parçaları — Natural Earth verisinden, rota ile AYNI
+              izdüşümle çiziliyor (bkz. route.ts LAND_PATHS). Haritanın
+              "Avrupa" dediği yer burası; bu katman olmadan geriye sadece
+              etiket serpilmiş bir ızgara kalıyor. */}
+          <g
+            className="fill-map-land stroke-map-coast"
+            strokeWidth={size.grid}
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            {LAND_PATHS.map((d, index) => (
+              <path key={`land${index}`} d={d} />
+            ))}
+          </g>
+
+          {/* Başlangıç ülkesi. Rota tek bir şehirden değil ülkeden çıkıyor:
+              öğrenci nerede olursa olsun yolculuk aynı yerden başlıyor. */}
+          <g className="fill-accent stroke-accent route-origin" strokeWidth={size.grid} aria-hidden>
+            {ORIGIN_PATHS.map((d, index) => (
+              <path key={`origin${index}`} d={d} />
+            ))}
+          </g>
+
           {/* Enlem/boylam ızgarası — gerçek meridyen ve paraleller.
               Kesik çizgi, düz çizginin tablo gibi görünmemesi için. */}
-          <g className="stroke-line" strokeWidth={size.grid} strokeDasharray="3 7" aria-hidden>
+          <g className="stroke-map-coast" strokeWidth={size.grid} strokeDasharray="3 7" aria-hidden>
             {MERIDIANS.map((x) => (
               <line key={`m${x}`} x1={x} y1={0} x2={x} y2={VIEW_H} />
             ))}
@@ -213,10 +238,10 @@ export function RouteMap({
                     isActive ? "text-accent" : reached ? "text-ink" : "text-ink-faint"
                   )}
                 >
-                  {/* Katalog şehirleri iki dilde de katalogdaki gibi yazılır
-                      (Delft, Milano). Başlangıç noktası katalogda yok, adı
-                      sözlükten geliyor: EN'de "Istanbul". */}
-                  {stop.country ? stop.city : copy.originLabel}
+                  {/* Şehir adı katalogdan geliyor; Türkçede farklı söylenenler
+                      sözlükteki `cityNames` ile çevriliyor (London → Londra).
+                      Başlangıç durağı bir şehir değil ülke, adı sözlükten. */}
+                  {stop.country ? (copy.cityNames[stop.city] ?? stop.city) : copy.originLabel}
                 </span>
                 <span className="mt-0.5 block text-[11px] text-ink-faint">
                   {stop.country ? fill(copy.stopPrograms, { count }) : copy.originNote}

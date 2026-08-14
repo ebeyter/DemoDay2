@@ -323,6 +323,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       } else if (action === "clear") {
         // Bu hesaba ait olduğu kanıtlanmayan veri ekranda kalmıyor.
         clearLocal();
+
+        /**
+         * TEMİZLENEN PROFİL DAMGASIZSA TAŞIMAYI TEKLİF ET.
+         *
+         * `reconcileLocalProfile` iki farklı sebeple "clear" diyor:
+         *   a) profil BAŞKASININ damgasını taşıyor → teklif YOK, o veri bu
+         *      kullanıcıya ait değil ve gösterilmemeli;
+         *   b) profil damgasız (hesap zorunlu olmadan önce doldurulmuş) →
+         *      bu kişinin kendi verisi OLABİLİR.
+         *
+         * `localSnapshot` yalnızca (b) durumunda dolu — sağlayıcı kurulurken
+         * `stored.userId` yoksa alınıyor. Yani başkasının profili buraya asla
+         * giremiyor ve gizlilik kuralı bozulmuyor.
+         *
+         * Yerel kopya yine de SİLİNDİ: ekranda bir an bile durmuyor. Veri
+         * bellekteki fotoğrafta duruyor ve hesaba yalnızca kullanıcı
+         * diyalogda "taşı" derse yazılıyor — `profile-reconcile.ts`'in
+         * "taşıma açık onayla yapılmalı" notunun istediği tam olarak bu.
+         */
+        if (localSnapshot) setHandoff(localSnapshot);
       } else if (!error && !data?.profile) {
         // KORUNAN AMA SUNUCUDA OLMAYAN PROFİL = SENKRON KAYBI, VERİ KAYBI DEĞİL.
         //

@@ -10,11 +10,488 @@
    bu dosyada değişecek bir şey olmasın diye.
    --------------------------------------------------------------------------- */
 
-/* Rota bacakları — `strokeDashoffset` her karede JS'ten geliyor. Kısa bir
-   geçiş, React'in render gecikmesini yumuşatıyor; uzun olsaydı kaydırmanın
-   gerisinde sürüklenirdi. */
+/* ---------------------------------------------------------------------------
+   TAM SAYFA BÖLÜMLER
+
+   Kaydırma bağlamı `main`de kuruluyor, `html`de değil: tutturma yalnızca
+   landing'i ilgilendiriyor, uygulamanın geri kalanı normal aksın.
+
+   `proximity`, `mandatory` DEĞİL. Zorunlu tutturma bir bölüm ekrandan uzun
+   olduğunda (küçük telefon, büyük yazı tipi, uzun çeviri) alt kısmı
+   erişilemez hale getiriyor. Yakınlık modu aynı "yerine oturma" hissini
+   veriyor ama içeriği kilitlemiyor.
+   --------------------------------------------------------------------------- */
+.landing-scroll {
+  /* `position: relative` bölümlerin `offsetTop`u bu kaba göre ölçülsün diye
+     — gösterge düğmeleri hedefe buradan gidiyor (bkz. page.tsx `goTo`). */
+  position: relative;
+  height: calc(100dvh - 4rem); /* 4rem = yapışkan başlık yüksekliği */
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y proximity;
+  /* `scroll-behavior: smooth` BİLİNÇLİ OLARAK YOK: tutturmalı bir kapta
+     programatik yumuşak kaydırmayı tamamen kilitliyor (bkz. page.tsx `goTo`).
+     Yumuşatmayı orada kare kare kendimiz yapıyoruz. */
+}
+
+.landing-page {
+  position: relative;
+  scroll-snap-align: start;
+  min-height: calc(100dvh - 4rem);
+  display: flex;
+  align-items: center;
+  padding: 3.5rem 0;
+}
+
+.landing-inner {
+  position: relative;
+  z-index: 2;
+  margin-inline: auto;
+  width: 100%;
+  max-width: 72rem;
+  padding-inline: 1.25rem;
+}
+
+/* --- Koyu bölümler ---------------------------------------------------------
+   Açılış ve rota bölümü her iki temada da koyu. Renkler `--color-hero-*`
+   tokenlarından; burada sabit renk yok. */
+.landing-dark {
+  background: var(--color-hero-bg);
+  color: var(--color-hero-ink);
+  overflow: hidden;
+
+  /* Bölümün içindeki her şey — harita, kart, yazı — koyu zemine göre
+     boyansın. Başlık çubuğundaki ile aynı yöntem: rengi değil, o kapsamdaki
+     tema DEĞİŞKENLERİNİ yeniden bağlıyoruz. RouteMap'in tek satırı bile
+     değişmeden koyu paletine dönüyor. */
+  --color-surface: color-mix(in oklab, var(--color-hero-ink) 5%, transparent);
+  --color-surface-soft: color-mix(in oklab, var(--color-hero-ink) 8%, transparent);
+  --color-line: var(--color-hero-line);
+  --color-line-strong: var(--color-hero-line);
+  --color-ink: var(--color-hero-ink);
+  --color-ink-soft: var(--color-hero-ink-soft);
+  --color-ink-faint: var(--color-hero-ink-soft);
+  --color-accent: var(--color-hero-glow);
+  --color-accent-soft: color-mix(in oklab, var(--color-hero-glow) 12%, transparent);
+  --color-accent-line: color-mix(in oklab, var(--color-hero-glow) 26%, transparent);
+
+  --color-map-sea: var(--map-dark-sea);
+  --color-map-land: var(--map-dark-land);
+  --color-map-coast: var(--map-dark-coast);
+}
+
+/* --- Açık bölümler: düz zemin değil, hafif renkli -------------------------
+   "Neden zor?" ve "Sözümüz" bölümleri düz beyaz zemindeydi ve koyu açılıştan
+   sonra bomboş duruyordu. Aksan renginden türetilen çok soluk bir geçiş,
+   bölümlere renk katıyor ama okunurluğa dokunmuyor — kart ve metin renkleri
+   olduğu gibi kalıyor.
+
+   Renk aksandan türetildiği için ayarlardan seçilen aksan burayı da
+   değiştiriyor; sabit bir ton yazsaydık dört aksandan üçüyle kavga ederdi. */
+.landing-tint {
+  background:
+    radial-gradient(
+      68% 52% at 12% 0%,
+      color-mix(in oklab, var(--color-accent) 10%, transparent),
+      transparent 68%
+    ),
+    radial-gradient(
+      56% 48% at 96% 100%,
+      color-mix(in oklab, var(--color-accent) 7%, transparent),
+      transparent 70%
+    ),
+    var(--color-canvas);
+}
+
+.landing-tint-strong {
+  background:
+    radial-gradient(
+      74% 60% at 50% 0%,
+      color-mix(in oklab, var(--color-accent) 16%, transparent),
+      transparent 72%
+    ),
+    var(--color-canvas);
+}
+
+/* --- Başlık çubuğu landing'de koyu -------------------------------------------
+   Açık bir başlık çubuğunun altında koyu bir açılış, ortada bir dikiş
+   bırakıyordu.
+
+   Header.tsx'e DOKUNMADAN çözülüyor: burada rengi değil, o kapsamdaki tema
+   DEĞİŞKENLERİNİ yeniden bağlıyoruz. Başlıktaki `bg-surface`, `text-ink`,
+   `border-line` sınıflarının hepsi zaten bu değişkenleri okuyor, dolayısıyla
+   tek satır bileşen kodu değişmeden çubuk koyu temaya dönüyor. Tasarım
+   sisteminin amacı tam olarak bu.
+
+   `:has()` seçicisi landing dışındaki sayfalarda eşleşmiyor; uygulamanın geri
+   kalanı etkilenmiyor. */
+body:has(.landing-scroll) header {
+  --color-surface: var(--color-hero-bg);
+  --color-surface-soft: color-mix(in oklab, var(--color-hero-ink) 10%, transparent);
+  --color-line: var(--color-hero-line);
+  --color-line-strong: var(--color-hero-line);
+  --color-ink: var(--color-hero-ink);
+  --color-ink-soft: var(--color-hero-ink-soft);
+  --color-ink-faint: var(--color-hero-ink-soft);
+  --color-accent: var(--color-hero-glow);
+  --color-accent-soft: color-mix(in oklab, var(--color-hero-glow) 14%, transparent);
+}
+
+.landing-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-hero-glow);
+}
+
+/* Işık lekeleri — sayfanın "renksiz" olmaktan çıktığı yer.
+   Tamamen dekoratif; `aria-hidden` ve tıklanamaz. */
+.landing-aurora {
+  position: absolute;
+  inset: -20% -10%;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      42% 38% at 18% 22%,
+      color-mix(in oklab, var(--color-hero-glow) 42%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      38% 42% at 82% 30%,
+      color-mix(in oklab, var(--color-accent) 55%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      46% 40% at 60% 92%,
+      color-mix(in oklab, var(--color-hero-glow) 26%, transparent),
+      transparent 70%
+    );
+  filter: blur(28px);
+  opacity: 0.5;
+  animation: landing-drift 22s ease-in-out infinite alternate;
+}
+
+@keyframes landing-drift {
+  from {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(3%, 2%, 0) scale(1.08);
+  }
+}
+
+/* --- Metin perdesi --------------------------------------------------------
+   Kalıcı sahne (harita) metnin arkasından geçiyor ve okunurluğu düşürüyordu.
+   Perde, metnin durduğu tarafı bölümün kendi zeminiyle dolduruyor; harita
+   yalnızca boş tarafta görünüyor.
+
+   Katman sırası: bölüm zemini (0) → harita (1) → PERDE (1, DOM'da sonra) →
+   metin (2). Bölümler yığılma bağlamı kurmadığı için perde ile harita aynı
+   düzlemde yarışıyor ve DOM sırası kazanıyor.
+
+   `mask` yerine düz gradyan: `mask` bazı tarayıcılarda tüm bölümü katman
+   olarak yükseltip metni bulanıklaştırıyordu. */
+.landing-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    var(--color-hero-bg) 0%,
+    var(--color-hero-bg) 34%,
+    color-mix(in oklab, var(--color-hero-bg) 72%, transparent) 54%,
+    transparent 76%
+  );
+}
+
+/* Ortalanmış metin için — perde metnin çevresinde toplanıyor. */
+.landing-scrim-center {
+  background: radial-gradient(
+    58% 62% at 50% 50%,
+    var(--color-hero-bg) 0%,
+    color-mix(in oklab, var(--color-hero-bg) 78%, transparent) 46%,
+    transparent 78%
+  );
+}
+
+@media (max-width: 1023px) {
+  /* Dar ekranda metin tam genişlikte; perde de tam kapatıyor. */
+  .landing-scrim {
+    background: color-mix(in oklab, var(--color-hero-bg) 88%, transparent);
+  }
+}
+
+/* Koyu zeminde ikincil buton: `secondary` varyantı açık yüzey varsayıyor. */
+.landing-ghost-button {
+  background: transparent;
+  color: var(--color-hero-ink);
+  border-color: var(--color-hero-line);
+}
+
+.landing-ghost-button:hover {
+  color: var(--color-hero-glow);
+  border-color: var(--color-hero-glow);
+}
+
+/* Aşağı iniş ipucu — bölümlerin devam ettiğini söylüyor. */
+.landing-scroll-cue {
+  position: absolute;
+  bottom: 1.75rem;
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-left: -1.25rem;
+  border: 1px solid var(--color-hero-line);
+  border-radius: 999px;
+  color: var(--color-hero-ink-soft);
+  animation: landing-bob 2.6s ease-in-out infinite;
+}
+
+.landing-scroll-cue:hover {
+  color: var(--color-hero-glow);
+  border-color: var(--color-hero-glow);
+}
+
+@keyframes landing-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+/* Kartların sırayla belirmesi. */
+.landing-reveal {
+  animation: rise 0.5s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+
+/* ---------------------------------------------------------------------------
+   KALICI SAHNE — bölümden bölüme taşınan harita
+
+   `position: fixed`: harita sayfayla akmıyor, bölüm değişince yeni yerine
+   SÜZÜLÜYOR. Geçiş uzun (1.2s) ve yumuşak bir eğri kullanıyor; kısa bir geçiş
+   bunu "zıplama" gibi gösteriyordu.
+
+   `pointer-events: none`: harita metnin üstünden geçtiği yerlerde tıklamayı
+   yakalamamalı. Rota bölümünde de sadece bakılan bir görsel.
+   --------------------------------------------------------------------------- */
+.landing-stage {
+  position: fixed;
+  top: 4rem; /* yapışkan başlığın altı */
+  left: 0;
+  /* Bölüm arka planlarının ÜSTÜNDE, metnin ALTINDA.
+     Bölümler konumlandırılmış ama z-index'i yok; DOM'da sahneden sonra
+     geldikleri için z-index verilmeseydi opak arka planları haritayı
+     tamamen örterdi. Metin `.landing-inner` ile bir üst katmanda. */
+  z-index: 1;
+  pointer-events: none;
+  /* Taban genişlik; duruşlar bunu `scale` ile büyütüp küçültüyor. Piksel
+     üst sınırı YOK — açılışta ekranı kaplaması gerekiyor. */
+  width: 52vw;
+  will-change: transform, opacity;
+  transition:
+    transform 1200ms cubic-bezier(0.23, 1, 0.32, 1),
+    opacity 900ms ease;
+}
+
+/* --- Sahnenin tonu --------------------------------------------------------
+   Sahne bölümlerin kardeşi, çocuğu değil; `.landing-dark` içindeki
+   değişkenleri miras alamıyor. Hangi bölümün üstündeyse o paleti burada
+   elle bağlıyoruz — yoksa açık temada koyu açılışın üstünde açık renkli bir
+   harita çıkıyor. */
+.landing-stage[data-tone="dark"] {
+  --color-map-sea: var(--map-dark-sea);
+  --color-map-land: var(--map-dark-land);
+  --color-map-coast: var(--map-dark-coast);
+  --color-ink: var(--color-hero-ink);
+  --color-ink-soft: var(--color-hero-ink-soft);
+  --color-ink-faint: var(--color-hero-ink-soft);
+  --color-line: var(--color-hero-line);
+  --color-line-strong: var(--color-hero-line);
+  --color-surface: transparent;
+  --color-accent: var(--color-hero-glow);
+  --stage-label-halo: var(--color-hero-bg);
+}
+
+.landing-stage[data-tone="light"] {
+  --stage-label-halo: var(--color-canvas);
+}
+
+/* Sahnedeki harita kartı: kenarlık ve zemin yok — sahnede yüzüyor, kutu
+   içinde durmuyor. Kutu, rota bölümünde metinle yan yana dururken anlamlıydı;
+   ekranın ortasında süzülen bir görselde çerçeve fazlalık. */
+.landing-stage-map > div {
+  border-color: transparent;
+  background: transparent;
+}
+
+/* Şehir etiketleri sahnede daha iri ve arkalarında bir hâle var: harita
+   bazen kara bazen deniz üstünde duruyor, sabit bir renk her ikisinde birden
+   okunmuyor. Hâle, etiketin zeminini kendi rengiyle bastırıyor. */
+/* Punto ölçeğin tersiyle çarpılıyor — bkz. LandingStage `--stage-label-inv`.
+   Konum haritayla birlikte ölçekleniyor (doğrusu bu), yazı boyutu sabit.
+
+   Geçiş süresi sahnenin `transform` süresiyle AYNI: punto anında değişip
+   dönüşüm 1.2 saniye sürerse, geçiş boyunca ikisi birbirini tutmuyor ve
+   etiketler bir an devleşiyor. */
+.landing-stage-map .route-label span:first-child {
+  font-size: calc(15px * var(--stage-label-inv, 1));
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.landing-stage-map .route-label span:last-child {
+  font-size: calc(12px * var(--stage-label-inv, 1));
+}
+
+.landing-stage-map .route-label span {
+  transition: font-size 1200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.landing-stage-map .route-label span {
+  text-shadow:
+    0 0 3px var(--stage-label-halo),
+    0 0 8px var(--stage-label-halo),
+    0 1px 2px var(--stage-label-halo);
+}
+
+/* Haritanın altındaki "Türkiye → Delft" şeridi sahnede gizli: orada bir kutu
+   içinde değil, ekranda süzülen bir görsel; şerit metnin üstüne biniyordu.
+   Bilgi kaybı yok — aynı bilgi rota bölümündeki durak listesinde yazıyor. */
+.landing-stage-map figcaption {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  /* Dar ekranda harita metnin altında kalıyor ve okumayı zorlaştırıyor;
+     iyice geriye çekiyoruz. Bilgi kaybı yok: rota bölümündeki durak listesi
+     haritanın söylediğinin tamamını yazıyor. */
+  .landing-stage {
+    width: 92vw;
+    opacity: 0.1 !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Sağ kenardaki bölüm göstergesi
+   --------------------------------------------------------------------------- */
+.landing-nav {
+  position: fixed;
+  right: 1.5rem;
+  top: 50%;
+  z-index: 30;
+  display: none;
+  flex-direction: column;
+  gap: 0.35rem;
+  transform: translateY(-50%);
+}
+
+@media (min-width: 768px) {
+  .landing-nav {
+    display: flex;
+  }
+}
+
+/* Nokta 8px ama dokunma hedefi 40px: 8px'lik bir düğmeye fare ya da parmakla
+   isabet ettirmek zor. Görsel küçük, hedef büyük. */
+.landing-nav-item {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: -0.625rem 0;
+}
+
+.landing-nav-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  color: var(--color-ink-faint);
+  transition:
+    transform 260ms cubic-bezier(0.22, 0.8, 0.3, 1),
+    background-color 260ms ease,
+    color 260ms ease;
+}
+
+.landing-nav-item:hover .landing-nav-dot {
+  color: var(--color-accent);
+}
+
+.landing-nav-dot-active {
+  color: var(--color-accent);
+  background: var(--color-accent);
+  transform: scale(1.5);
+}
+
+/* Etiket yalnızca üzerine gelince veya klavyeyle odaklanınca çıkıyor:
+   sürekli açık dursa beş etiket sayfanın sağını kaplardı. */
+.landing-nav-label {
+  position: absolute;
+  right: 1.5rem;
+  white-space: nowrap;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  padding: 0.25rem 0.6rem;
+  font-size: 12px;
+  color: var(--color-ink);
+  opacity: 0;
+  transform: translateX(0.35rem);
+  pointer-events: none;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+}
+
+.landing-nav-item:hover .landing-nav-label,
+.landing-nav-item:focus-visible .landing-nav-label {
+  opacity: 1;
+  transform: none;
+}
+
+/* Koyu bölümlerde gösterge de koyu zemine göre — değişkenler bölümden değil
+   `<html>`den geldiği için burada elle bağlanıyor. */
+.landing-page.landing-dark ~ .landing-nav {
+  color: var(--color-hero-ink);
+}
+
+/* Rota bölümündeki durak düğmeleri. */
+.journey-stop {
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease;
+}
+
+.journey-stop:hover {
+  border-color: var(--color-hero-line);
+}
+
+.journey-stop-active {
+  border-color: var(--color-hero-line);
+  background: color-mix(in oklab, var(--color-hero-glow) 8%, transparent);
+}
+
+/* Başlangıç ülkesi — dolgu çok soluk, sınırı belirgin. Ülkeyi kapatmadan
+   "buradan başlıyorsun" demenin yolu. */
+.route-origin {
+  fill-opacity: 0.18;
+  stroke-opacity: 0.85;
+}
+
+/* Rota bacakları — `strokeDashoffset` adım adım değişiyor (bkz. Journey.tsx).
+   Geçiş süresi yayın çizilme süresi: kaydırmaya bağlıyken 120ms gerekiyordu,
+   adım bazlı çizimde o kadar kısa süre yayı "birden belirmiş" gösteriyor. */
 .route-leg {
-  transition: stroke-dashoffset 120ms linear;
+  transition: stroke-dashoffset 620ms cubic-bezier(0.33, 0.85, 0.4, 1);
   will-change: stroke-dashoffset;
 }
 
@@ -87,16 +564,33 @@
   .route-leg,
   .route-node,
   .route-label span,
-  .route-stop {
+  .route-stop,
+  .journey-stop {
     transition: none !important;
   }
 
   .route-halo,
-  .route-marker {
+  .route-marker,
+  .landing-aurora,
+  .landing-scroll-cue,
+  .landing-reveal {
     animation: none !important;
+  }
+
+  /* Sahne yer değiştirmeye devam ediyor ama süzülmeden, anında. */
+  .landing-stage,
+  .landing-nav-dot {
+    transition: none !important;
   }
 
   .route-stop {
     opacity: 1 !important;
+  }
+
+  /* Tutturmayı da kapatıyoruz: kaydırmanın kullanıcının bıraktığı yerden
+     başka bir yere kayması, hareket hassasiyeti olan biri için tam olarak
+     istenmeyen şey. */
+  .landing-scroll {
+    scroll-snap-type: none;
   }
 }

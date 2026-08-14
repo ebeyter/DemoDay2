@@ -37,20 +37,47 @@ import type { CountryCode, MatchResult } from "./types";
 import { getUniversity } from "@/data/universities";
 import type { University } from "@/data/universities";
 
+/**
+ * YÜZDE GÖSTERMEK İÇİN GEREKEN EN AZ BİLİNEN ŞART SAYISI.
+ *
+ * Neden bir eşik var: kaynak boşluklarını paydadan düşürdüğümüz için, üç
+ * zorunlu şartından yalnızca birini bildiğimiz bir program "1/1 → %100"
+ * yazıyordu. Yüzde teknik olarak doğruydu ama ekranda, altı şartın altısını
+ * bildiğimiz bir programın "%100"ü ile AYNI görünüyordu — oysa biri ölçüm,
+ * öbürü tahmin bile değil. Bu somut olarak yaşandı: Alp'in profilinde
+ * Keşfet 27 program için %100 gösteriyordu ve bunların dördü tek bilinen
+ * şarta dayanıyordu (nl-uva-economics, de-tum-informatics,
+ * it-sapienza-acsai, it-polito-computer-engineering).
+ *
+ * İki koşul birlikte: en az iki şart bilinecek VE zorunlu şartların en az
+ * yarısı bilinecek. Yarı oranı, çok şartlı programlarda iki bilinen şartın
+ * yeterli sayılmasını engelliyor (6 şartlı bir programda 2 bilinen = %33,
+ * yüzde göstermeye yetmez).
+ */
+export const MIN_KNOWN_CHECKS = 2;
+
 /** Tek bir programın şart uyumu. */
 export interface FitSummary {
-  /** 0-100, yuvarlanmış. Kabul olasılığı DEĞİL. */
+  /** 0-100, yuvarlanmış. Kabul olasılığı DEĞİL. `reliable` false ise gösterilmez. */
   percent: number;
   /** Karşılanan zorunlu şart sayısı. */
   met: number;
   /** Yüzdenin paydası: bildiğimiz zorunlu şart sayısı. */
   total: number;
+  /** Programın TÜM zorunlu şart sayısı (bilinmeyenler dahil) — oran için. */
+  mandatoryTotal: number;
   /** Kaynak sayfanın yayınlamadığı zorunlu şart sayısı — paydaya girmez. */
   unknownFromSource: number;
   /** Öğrencinin bilgi girmediği zorunlu şart sayısı — paydaya girer. */
   unknownFromStudent: number;
   /** Uyum hiç hesaplanamıyor mu (bildiğimiz zorunlu şart yok). */
   unknownOnly: boolean;
+  /**
+   * Yüzde gösterilebilir mi? Şartların çok azını biliyorsak false olur ve
+   * arayüz sayı yerine "veri yetersiz" gösterir. Ortalamalar da bu programı
+   * dışarıda bırakıyor.
+   */
+  reliable: boolean;
 }
 
 /**
@@ -83,15 +110,24 @@ export function fitSummary(result: MatchResult): FitSummary {
     (c) => c.mandatory && c.status === "unknown" && c.unknownReason !== "source"
   ).length;
 
+  // Programın TÜM zorunlu şartları. Motor paydadan kaynak boşluklarını zaten
+  // düşürdüğü için (`totalMandatory = mandatory.length - unknownFromSource`),
+  // ikisini toplamak diziyi yeniden saymadan aynı sayıyı veriyor. Şartları
+  // burada tekrar filtrelemek, yukarıdaki "tek tanım motorda" kuralını
+  // bozardı — sayım iki yere yazıldığı anda bir gün birbirinden sapıyor.
+  const mandatoryTotal = total + unknownFromSource;
+
   return {
     // Bildiğimiz hiç zorunlu şart kalmadıysa yüzde uydurmuyoruz; arayüz
     // "hesaplanamıyor" gösteriyor. 100 demek "her şeyi karşılıyorsun" olurdu.
     percent: total === 0 ? 0 : Math.round((met / total) * 100),
     met,
     total,
+    mandatoryTotal,
     unknownFromSource,
     unknownFromStudent,
     unknownOnly: total === 0,
+    reliable: total >= MIN_KNOWN_CHECKS && total * 2 >= mandatoryTotal,
   };
 }
 
@@ -110,7 +146,11 @@ export function compareByFit(a: MatchResult, b: MatchResult): number {
   const fa = fitSummary(a);
   const fb = fitSummary(b);
 
-  if (fa.unknownOnly !== fb.unknownOnly) return fa.unknownOnly ? 1 : -1;
+  // Yüzdesi gösterilemeyen programlar (hiç bilinen şart yok ya da çok az)
+  // listenin sonuna. Aksi hâlde "1/1 → %100" bir program, altı şartın altısını
+  // karşılayan programın ÜSTÜNE çıkıyordu — ölçülmüş bir uyumun önüne
+  // ölçülmemiş bir tahmin geçmiş olurdu.
+  if (fa.reliable !== fb.reliable) return fa.reliable ? -1 : 1;
   if (fb.percent !== fa.percent) return fb.percent - fa.percent;
   return fb.total - fa.total;
 }
@@ -129,8 +169,14 @@ export interface UniversityGroup {
    */
   averagePercent: number | null;
   /**
-   * En iyi uyumlu programın yüzdesi — sıralama bunu kullanıyor. null = bu
-   * üniversitenin hiçbir programının uyumu hesaplanamadı.
+   * En iyi uyumlu programın yüzdesi — sıralama bunu kullanıyor.
+   *
+   * null = bu üniversitenin hiçbir programının şartlarını yüzde gösterecek
+   * kadar bilmiyoruz. Ayrı bir `hasReliableFit` bayrağı YOK: bilgi zaten
+   * null'un içinde ve iki alanın birbiriyle çelişebildiği bir durum
+   * bırakmıyoruz. `bestPercent === 0` ile karıştırılamaz — sıfır "hiçbir
+   * şartı karşılamıyor" demek ve ikisini aynı göstermek öğrenci hakkında
+   * yanlış bir iddia olurdu.
    */
   bestPercent: number | null;
   /**
@@ -150,9 +196,9 @@ export interface CountryGroup {
   country: CountryCode;
   universities: UniversityGroup[];
   programCount: number;
-  /** null = bu ülkedeki hiçbir programın uyumu hesaplanamadı. */
+  /** null = bu ülkedeki hiçbir programın uyumu güvenilir şekilde hesaplanamadı. */
   averagePercent: number | null;
-  /** null = bu ülkedeki hiçbir programın uyumu hesaplanamadı. */
+  /** null = bu ülkedeki hiçbir programın uyumu güvenilir şekilde hesaplanamadı. */
   bestPercent: number | null;
   verifiedCount: number;
 }
@@ -213,7 +259,10 @@ export function groupByCountry(results: MatchResult[]): CountryGroup[] {
       // Uyumu HESAPLANAMAYAN programlar ortalamaya girmiyor. Girerse 0 olarak
       // sayılır ve üniversiteyi olduğundan kötü gösterir — oysa bilmediğimiz
       // şey öğrencinin uyumsuzluğu değil, bizim veri boşluğumuz.
-      const percents = sorted.map(fitSummary).filter((f) => !f.unknownOnly).map((f) => f.percent);
+      // Yalnızca GÜVENİLİR yüzdeler ortalamaya ve "en iyi"ye giriyor. Tek
+      // bilinen şarta dayanan bir %100, üniversitenin başlığında dev puntoyla
+      // "%100" yazdırıyordu; o sayı ölçüm değil gürültüydü.
+      const percents = sorted.map(fitSummary).filter((f) => f.reliable).map((f) => f.percent);
       const first = sorted[0].program;
 
       universities.push({
@@ -243,7 +292,7 @@ export function groupByCountry(results: MatchResult[]): CountryGroup[] {
     const allResults = universities.flatMap((u) => u.results);
     const allPercents = allResults
       .map(fitSummary)
-      .filter((f) => !f.unknownOnly)
+      .filter((f) => f.reliable)
       .map((f) => f.percent);
 
     countries.push({

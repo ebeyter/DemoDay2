@@ -1,79 +1,142 @@
 import { describe, expect, it } from "vitest";
+import { compareByFit, fitSummary, groupByCountry } from "@/lib/discover";
 import { evaluateProgram } from "@/lib/matching";
-import { fitSummary, groupByCountry } from "@/lib/discover";
 import { makeProfile, makeProgram } from "./fixtures";
+import type { MatchResult } from "@/lib/types";
 
-// "Hiçbir zorunlu şartını bilmiyoruz" (kaynak sayfa hem not eşiğini hem dil
-// şartını hiç belirtmiyor, başka zorunlu şart da yok) — unknownOnly=true.
-function unknownOnlyResult(id: string, university: string) {
-  const program = {
-    ...makeProgram({ requirements: { minGpa: undefined, language: undefined } }),
-    id,
-    university,
-  };
-  return evaluateProgram(program, makeProfile({ gpa: 90 }));
+/**
+ * Keşfet'in yüzdesi ürünün en kolay yanlış okunan sayısı: çıplak bir yüzde
+ * kaçınılmaz olarak "kabul şansı" gibi okunuyor. Buradaki testler yüzdenin
+ * NE ZAMAN GÖSTERİLMEDİĞİNİ sabitliyor — gösterildiği durumdan daha önemli
+ * olan bu.
+ */
+
+/** Verilen şart yapısıyla tek bir programı değerlendirir. */
+function evaluate(overrides: Parameters<typeof makeProgram>[0], profile = makeProfile()) {
+  return evaluateProgram(makeProgram(overrides), profile);
 }
 
-// Gerçekten hesaplanabilir ve gerçekten %0 (tek zorunlu şart: not ortalaması,
-// öğrenci çok uzak) — unknownOnly=false, percent=0.
-function realZeroResult(id: string, university: string) {
-  const program = {
-    ...makeProgram({ requirements: { minGpa: 95, language: [] } }),
-    id,
-    university,
-  };
-  return evaluateProgram(program, makeProfile({ gpa: 10 }));
-}
-
-describe("fitSummary — unknownOnly ile gerçek %0 birbirine karışmıyor", () => {
-  it("hiçbir zorunlu şartı bilinmeyen programda unknownOnly true, percent 0'a zorlanmaz ama total da 0 olur", () => {
-    const result = unknownOnlyResult("u-1", "Bilinmeyen Üniversite");
-    const summary = fitSummary(result);
-    expect(summary.unknownOnly).toBe(true);
-    expect(summary.total).toBe(0);
-  });
-
-  it("gerçekten hesaplanabilir bir %0 sonuçta unknownOnly false'tur", () => {
-    const result = realZeroResult("r-1", "Gerçek Üniversite");
-    const summary = fitSummary(result);
-    expect(summary.unknownOnly).toBe(false);
-    expect(summary.percent).toBe(0);
+describe("fitSummary — kaynak boşluğu paydadan düşer", () => {
+  it("kaynağın yayınlamadığı şart paydaya girmez ama sayılır", () => {
+    // minGpa biliniyor (öğrenci karşılıyor), dil şartı kaynakta yok.
+    const result = evaluate(
+      { requirements: { minGpa: 60, language: undefined } },
+      makeProfile({ gpa: 90 })
+    );
+    const fit = fitSummary(result);
+    expect(fit.unknownFromSource).toBeGreaterThan(0);
+    // Payda yalnızca bildiğimiz şartlar.
+    expect(fit.total).toBe(fit.mandatoryTotal - fit.unknownFromSource);
   });
 });
 
-describe("groupByCountry — bilinmeyen (null) ile gerçek %0 aynı sayı olarak görünmüyor", () => {
-  it("tüm programları unknownOnly olan üniversitenin bestPercent/averagePercent'i null'dur, 0 değil", () => {
-    const results = [unknownOnlyResult("u-1", "Bilinmeyen Üniversite")];
-    const [country] = groupByCountry(results);
-    const [university] = country.universities;
+describe("fitSummary — yüzde ne zaman GÖSTERİLMEZ", () => {
+  it("tek bilinen şart varken güvenilir değil: '1/1 → %100' ekranda sayı olarak çıkmaz", () => {
+    // Üç zorunlu şarttan ikisi kaynakta yok → 1/1 = %100 ama anlamı yok.
+    const result = evaluate(
+      {
+        requirements: {
+          minGpa: 60,
+          language: undefined,
+          standardizedTests: undefined,
+        },
+      },
+      makeProfile({ gpa: 90 })
+    );
+    const fit = fitSummary(result);
+    expect(fit.percent).toBe(100);
+    // Yüzde doğru ama gösterilemez: arayüz "veri yetersiz" yazıyor.
+    expect(fit.reliable).toBe(false);
+  });
 
-    expect(university.bestPercent).toBeNull();
-    expect(university.averagePercent).toBeNull();
+  it("zorunlu şartların yarısını biliyorsak yüzde gösterilir", () => {
+    const result = evaluate(
+      { requirements: { minGpa: 60, language: [{ test: "ielts", min: 6 }] } },
+      makeProfile({ gpa: 90, languageTests: [{ test: "ielts", score: 7 }] })
+    );
+    const fit = fitSummary(result);
+    expect(fit.total).toBeGreaterThanOrEqual(2);
+    expect(fit.reliable).toBe(true);
+    expect(fit.percent).toBe(100);
+  });
+
+  it("hiç bilinen zorunlu şart yoksa unknownOnly, yüzde 0 ve güvenilir değil", () => {
+    const result = evaluate(
+      { requirements: { minGpa: undefined, language: undefined } },
+      makeProfile()
+    );
+    const fit = fitSummary(result);
+    expect(fit.unknownOnly).toBe(true);
+    expect(fit.reliable).toBe(false);
+    // 0 yazmak "hiçbir şartı karşılamıyorsun" demek olurdu; arayüz sayı basmıyor.
+    expect(fit.percent).toBe(0);
+  });
+});
+
+describe("compareByFit — ölçülmüş uyum, ölçülmemişin önünde", () => {
+  it("6/6 karşılayan program, 1/1 ile %100 görünen programın ÖNÜNE geçer", () => {
+    const wellKnown = evaluate(
+      { requirements: { minGpa: 60, language: [{ test: "ielts", min: 6 }] } },
+      makeProfile({ gpa: 90, languageTests: [{ test: "ielts", score: 7 }] })
+    );
+    const barelyKnown = evaluate(
+      { requirements: { minGpa: 60, language: undefined, standardizedTests: undefined } },
+      makeProfile({ gpa: 90 })
+    );
+
+    expect(fitSummary(wellKnown).percent).toBe(100);
+    expect(fitSummary(barelyKnown).percent).toBe(100);
+    // İkisi de %100; sıralamayı bilgi miktarı belirliyor.
+    expect(compareByFit(wellKnown, barelyKnown)).toBeLessThan(0);
+    expect(compareByFit(barelyKnown, wellKnown)).toBeGreaterThan(0);
+  });
+});
+
+describe("groupByCountry — güvenilmez yüzde ortalamayı ve 'en iyi'yi kirletmez", () => {
+  /** Aynı üniversiteye ait iki program üretir. */
+  function resultsFor(): MatchResult[] {
+    const strongProfile = makeProfile({ gpa: 90, languageTests: [{ test: "ielts", score: 7 }] });
+    const barely = evaluateProgram(
+      {
+        ...makeProgram({
+          requirements: { minGpa: 60, language: undefined, standardizedTests: undefined },
+        }),
+        id: "nl-x-barely",
+      },
+      strongProfile
+    );
+    return [barely];
+  }
+
+  it("tek programı da güvenilmezse üniversite yüzdesi gösterilmiyor (null)", () => {
+    const [country] = groupByCountry(resultsFor());
+    const uni = country.universities[0];
+
+    // AYRI BİR `hasReliableFit` BAYRAĞI YOK: güvenilmezlik `null` ile ifade
+    // ediliyor. İki ayrı gösterge (bayrak + sayı) tutmak, bir gün birinin
+    // diğerini yalanlaması demekti — 0 ile "bilmiyoruz"un karışması zaten
+    // tam olarak bu dosyanın önlediği hata.
+    expect(uni.bestPercent).toBeNull();
+    expect(uni.averagePercent).toBeNull();
     expect(country.bestPercent).toBeNull();
-    expect(country.averagePercent).toBeNull();
+
+    // Program yine listede — gizlemiyoruz, yalnızca yüzde iddia etmiyoruz.
+    expect(country.programCount).toBe(1);
   });
 
-  it("gerçekten %0 olan bir üniversitenin bestPercent'i sayısal 0'dır (null değil)", () => {
-    const results = [realZeroResult("r-1", "Gerçek Üniversite")];
-    const [country] = groupByCountry(results);
-    const [university] = country.universities;
+  it("gerçekten %0 karşılayan program null DEĞİL, sayısal 0 döner", () => {
+    // Ayrımın kendisi: "hiçbir şartı karşılamıyor" ölçülmüş bir sonuç,
+    // "bilmiyoruz" ise bizim boşluğumuz. İkisi aynı sayıya düşerse ürün
+    // katalog eksiğini öğrencinin başarısızlığı gibi gösterir.
+    const zero = evaluateProgram(
+      makeProgram({
+        requirements: { minGpa: 95, language: [{ test: "ielts", min: 8 }] },
+      }),
+      makeProfile({ gpa: 10, languageTests: [{ test: "ielts", score: 1 }] })
+    );
+    const [country] = groupByCountry([zero]);
 
-    expect(university.bestPercent).toBe(0);
-    expect(university.averagePercent).toBe(0);
-    expect(country.bestPercent).toBe(0);
-  });
-
-  it("sıralamada bestPercent'i null olan üniversite/ülke, sayısal (0 dahil) bir bestPercent'i olandan sonra gelir", () => {
-    // Aynı ülkede iki üniversite: biri gerçekten %0, diğeri hiç hesaplanamıyor.
-    const results = [
-      { ...unknownOnlyResult("u-1", "Bilinmeyen Üniversite") },
-      { ...realZeroResult("r-1", "Gerçek Üniversite") },
-    ];
-    const [country] = groupByCountry(results);
-
-    expect(country.universities.map((u) => u.university)).toEqual([
-      "Gerçek Üniversite",
-      "Bilinmeyen Üniversite",
-    ]);
+    expect(fitSummary(zero).reliable).toBe(true);
+    expect(country.universities[0].bestPercent).toBe(0);
   });
 });

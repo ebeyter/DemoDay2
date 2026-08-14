@@ -113,6 +113,12 @@ Bu yüzden AI'sız çalışan bir ürün elde ettik: Bedrock ayarları hiç giri
 
 ## Deploy (Vercel)
 
+0. **Root Directory'yi `beyond` yap** — Settings → Build & Deployment → Root Directory.
+
+   **Bu adım atlanırsa site 404 döner** ve hata mesajı sebebi söylemez. Uygulama deponun kökünde değil, `beyond/` altında; kökte `package.json` yok. Vercel varsayılan olarak köke bakar, orada bir Next.js uygulaması bulamaz ve yayınlanacak bir şey olmadığı için her yol 404 olur. Build günlüğünde de "hata" görünmez — yapacak iş bulamamıştır.
+
+   Aynı sebeple `beyond/vercel.json`'daki cron tanımı da bu ayar yapılmadan hiç okunmaz; Vercel o dosyayı kök dizinde arar.
+
 1. **Supabase şemasını çalıştır** — `supabase/schema.sql` içeriğini SQL Editor'e yapıştır. Betiğin 6. bölümü `beyond_source_checks` tablosunu ekler; sadece ekleme yapar, mevcut hiçbir şeye dokunmaz.
 
 2. **Ortam değişkenlerini Vercel'e gir** (Settings → Environment Variables). `.env.local` deploy edilmez.

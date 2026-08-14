@@ -40,17 +40,25 @@ export function FitBadge({
 }) {
   const { t } = useLocale();
 
-  if (fit.unknownOnly) {
+  // İKİ FARKLI "SAYI YOK" HÂLİ, İKİ FARKLI CÜMLE:
+  //   unknownOnly → hiçbir zorunlu şartı bilmiyoruz
+  //   !reliable   → biliyoruz ama o kadar azını ki yüzde yanıltıcı olur
+  // İkisini aynı etiketle geçmek, ikinci durumu olduğundan kötü gösterirdi:
+  // orada bilgi VAR, sadece yüzde çıkarmaya yetmiyor.
+  if (fit.unknownOnly || !fit.reliable) {
+    const uncomputable = fit.unknownOnly;
     return (
       <span
-        title={t.discover.fitUncomputableHint}
+        title={
+          uncomputable ? t.discover.fitUncomputableHint : t.discover.fitInsufficientHint
+        }
         className={cx(
           "inline-flex items-center rounded-lg bg-surface-soft text-ink-faint font-medium",
           size === "sm" ? "text-[11px] px-2 py-0.5" : "text-[12px] px-2.5 py-1",
           className
         )}
       >
-        {t.discover.fitUncomputable}
+        {uncomputable ? t.discover.fitUncomputable : t.discover.fitInsufficient}
       </span>
     );
   }
@@ -77,9 +85,17 @@ export function FitDetail({ fit, className }: { fit: FitSummary; className?: str
 
   return (
     <div className={cx("flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px]", className)}>
-      {!fit.unknownOnly && (
+      {/* Yüzde gösterilmediğinde sayaç da değişiyor: "4/4 karşılıyorsun"
+          demek yerine "3 şarttan 1'i biliniyor" diyoruz. Öğrencinin neyi
+          karşıladığı değil, bizim ne kadarını bildiğimiz asıl bilgi. */}
+      {!fit.unknownOnly && fit.reliable && (
         <span className="text-ink-soft tabular-nums">
           {fill(t.discover.fitCounter, { met: fit.met, total: fit.total })}
+        </span>
+      )}
+      {!fit.unknownOnly && !fit.reliable && (
+        <span className="text-ink-soft tabular-nums" title={t.discover.fitInsufficientHint}>
+          {fill(t.discover.fitKnownOf, { known: fit.total, mandatory: fit.mandatoryTotal })}
         </span>
       )}
       {fit.unknownFromSource > 0 && (

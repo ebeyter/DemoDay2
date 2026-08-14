@@ -1,0 +1,102 @@
+/* ---------------------------------------------------------------------------
+   Landing — rota haritasının hareketi.
+
+   Buradaki her şey `route-` önekli: `globals.css` tema değişkenlerinin ve
+   uygulama genelindeki animasyonların yeri, landing onun üstüne yazmıyor.
+
+   Renk yok. Rota SVG'sindeki tonlar Tailwind token sınıflarından geliyor
+   (stroke-accent, fill-surface…); burada sadece `currentColor` ve tema
+   değişkenleri kullanılıyor, tek bir sabit hex yok — koyu tema açıldığında
+   bu dosyada değişecek bir şey olmasın diye.
+   --------------------------------------------------------------------------- */
+
+/* Rota bacakları — `strokeDashoffset` her karede JS'ten geliyor. Kısa bir
+   geçiş, React'in render gecikmesini yumuşatıyor; uzun olsaydı kaydırmanın
+   gerisinde sürüklenirdi. */
+.route-leg {
+  transition: stroke-dashoffset 120ms linear;
+  will-change: stroke-dashoffset;
+}
+
+/* Durak düğümleri — aktif olan büyüyor ve rengi dönüyor. */
+.route-node {
+  transition:
+    r 220ms cubic-bezier(0.22, 0.8, 0.3, 1),
+    fill 220ms ease,
+    stroke 220ms ease;
+}
+
+/* Aktif durağın hâlesi. Nabız, "buradasın" demenin en sessiz yolu. */
+.route-halo {
+  opacity: 0.16;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: route-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes route-pulse {
+  0%,
+  100% {
+    transform: scale(0.72);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 0.07;
+  }
+}
+
+/* İlerleme işaretçisi — bacak yarıdayken beliriyor. */
+.route-marker {
+  animation: route-marker-in 200ms ease both;
+}
+
+@keyframes route-marker-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Şehir etiketleri — vurgu değişince renk yumuşak dönsün. */
+.route-label span {
+  transition: color 220ms ease;
+}
+
+/* Okunan durağın metni öne çıkıyor. Sadece harita yandayken: dar ekranda
+   bölümler tek başına okunuyor, soldurmak orada sadece kontrastı düşürür. */
+@media (min-width: 1024px) {
+  .route-stop {
+    opacity: 0.62;
+    transition: opacity 320ms ease;
+  }
+
+  .route-stop-active {
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Hareket azaltma — kullanıcı istemiyorsa hiçbir şey oynamıyor.
+   Rota yine tamamen çizili geliyor (bkz. usePrefersReducedMotion): bilgi
+   kaybolmuyor, sadece hareket gidiyor.
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .route-leg,
+  .route-node,
+  .route-label span,
+  .route-stop {
+    transition: none !important;
+  }
+
+  .route-halo,
+  .route-marker {
+    animation: none !important;
+  }
+
+  .route-stop {
+    opacity: 1 !important;
+  }
+}

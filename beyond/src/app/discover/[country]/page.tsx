@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { BandPill, Button, Card, EmptyState, SectionTitle, VerificationBadge, cx } from "@/components/ui";
 import { FitBadge, FitDetail } from "@/components/FitBadge";
+import { RequirementChecklist } from "@/components/RequirementChecklist";
 import { useLocale } from "@/lib/i18n/context";
 import { fill } from "@/lib/i18n/dictionary";
 import { useStore } from "@/lib/store";
@@ -231,6 +232,16 @@ export default function DiscoverCountryPage() {
                                 </div>
                               </div>
                             </div>
+
+                            {/* Şart şart neyi karşılıyor, neyi karşılamıyor.
+                                Yüzde ve sayaç "ne kadarını" söylüyordu;
+                                öğrencinin asıl sorusu "hangisini" — cevabı
+                                bir tık ötede, program detayında bırakmak
+                                bu ekranı yarım bırakıyordu. */}
+                            <RequirementChecklist
+                              result={result}
+                              className="mt-3 pl-0.5"
+                            />
                           </li>
                         );
                       })}

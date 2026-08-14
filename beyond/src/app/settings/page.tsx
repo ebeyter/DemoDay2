@@ -102,21 +102,34 @@ function ProfileTab() {
   const { t } = useLocale();
   const { profile, saveProfile } = useStore();
 
-  const [draft, setDraft] = useState<StudentProfile>(() => profile ?? emptyProfile());
+  /**
+   * Taslak, kullanıcı bir şeye dokunana kadar `null` kalıyor ve gösterilen
+   * değer doğrudan kayıtlı profilden geliyor.
+   *
+   * NEDEN `useState(() => profile)` DEĞİL: profil localStorage'dan geliyor ve
+   * ilk (hidrasyon) render'ında henüz `null`. Başlangıç değeri o anda
+   * dondurulsaydı form boş açılır, üstelik "kaydedilmemiş değişiklik var" ve
+   * "adını yazman gerekiyor" uyarıları hiç düzenleme yapılmadan görünürdü.
+   */
+  const [edited, setEdited] = useState<StudentProfile | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  const draft = edited ?? profile ?? emptyProfile();
+
   const update = (patch: Partial<StudentProfile>) => {
     setSaved(false);
-    setDraft((prev) => ({ ...prev, ...patch }));
+    setEdited({ ...draft, ...patch });
   };
 
   // Kaydedilmemiş değişiklik uyarısı: taslakla kayıtlı profili karşılaştırıyoruz.
   // Alan sayısı azken JSON karşılaştırması yeterince ucuz ve her yeni alanı
   // kendiliğinden kapsıyor — elle yazılmış bir karşılaştırma unutulurdu.
   const dirty = useMemo(
-    () => JSON.stringify(stripVolatile(draft)) !== JSON.stringify(stripVolatile(profile)),
-    [draft, profile]
+    () =>
+      edited !== null &&
+      JSON.stringify(stripVolatile(edited)) !== JSON.stringify(stripVolatile(profile)),
+    [edited, profile]
   );
 
   const nameMissing = draft.fullName.trim().length === 0;
@@ -127,6 +140,8 @@ function ProfileTab() {
     setSaving(true);
     await saveProfile(draft);
     setSaving(false);
+    // Kayıtlı profil artık tek kaynak — taslağı bırakıyoruz.
+    setEdited(null);
     setSaved(true);
   }
 
@@ -144,6 +159,45 @@ function ProfileTab() {
   return (
     <div className="space-y-5">
       <p className="text-sm text-ink-soft">{t.settings.profile.body}</p>
+
+      {/* Kaydet çubuğu ÜSTTE yapışıyor: altta olsaydı sağ alttaki asistan
+          düğmesiyle üst üste binerdi. `top-16` başlıktaki sticky header'ın
+          hemen altı. */}
+      <div className="sticky top-16 z-20 pt-1 pb-1">
+        <Card className="p-4 flex flex-wrap items-center justify-between gap-3 shadow-[0_4px_24px_var(--color-scrim)]">
+          <p className="text-[13px] text-ink-soft">
+            {nameMissing
+              ? t.settings.profile.needFullName
+              : fieldMissing
+                ? t.settings.profile.needField
+                : saved && !dirty
+                  ? t.settings.profile.saved
+                  : dirty
+                    ? t.settings.profile.unsaved
+                    : ""}
+          </p>
+          <div className="flex items-center gap-2">
+            {dirty && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setEdited(null);
+                  setSaved(false);
+                }}
+              >
+                {t.settings.profile.revert}
+              </Button>
+            )}
+            <Button
+              onClick={() => void handleSave()}
+              disabled={saving || !dirty || nameMissing || fieldMissing}
+            >
+              {saving ? t.settings.profile.saving : t.settings.profile.save}
+            </Button>
+          </div>
+        </Card>
+      </div>
 
       <Section label={t.wizard.steps.basics}>
         <BasicsFields draft={draft} update={update} />
@@ -163,43 +217,6 @@ function ProfileTab() {
       <Section label={t.wizard.steps.targets}>
         <TargetFields draft={draft} update={update} />
       </Section>
-
-      {/* Kaydet çubuğu — uzun formda dibe inmeden kaydedebilmek için yapışkan */}
-      <div className="sticky bottom-4 z-10">
-        <Card className="p-4 flex flex-wrap items-center justify-between gap-3 shadow-[0_4px_24px_var(--color-scrim)]">
-          <p className="text-[13px] text-ink-soft">
-            {nameMissing
-              ? t.settings.profile.needFullName
-              : fieldMissing
-                ? t.settings.profile.needField
-                : saved && !dirty
-                  ? t.settings.profile.saved
-                  : dirty
-                    ? t.settings.profile.unsaved
-                    : ""}
-          </p>
-          <div className="flex items-center gap-2">
-            {dirty && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setDraft(profile);
-                  setSaved(false);
-                }}
-              >
-                {t.settings.profile.revert}
-              </Button>
-            )}
-            <Button
-              onClick={() => void handleSave()}
-              disabled={saving || !dirty || nameMissing || fieldMissing}
-            >
-              {saving ? t.settings.profile.saving : t.settings.profile.save}
-            </Button>
-          </div>
-        </Card>
-      </div>
     </div>
   );
 }

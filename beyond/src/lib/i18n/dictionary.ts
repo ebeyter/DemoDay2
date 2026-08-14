@@ -141,6 +141,7 @@ const tr = {
     closingTitle: "Bir dakikanı ayır, tercihini veriyle yap.",
     closingBody:
       "Profil sihirbazı yaklaşık altmış saniye sürüyor. Hesap açman gerekmiyor — anahtar yoksa profilin bu tarayıcıda kalır.",
+    footerNote: "Veriler bilgilendirme amaçlıdır; başvurmadan önce kaynağından teyit et.",
   },
 
   auth: {
@@ -582,6 +583,54 @@ const tr = {
       body: "Supabase yapılandırılmamış, bu yüzden hesap açılamıyor ve bu sayfadaki hesap işlemleri kapalı. Profilin yalnızca bu tarayıcıda saklanıyor.",
     },
   },
+
+  discover: {
+    title: "Keşfet",
+    subtitle: "{count} program, {countries} ülke — profiline göre sıralandı",
+    countryHint: "Bir ülkeye gir, üniversiteleri ve bölümlerini uyum oranıyla gör.",
+    bestFit: "En iyi uyum",
+    averageFit: "Ortalama",
+    programCount: "{count} program",
+    universityCount: "{count} üniversite",
+    verifiedCount: "{count} doğrulanmış",
+    officialSite: "Resmî site",
+    facultyPage: "Bölüm sayfası",
+    backToCountries: "← Tüm ülkeler",
+    programsAtUniversity: "Bu üniversitedeki programlar",
+    // Yüzdenin ne OLMADIĞINI söylemek, ne olduğunu söylemekten daha önemli.
+    fitLabel: "şart uyumu",
+    fitExplain:
+      "Şart uyumu = karşıladığın zorunlu şart / bildiğimiz zorunlu şart. Kabul olasılığı DEĞİL — Avrupa'da kabul eşik bazlı ve kabul istatistikleri kamuya açık değil, o yüzden olasılık uydurmuyoruz.",
+    fitCounter: "{met}/{total} zorunlu şart",
+    unknownFromSource: "{count} şart bilinmiyor",
+    unknownFromSourceHint:
+      "Üniversite bu şartları kaynak sayfasında yayınlamıyor. Bizim veri boşluğumuz olduğu için uyum hesabına katılmıyor — senin aleyhine yazılmıyor.",
+    unknownFromStudent: "{count} bilgi senden eksik",
+    unknownFromStudentHint: "Profilini tamamlayınca bu şartlar hesaplanabilir hale geliyor.",
+    fitUncomputable: "Uyum hesaplanamıyor",
+    fitUncomputableHint:
+      "Bu programın zorunlu şartlarını kaynak sayfasından okuyamadık. Yüzde uydurmuyoruz.",
+    descriptionNote: "Bu tanıtımı biz yazdık, üniversitenin kendi metni değil — kaynak için resmî siteye bak.",
+    urlBlocked: "Bu site otomatik kontrollere kapalı, tarayıcıda açılıyor",
+    addToList: "Listeme ekle",
+    inList: "Listemde",
+    empty: "Bu filtrelerle gösterilecek program yok.",
+    emptyHint: "Profilindeki alan veya ülke kısıtını gevşetmeyi dene.",
+  },
+
+  myList: {
+    title: "Listem",
+    subtitle: "{count} program kaydettin",
+    empty: "Listen henüz boş.",
+    emptyHint: "Keşfet'ten ya da eşleşmelerinden programları listene ekleyebilirsin.",
+    goDiscover: "Keşfet'e git",
+    remove: "Listeden çıkar",
+    groupedByCountry: "Ülkeye göre",
+    deadlineSoon: "Son tarih yaklaşıyor",
+    // Listem ve takvim aynı listeyi gösteriyor; kullanıcı bunu bilmezse
+    // iki ayrı liste tuttuğunu sanıp kafası karışır.
+    sharedWithTimeline: "Bu liste takvimindekiyle aynı — buraya eklediğin program takvimde de görünür.",
+  },
 };
 
 /**
@@ -712,6 +761,7 @@ const en: Dictionary = {
     closingTitle: "Give it a minute, then decide on evidence.",
     closingBody:
       "The profile wizard takes about sixty seconds. No account needed — without keys your profile simply stays in this browser.",
+    footerNote: "Data is informational — always confirm at the source before applying.",
   },
 
   auth: {
@@ -1132,6 +1182,51 @@ const en: Dictionary = {
       title: "Local mode",
       body: "Supabase isn't configured, so accounts are unavailable and the account actions on this page are disabled. Your profile is stored in this browser only.",
     },
+  },
+
+  discover: {
+    title: "Discover",
+    subtitle: "{count} programmes across {countries} countries — ranked for your profile",
+    countryHint: "Open a country to see its universities and their programmes with fit scores.",
+    bestFit: "Best fit",
+    averageFit: "Average",
+    programCount: "{count} programmes",
+    universityCount: "{count} universities",
+    verifiedCount: "{count} verified",
+    officialSite: "Official site",
+    facultyPage: "Department page",
+    backToCountries: "← All countries",
+    programsAtUniversity: "Programmes at this university",
+    fitLabel: "requirement fit",
+    fitExplain:
+      "Requirement fit = mandatory requirements you meet / mandatory requirements we know. This is NOT an admission probability — admission in Europe is threshold-based and acceptance statistics are not public, so we do not invent odds.",
+    fitCounter: "{met}/{total} mandatory requirements",
+    unknownFromSource: "{count} requirements unknown",
+    unknownFromSourceHint:
+      "The university does not publish these on its source page. Because that is our data gap, it is left out of the fit calculation — it is not counted against you.",
+    unknownFromStudent: "{count} details missing from you",
+    unknownFromStudentHint: "Completing your profile makes these requirements checkable.",
+    fitUncomputable: "Fit cannot be calculated",
+    fitUncomputableHint:
+      "We could not read this programme's mandatory requirements from its source page. We do not invent a percentage.",
+    descriptionNote: "We wrote this summary — it is not the university's own text. Follow the official site for their wording.",
+    urlBlocked: "This site blocks automated checks but opens in a browser",
+    addToList: "Add to my list",
+    inList: "In my list",
+    empty: "No programmes to show with these filters.",
+    emptyHint: "Try relaxing the field or country limits in your profile.",
+  },
+
+  myList: {
+    title: "My list",
+    subtitle: "You saved {count} programmes",
+    empty: "Your list is empty.",
+    emptyHint: "You can add programmes from Discover or from your matches.",
+    goDiscover: "Go to Discover",
+    remove: "Remove from list",
+    groupedByCountry: "By country",
+    deadlineSoon: "Deadline approaching",
+    sharedWithTimeline: "This is the same list as your timeline — anything you add here also shows up there.",
   },
 };
 

@@ -336,7 +336,11 @@ body:has(.landing-scroll) header {
    bazen kara bazen deniz üstünde duruyor, sabit bir renk her ikisinde birden
    okunmuyor. Hâle, etiketin zeminini kendi rengiyle bastırıyor. */
 /* Punto ölçeğin tersiyle çarpılıyor — bkz. LandingStage `--stage-label-inv`.
-   Konum haritayla birlikte ölçekleniyor (doğrusu bu), yazı boyutu sabit. */
+   Konum haritayla birlikte ölçekleniyor (doğrusu bu), yazı boyutu sabit.
+
+   Geçiş süresi sahnenin `transform` süresiyle AYNI: punto anında değişip
+   dönüşüm 1.2 saniye sürerse, geçiş boyunca ikisi birbirini tutmuyor ve
+   etiketler bir an devleşiyor. */
 .landing-stage-map .route-label span:first-child {
   font-size: calc(15px * var(--stage-label-inv, 1));
   font-weight: 700;
@@ -345,6 +349,10 @@ body:has(.landing-scroll) header {
 
 .landing-stage-map .route-label span:last-child {
   font-size: calc(12px * var(--stage-label-inv, 1));
+}
+
+.landing-stage-map .route-label span {
+  transition: font-size 1200ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .landing-stage-map .route-label span {

@@ -122,6 +122,75 @@ export default function LandingPage() {
     container.scrollTop = target.offsetTop;
   }, []);
 
+  /**
+   * BİR KAYDIRMA = BİR BÖLÜM.
+   *
+   * `scroll-snap` tek başına yetmiyor: tek bir tekerlek hareketi 800-1000px
+   * ilerletebiliyor ve tutturma en yakın noktaya çekince ikinci bölüm
+   * atlanıp üçüncüye geçiliyordu. Burada hareketi biz alıyoruz ve her
+   * jestte tam bir bölüm ilerliyoruz.
+   *
+   * İKİ İSTİSNA — kaydırmayı ele geçirmek kolayca düşmanca bir davranışa
+   * dönüşüyor, o yüzden:
+   *   1. Bölüm ekrandan uzunsa karışmıyoruz; kullanıcının o bölümün alt
+   *      kısmına ulaşabilmesi gerekiyor.
+   *   2. Hareket azaltma açıksa karışmıyoruz.
+   *
+   * Bekleme süresi, dokunmatik yüzeylerin tek bir jestte onlarca olay
+   * üretmesi için: onu almazsak bir parmak hareketi üç bölüm birden atlıyor.
+   */
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container || reduced) return;
+
+    let locked = false;
+    let unlockTimer = 0;
+
+    const onWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaY) < 4) return;
+
+      const current = sectionRefs.current[active];
+      if (!current) return;
+
+      const down = event.deltaY > 0;
+
+      /**
+       * Bölüm ekrandan uzunsa (küçük pencere, uzun çeviri, büyük yazı tipi)
+       * önce o bölümün içi okunabilmeli. O yönde sonuna gelmeden karışmıyoruz;
+       * gelince normal "bir jest = bir bölüm" davranışına dönüyoruz.
+       */
+      if (current.offsetHeight > container.clientHeight + 4) {
+        const top = current.offsetTop;
+        const bottom = top + current.offsetHeight;
+        const viewTop = container.scrollTop;
+        const viewBottom = viewTop + container.clientHeight;
+
+        if (down && viewBottom < bottom - 2) return;
+        if (!down && viewTop > top + 2) return;
+      }
+
+      event.preventDefault();
+      if (locked) return;
+
+      const next = active + (down ? 1 : -1);
+      if (next < 0 || next >= sectionRefs.current.length) return;
+
+      locked = true;
+      window.clearTimeout(unlockTimer);
+      unlockTimer = window.setTimeout(() => {
+        locked = false;
+      }, 620);
+
+      goTo(next);
+    };
+
+    container.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      container.removeEventListener("wheel", onWheel);
+      window.clearTimeout(unlockTimer);
+    };
+  }, [active, goTo, reduced]);
+
   // --- Rota adımları -------------------------------------------------------
   const [step, setStep] = useState(0);
   const [pinned, setPinned] = useState(false);

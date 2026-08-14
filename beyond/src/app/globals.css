@@ -45,7 +45,26 @@
      açık renge dönüyor ve perde beyazlardı. Ayrı token olmak zorunda. */
   --color-scrim: rgba(20, 20, 43, 0.45);
 
+  /* Harita katmanı — deniz, kara, kıyı. Yüzey tokenlarından türetilseydi
+     kara ile kart zemini aynı tona düşer, kıyı çizgisi kaybolurdu. */
+  --color-map-sea: #eceff8;
+  --color-map-land: #ffffff;
+  --color-map-coast: #cfd3e6;
+
+  /* Landing açılışı — HER İKİ TEMADA DA KOYU.
+     Bilinçli bir sahne: ürün "sınırların ötesi" diyor, açılış da gece göğü
+     gibi duruyor ve rota orada parlıyor. Tema tokenlarından türetilemez,
+     çünkü açık temada da koyu kalmak zorunda. */
+  --color-hero-bg: #0a0a12;
+  --color-hero-ink: #f4f4fc;
+  --color-hero-ink-soft: #a9a9c4;
+  --color-hero-line: #26263c;
+  /* Aksanın parlak tonu; seçilen aksana göre aşağıda yeniden bağlanıyor. */
+  --color-hero-glow: #a5b4fc;
+
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Başlık yazı tipi — `font-display` yardımcı sınıfı buradan üretiliyor. */
+  --font-display: var(--font-bricolage), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   /* Yumuşak ama abartısız köşeler */
   --radius-card: 14px;
@@ -106,6 +125,10 @@
 
   --color-scrim: rgba(20, 20, 43, 0.45);
 
+  --color-map-sea: #eceff8;
+  --color-map-land: #ffffff;
+  --color-map-coast: #cfd3e6;
+
   /* Dolgu rengi üzerine gelen yazının rengi — bkz. aşağıdaki `.text-white` kuralı. */
   --color-on-fill: #ffffff;
 }
@@ -143,6 +166,12 @@
 
   --color-scrim: rgba(3, 3, 8, 0.66);
 
+  /* Koyu temada deniz zeminden biraz daha koyu, kara biraz daha açık:
+     kontrast ters çevrilmezse kıyı çizgisi tamamen kaybolur. */
+  --color-map-sea: var(--map-dark-sea);
+  --color-map-land: var(--map-dark-land);
+  --color-map-coast: var(--map-dark-coast);
+
   --color-on-fill: #12121c;
 }
 
@@ -157,21 +186,36 @@
    ayarlardaki renk seçicinin dört örneği aynı anda gösterebilmesi gerekiyor.
    Bileşen bu değişkeni adıyla okuyor, sabit renk yazmıyor. */
 :root {
+  /* Haritanın koyu paleti — TEMADAN BAĞIMSIZ. Landing'in koyu bölümleri
+     açık temada da bunu kullanıyor (bkz. landing.css `.landing-dark`). */
+  --map-dark-sea: #0e0e18;
+  --map-dark-land: #1c1c2b;
+  --map-dark-coast: #3a3a52;
+
+  /* Aksanın parlak tonu — TEMADAN BAĞIMSIZ. Koyu zeminler (koyu tema ve
+     landing açılışı) bunu kullanıyor; landing açık temada da koyu olduğu için
+     aksanın parlak hâline her koşulda erişebilmek gerekiyor. */
+  --accent-bright-indigo: #a5b4fc;
+  --accent-bright-teal: #5eead4;
+  --accent-bright-violet: #c4b5fd;
+  --accent-bright-rose: #fda4c4;
+
   --accent-indigo: #3730a3;
   --accent-teal: #0f766e;
   --accent-violet: #7c3aed;
   --accent-rose: #be185d;
 }
 :root[data-theme="dark"] {
-  --accent-indigo: #a5b4fc;
-  --accent-teal: #5eead4;
-  --accent-violet: #c4b5fd;
-  --accent-rose: #fda4c4;
+  --accent-indigo: var(--accent-bright-indigo);
+  --accent-teal: var(--accent-bright-teal);
+  --accent-violet: var(--accent-bright-violet);
+  --accent-rose: var(--accent-bright-rose);
 }
 
 /* indigo — varsayılan */
 :root[data-accent="indigo"] {
   --color-accent: var(--accent-indigo);
+  --color-hero-glow: var(--accent-bright-indigo);
   --color-accent-hover: #2f2a8c;
   --color-accent-soft: #eef0fd;
   --color-accent-line: #c9caf5;
@@ -186,6 +230,7 @@
 /* deniz yeşili */
 :root[data-accent="teal"] {
   --color-accent: var(--accent-teal);
+  --color-hero-glow: var(--accent-bright-teal);
   --color-accent-hover: #115e59;
   --color-accent-soft: #e6f4f2;
   --color-accent-line: #a5d6cf;
@@ -200,6 +245,7 @@
 /* mor */
 :root[data-accent="violet"] {
   --color-accent: var(--accent-violet);
+  --color-hero-glow: var(--accent-bright-violet);
   --color-accent-hover: #6d28d9;
   --color-accent-soft: #f3ecfe;
   --color-accent-line: #d5c2fb;
@@ -214,6 +260,7 @@
 /* gül */
 :root[data-accent="rose"] {
   --color-accent: var(--accent-rose);
+  --color-hero-glow: var(--accent-bright-rose);
   --color-accent-hover: #9f1239;
   --color-accent-soft: #fdeaf2;
   --color-accent-line: #f6c2d8;
@@ -261,6 +308,190 @@
 :root input[type="checkbox"],
 :root input[type="radio"] {
   accent-color: var(--color-accent);
+}
+
+/* ===========================================================================
+   BAŞLIK ÇUBUĞU — cam yüzey, canlı bağlantılar
+
+   Header.tsx'e DOKUNULMUYOR (sahibi başkası). Bileşen zaten tema
+   tokenlarını kullanan yardımcı sınıflar taşıyor; buradaki kurallar yalnızca
+   yüzey işini yapıyor: saydamlık, ince ayraç ve bağlantı hareketi. Bileşenin
+   yapısı değişirse en fazla bu süslemeler düşer, çubuk çalışmaya devam eder.
+   =========================================================================== */
+
+header {
+  /* Cam yüzey: arkasındaki içerik hafifçe görünüyor ve doygunluk artıyor.
+     Düz opak bir çubuk, sayfanın üstüne yapıştırılmış gibi duruyordu. */
+  background: color-mix(in oklab, var(--color-surface) 68%, transparent);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  /* Ayraç kenarlardan sönüyor — düz çizgi çubuğu bir tabloya benzetiyordu. */
+  border-bottom-color: transparent;
+}
+
+header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-line-strong) 18%,
+    var(--color-line-strong) 82%,
+    transparent
+  );
+}
+
+/* Marka: nokta aksan renginde ve hafifçe parlıyor. */
+header a[href="/"] {
+  letter-spacing: -0.035em;
+}
+
+header a[href="/"] span {
+  text-shadow: 0 0 12px color-mix(in oklab, var(--color-accent) 55%, transparent);
+}
+
+/* Gezinme bağlantıları: altında soldan açılan bir çizgi. Hover'da zemin
+   yerine hareket — zemin değişimi çubuğu kalabalıklaştırıyordu. */
+header nav a {
+  position: relative;
+  letter-spacing: -0.006em;
+}
+
+header nav a::after {
+  content: "";
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.15rem;
+  height: 1.5px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 240ms cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+
+header nav a:hover::after {
+  transform: scaleX(1);
+}
+
+/* Aktif bağlantı — Header aktif duruma `bg-accent-soft` veriyor, onu
+   yakalayıp yumuşak bir hâle ekliyoruz. */
+header nav a.bg-accent-soft {
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-accent) 22%, transparent);
+}
+
+header nav a.bg-accent-soft::after {
+  transform: scaleX(1);
+}
+
+/* Uzun e-posta çubuğu dolduruyordu; sonu yumuşakça sönsün. */
+header .truncate {
+  mask-image: linear-gradient(90deg, #000 78%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, #000 78%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  header nav a::after {
+    transition: none;
+  }
+}
+
+/* ===========================================================================
+   AKIŞ DÜĞMESİ (.flow-button)
+
+   Üzerine gelince ortadan büyüyen bir daire düğmeyi dolduruyor, köşeler
+   hapdan dikdörtgene dönüyor ve varsa ok sağa kayıyor.
+
+   OK EKLEMİYOR. Daire ve köşe animasyonu her düğmede çalışıyor ama ok
+   yalnızca JSX'te zaten varsa (`.flow-arrow`) kayıyor — oku olmayan bir
+   düğmeye CSS ile ok takmak, "Rotayı gör" gibi yön bildirmeyen bir eylemi
+   yönlü gösterirdi.
+
+   SABİT RENK YOK. Örnek uygulamada #111111/#333333 vardı; burada her şey
+   tema değişkeninden geliyor, o yüzden koyu temada ve dört aksanın hepsinde
+   doğru çalışıyor.
+   =========================================================================== */
+
+.flow-button {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  isolation: isolate;
+  transition:
+    border-radius 600ms cubic-bezier(0.23, 1, 0.32, 1),
+    color 400ms ease,
+    border-color 400ms ease;
+}
+
+.flow-button:hover {
+  border-radius: 12px;
+}
+
+/* Büyüyen daire. Ayrı bir eleman gerekmiyor — `::before` yetiyor, yani
+   düğmenin JSX'ine dokunmadan çalışıyor. */
+.flow-button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  background: var(--color-accent);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+  transition:
+    transform 800ms cubic-bezier(0.19, 1, 0.22, 1),
+    opacity 800ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.flow-button:hover::before {
+  opacity: 1;
+  /* Daire düğmenin köşelerini de kapatacak kadar büyüyor. */
+  transform: translate(-50%, -50%) scale(30);
+}
+
+.flow-button:hover {
+  color: var(--color-on-fill);
+  border-color: transparent;
+}
+
+/* Dolu (primary) düğmede daire aksanın koyu tonuyla geliyor: zaten aksan
+   zemindeyken aynı rengi büyütmek görünmez bir animasyon olurdu. */
+.flow-button.bg-accent::before {
+  background: var(--color-accent-hover);
+}
+
+/* Ok — yalnızca varsa. */
+.flow-arrow {
+  display: inline-block;
+  transition: transform 800ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.flow-button:hover .flow-arrow {
+  transform: translateX(0.35rem);
+}
+
+.flow-button:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-button,
+  .flow-button::before,
+  .flow-arrow {
+    transition: none !important;
+  }
+  .flow-button:active {
+    transform: none;
+  }
 }
 
 body {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Bricolage_Grotesque, Inter } from "next/font/google";
 import "./globals.css";
 import { LocaleProvider } from "@/lib/i18n/context";
 import { StoreProvider } from "@/lib/store";
@@ -32,6 +32,19 @@ const inter = Inter({
   display: "swap",
 });
 
+/**
+ * Başlık yazı tipi. Gövde metni Inter'de kalıyor — uzun paragrafta okunurluk
+ * karakterden önce gelir; karakteri başlıklar taşıyor.
+ *
+ * latin-ext ZORUNLU: bu alt küme olmadan ğ/ş/İ karakterleri yedek yazı tipine
+ * düşer ve Türkçe başlıklar iki farklı fontla karışık görünür.
+ */
+const display = Bricolage_Grotesque({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-bricolage",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Beyond — Yurtdışı üniversite tercihi",
   description:
@@ -48,7 +61,7 @@ export default function RootLayout({
       lang="tr"
       data-theme="light"
       data-accent="indigo"
-      className={inter.variable}
+      className={`${inter.variable} ${display.variable}`}
       suppressHydrationWarning
     >
       <head>

@@ -101,7 +101,9 @@ export default function ProfilePage() {
         {/* İlerleme — "az kaldı" hissini veren asıl öğe */}
         <div className="mb-8">
           <div className="flex items-baseline justify-between mb-3">
-            <h1 className="text-[24px] text-ink">{t.wizard.title}</h1>
+            <h1 className="text-[26px] sm:text-[30px] font-semibold tracking-[-0.02em] leading-tight text-ink">
+              {t.wizard.title}
+            </h1>
             <span className="text-[13px] text-ink-faint tabular-nums">
               {fill(t.wizard.stepOf, { current: stepIndex + 1, total: STEPS.length })}
             </span>
@@ -138,7 +140,7 @@ export default function ProfilePage() {
           {/* Adım başlığı burada, soru gövdeleri ProfileFields'ta: ayarlar
               ekranı aynı gövdeleri kendi bölüm başlıklarıyla kullanıyor. */}
           {step !== "basics" && step !== "targets" && (
-            <h2 className="text-[17px] font-semibold text-ink mb-1.5">
+            <h2 className="text-[19px] font-semibold tracking-[-0.01em] text-ink mb-1.5">
               {t.wizard[step].question}
             </h2>
           )}

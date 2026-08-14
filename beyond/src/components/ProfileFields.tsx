@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Button, Chip, Field, Input, Select, cx } from "@/components/ui";
+import { Button, Chip, Eyebrow, Field, Input, Select, cx } from "@/components/ui";
 import { useLocale } from "@/lib/i18n/context";
 import { fill } from "@/lib/i18n/dictionary";
 import { toHundredScale } from "@/lib/matching";
@@ -465,9 +465,7 @@ export function LanguageFields({ draft, update }: ProfileFieldsProps) {
       <div className="space-y-5">
         {LANGUAGE_TEST_GROUPS.map((group) => (
           <div key={group.language.en}>
-            <p className="text-[12px] font-medium uppercase tracking-wider text-ink-faint mb-2">
-              {pick(group.language)}
-            </p>
+            <Eyebrow className="mb-2">{pick(group.language)}</Eyebrow>
             <div className="space-y-2">
               {group.tests.map((test) => (
                 <LanguageRow

@@ -101,7 +101,7 @@ export default function ResetPasswordConfirmPage() {
 
           {phase === "invalid" && (
             <div className="animate-rise">
-              <h1 className="text-[24px] text-ink mb-2">{t.authReset.linkInvalidTitle}</h1>
+              <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-ink mb-2">{t.authReset.linkInvalidTitle}</h1>
               <p className="text-sm text-ink-soft leading-relaxed mb-6">
                 {localMode ? t.auth.notConfigured : t.authReset.linkInvalidBody}
               </p>
@@ -113,7 +113,7 @@ export default function ResetPasswordConfirmPage() {
 
           {phase === "done" && (
             <div className="animate-rise">
-              <h1 className="text-[24px] text-ink mb-2">{t.authReset.doneTitle}</h1>
+              <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-ink mb-2">{t.authReset.doneTitle}</h1>
               <p className="text-sm text-ink-soft leading-relaxed mb-6">{t.authReset.doneBody}</p>
               <Link href="/results">
                 <Button className="w-full">{t.authReset.goToApp}</Button>
@@ -123,7 +123,7 @@ export default function ResetPasswordConfirmPage() {
 
           {phase === "ready" && (
             <>
-              <h1 className="text-[24px] text-ink mb-2">{t.authReset.confirmTitle}</h1>
+              <h1 className="text-[24px] font-semibold tracking-[-0.02em] text-ink mb-2">{t.authReset.confirmTitle}</h1>
               <p className="text-sm text-ink-soft mb-6">{t.authReset.confirmBody}</p>
 
               <form onSubmit={handleSubmit} className="space-y-4">

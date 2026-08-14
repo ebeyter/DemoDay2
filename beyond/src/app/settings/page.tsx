@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
-import { Button, Card, Chip, Field, Input, cx } from "@/components/ui";
+import { Button, Card, Chip, Eyebrow, Field, Input, SectionTitle, cx } from "@/components/ui";
 import {
   BasicsFields,
   GradeFields,
@@ -45,10 +45,9 @@ export default function SettingsPage() {
       <Header />
 
       <main className="mx-auto max-w-3xl px-5 py-10 sm:py-14">
-        <div className="mb-7">
-          <h1 className="text-[26px] text-ink">{t.settings.title}</h1>
-          <p className="text-sm text-ink-soft mt-1.5">{t.settings.subtitle}</p>
-        </div>
+        {/* Başlık ölçeği SectionTitle'da tanımlı; burada elle yazılmış bir
+            kopyası vardı ve diğer sayfalarla ayrı düşme riski taşıyordu. */}
+        <SectionTitle title={t.settings.title} subtitle={t.settings.subtitle} />
 
         {localMode && (
           <Card className="p-5 mb-6 border-band-reach/30 bg-band-reach-soft">
@@ -244,9 +243,7 @@ function stripVolatile(profile: StudentProfile | null) {
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <Card className="p-6 sm:p-7">
-      <p className="text-[12px] font-semibold uppercase tracking-wider text-ink-faint mb-4">
-        {label}
-      </p>
+      <Eyebrow className="mb-4">{label}</Eyebrow>
       {children}
     </Card>
   );
@@ -263,7 +260,7 @@ function AppearanceTab() {
   return (
     <div className="space-y-5">
       <Card className="p-6 sm:p-7">
-        <h2 className="text-[17px] font-semibold text-ink mb-1.5">{t.settings.appearance.title}</h2>
+        <h2 className="text-[19px] font-semibold tracking-[-0.01em] text-ink mb-1.5">{t.settings.appearance.title}</h2>
         <p className="text-sm text-ink-soft mb-6">{t.settings.appearance.body}</p>
 
         <Field label={t.settings.appearance.mode} hint={t.settings.appearance.systemHint}>
@@ -372,7 +369,7 @@ function AccountTab() {
   return (
     <div className="space-y-5">
       <Card className="p-6 sm:p-7">
-        <h2 className="text-[17px] font-semibold text-ink mb-4">{t.settings.account.title}</h2>
+        <h2 className="text-[19px] font-semibold tracking-[-0.01em] text-ink mb-4">{t.settings.account.title}</h2>
         <Field label={t.settings.account.email} hint={t.settings.account.emailNote}>
           <Input value={user?.email ?? "—"} readOnly disabled />
         </Field>
@@ -497,7 +494,7 @@ function PrivacyTab() {
   return (
     <div className="space-y-5">
       <Card className="p-6 sm:p-7">
-        <h2 className="text-[17px] font-semibold text-ink mb-2">{t.settings.privacy.title}</h2>
+        <h2 className="text-[19px] font-semibold tracking-[-0.01em] text-ink mb-2">{t.settings.privacy.title}</h2>
         <p className="text-sm text-ink-soft leading-relaxed">{t.settings.privacy.intro}</p>
       </Card>
 

@@ -86,7 +86,9 @@ export default function ProgramDetailPage() {
               <span aria-hidden>·</span>
               <span>{pick(FIELDS[program.field].name)}</span>
             </div>
-            <h1 className="text-[30px] leading-tight text-ink">{program.name}</h1>
+            <h1 className="text-[26px] sm:text-[30px] font-semibold tracking-[-0.02em] leading-tight text-ink">
+              {program.name}
+            </h1>
             <p className="text-[15px] text-ink-soft mt-1">
               {program.university}
               {program.universityLocal && program.universityLocal !== program.university && (

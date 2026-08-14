@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { ProgramCard } from "@/components/ProgramCard";
-import { Button, EmptyState, SectionTitle } from "@/components/ui";
+import { BAND_TEXT, Button, EmptyState, SectionTitle, cx } from "@/components/ui";
 import { useLocale } from "@/lib/i18n/context";
 import { fill } from "@/lib/i18n/dictionary";
 import { useStore } from "@/lib/store";
@@ -112,7 +112,19 @@ export default function ResultsPage() {
               return (
                 <section key={band}>
                   <div className="flex items-baseline gap-3 mb-4">
-                    <h3 className="text-[17px] font-semibold text-ink">{t.bands[band]}</h3>
+                    {/* Bant adı, rozetlerdeki RENGİ alıyor. Renk dili zaten
+                        kartların üstünde var (yeşil UYUMLU rozeti); başlığın
+                        beyaz kalması aynı bilgiyi iki farklı dille anlatmak
+                        oluyordu. Aynı token, dolayısıyla tema değişince ikisi
+                        birlikte değişiyor. */}
+                    <h2
+                      className={cx(
+                        "text-[19px] font-semibold tracking-[-0.01em]",
+                        BAND_TEXT[band]
+                      )}
+                    >
+                      {t.bands[band]}
+                    </h2>
                     <span className="text-[13px] text-ink-faint">
                       {items.length} {locale === "tr" ? "program" : "programs"}
                     </span>

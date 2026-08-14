@@ -34,6 +34,8 @@
  */
 
 import type { CountryCode, MatchResult } from "./types";
+import { getUniversity } from "@/data/universities";
+import type { University } from "@/data/universities";
 
 /** Tek bir programın şart uyumu. */
 export interface FitSummary {
@@ -108,8 +110,14 @@ export interface UniversityGroup {
   averagePercent: number;
   /** En iyi uyumlu programın yüzdesi — sıralama bunu kullanıyor. */
   bestPercent: number;
-  /** Elimizdeki en iyi kurumsal bağlantı (bkz. dosya başlığı). */
-  link?: string;
+  /**
+   * Üniversite kaydı: resmî site adresi ve kısa tanıtım (`universities.ts`).
+   * Adı katalogda olup burada karşılığı olmayan bir üniversite kalırsa
+   * undefined gelir — `npm run check:data` bunu ihlal olarak yakalıyor.
+   */
+  meta?: University;
+  /** Fakülte/bölüm sayfası — kurumun kendisi değil, programlardan geliyor. */
+  facultyLink?: string;
   verifiedCount: number;
   /** En iyi uyumlu programda kaç zorunlu şartı biliyoruz — eşitlik bozucu. */
   knownAtBest: number;
@@ -173,8 +181,10 @@ export function groupByCountry(results: MatchResult[]): CountryGroup[] {
         results: sorted,
         averagePercent: average(percents),
         bestPercent: percents.length === 0 ? 0 : Math.max(...percents),
-        // Programların içinde ilk bulunan fakülte bağlantısı.
-        link: sorted.find((r) => r.program.facultyUrl)?.program.facultyUrl,
+        meta: getUniversity(university),
+        // Programların içinde ilk bulunan fakülte bağlantısı. Resmî kurum
+        // adresi `meta.officialUrl`'de; bu ikisi farklı şeyler.
+        facultyLink: sorted.find((r) => r.program.facultyUrl)?.program.facultyUrl,
         verifiedCount: sorted.filter((r) => r.program.verification === "verified").length,
         knownAtBest: fitSummary(sorted[0]).total,
       });

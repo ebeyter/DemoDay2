@@ -26,6 +26,7 @@ import {
   LANGUAGE_TEST_SCALES,
   STANDARDIZED_TEST_SCALES,
 } from "../src/data/options.js";
+import { getUniversity, UNIVERSITIES } from "../src/data/universities.js";
 import type {
   Bilingual,
   Currency,
@@ -174,6 +175,32 @@ PROGRAMS.forEach((program, index) => {
   }
   if (!DEGREES[program.degree]) {
     fail(id, "degree", `tanımlı değil — "${program.degree}"`);
+  }
+
+  // Her programın üniversitesi `universities.ts`'te tanımlı olmalı.
+  //
+  // Keşfet ekranı üniversite düzeyinde resmî site adresi ve tanıtım gösteriyor;
+  // eşleşme kaçarsa o kutular sessizce boş kalır. Anahtar birebir string
+  // karşılaştırması olduğu için bir programın `university` alanındaki tek
+  // harflik fark bile bağı koparır — bu yüzden kural burada.
+  const uni = getUniversity(program.university);
+  if (!uni) {
+    fail(
+      id,
+      "university",
+      `universities.ts'te karşılığı yok — "${program.university}" (Keşfet'te resmî site ve tanıtım boş kalır)`
+    );
+  } else {
+    if (uni.country !== program.country) {
+      fail(
+        id,
+        "university",
+        `üniversite kaydı ${uni.country} diyor, program ${program.country} — biri yanlış`
+      );
+    }
+    checkUrl(id, "university.officialUrl", uni.officialUrl);
+    checkBilingual(id, "university.description", uni.description);
+    checkBilingual(id, "university.urlNote", uni.urlNote);
   }
 
   // id öneki ülke koduyla uyuşmalı: `it-` ile başlayan kaydın country'si IT
@@ -383,6 +410,26 @@ PROGRAMS.forEach((program, index) => {
     checkBilingual(id, `${where}.note`, scholarship.note);
   }
 });
+
+// ---------------------------------------------------------------------------
+// Üniversite dosyasında karşılığı olmayan kayıtlar
+//
+// Ters yön: yukarıdaki döngü "programın üniversitesi tanımlı mı" diye bakıyor.
+// Burada "tanımlı üniversitenin programı var mı" diye bakıyoruz. Programı
+// kalmamış bir üniversite kaydı ölü veri; Keşfet'te hiç görünmez ama bakımı
+// sürer ve resmî adresi eskir.
+// ---------------------------------------------------------------------------
+
+const universitiesInUse = new Set(PROGRAMS.map((p) => p.university));
+for (const uni of UNIVERSITIES) {
+  if (!universitiesInUse.has(uni.name)) {
+    fail(
+      uni.name,
+      "universities.ts",
+      "bu üniversitenin katalogda hiç programı yok — ölü kayıt, ya program ekle ya kaydı çıkar"
+    );
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Rapor

@@ -87,6 +87,62 @@ const tr = {
       "Beyond \"%78 ihtimalle kabul edilirsin\" demez. Avrupa'da kabul çoğunlukla eşik bazlıdır ve kabul istatistikleri kamuya açık değildir; olasılık uydurmak sana yardımcı olmaz. Bunun yerine karşıladığın ve karşılamadığın şartları tek tek, kaynağıyla birlikte gösteririz.",
   },
 
+  /**
+   * Rota haritalı landing — üstteki `landing` bloğundan ayrı duruyor.
+   * Sebep: eski sayfanın metinleri hâlâ derleniyor ve başka bir dalda
+   * kullanılıyor olabilir; yeni sayfa kurulurken oraya dokunmak gerekmesin.
+   * Buradaki her cümlenin karşılığı README'de var — sahnede söylenmeyen
+   * bir iddiayı landing'e yazmıyoruz.
+   */
+  landingJourney: {
+    eyebrow: "İstanbul'dan Avrupa'ya",
+    title: "Yolun İstanbul'da başlıyor. Nerede biteceğine veriyle karar ver.",
+    body: "Beyond profilini alır, katalogdaki her programı şart şart değerlendirir ve üç şey verir: karşıladığın şartların dürüst dökümü, eksikler için somut bir plan ve hepsi tek takvimde toplanmış başvuru tarihleri.",
+    ctaPrimary: "Profilimi oluştur",
+    ctaSecondary: "Rotayı gör",
+
+    /** Haritanın erişilebilir adı ve açıklaması (SVG title/desc). */
+    mapTitle: "İstanbul'dan Avrupa üniversite şehirlerine uzanan rota",
+    mapDesc:
+      "Şematik bir rota haritası: İstanbul'dan başlayıp Delft, Oxford, Paris ve Milano'ya uzanan dört durak. Sayfayı kaydırdıkça rotalar sırayla çiziliyor. Haritanın taşıdığı bilgilerin tamamı yanındaki metinde de yazıyor.",
+    originLabel: "İstanbul",
+    originNote: "Başlangıç noktan",
+    /** Durak etiketindeki alt satır — {count} katalogdan geliyor. */
+    stopPrograms: "katalogda {count} program",
+
+    stopsTitle: "Rotada ne oluyor?",
+    stops: [
+      {
+        tag: "Şart şart",
+        title: "Dürüst bir eşleşme",
+        body: "“%78 kabul edilirsin” yok. Bunun yerine: 9 zorunlu şartın 7'sini karşılıyorsun — kalan ikisi de kaynak bağlantısıyla birlikte satır satır yazıyor.",
+      },
+      {
+        tag: "Eksik planı",
+        title: "Eksikleri kapatma planı",
+        body: "Hangi sınav, kaç puan, ne zamana kadar. “IELTS 6.0'ın var, 6.5 lazım — tek sınav tekrarıyla kapanır.”",
+      },
+      {
+        tag: "Takvim",
+        title: "Tek başvuru takvimi",
+        body: "UCAS, Studielink, uni-assist, Parcoursup, Campus France ayrı ayrı değil; kendi programlarından çıkan tek bir liste.",
+      },
+      {
+        tag: "Tazelik",
+        title: "Kaynak takibi",
+        body: "Üniversitenin şart sayfası değişince kartta rozet çıkıyor: “Katalogda 11.400 → Sayfada geçen 14.000”. AI yok, parmak izi karşılaştırması var.",
+      },
+    ],
+
+    statPrograms: "program",
+    statCountries: "ülke",
+    statSystems: "başvuru sistemi",
+
+    closingTitle: "Bir dakikanı ayır, tercihini veriyle yap.",
+    closingBody:
+      "Profil sihirbazı yaklaşık altmış saniye sürüyor. Hesap açman gerekmiyor — anahtar yoksa profilin bu tarayıcıda kalır.",
+  },
+
   auth: {
     signInTitle: "Tekrar hoş geldin",
     signInBody: "Profilin ve kısa listen hesabına kayıtlı.",
@@ -425,6 +481,53 @@ const en: Dictionary = {
     honestyTitle: "What we will not promise you",
     honestyBody:
       "Beyond will never say \"you have a 78% chance of admission.\" European admissions are mostly threshold-based and acceptance statistics are not public; inventing a probability would not help you. Instead we show exactly which requirements you meet and which you do not, each with its source.",
+  },
+
+  landingJourney: {
+    eyebrow: "From Istanbul to Europe",
+    title: "Your route starts in Istanbul. Let the evidence decide where it ends.",
+    body: "Beyond takes your profile, walks every program in the catalogue requirement by requirement, and gives you three things: an honest account of what you meet, a concrete plan for what you do not, and every application date in one calendar.",
+    ctaPrimary: "Build my profile",
+    ctaSecondary: "See the route",
+
+    mapTitle: "A route from Istanbul to university cities across Europe",
+    mapDesc:
+      "A schematic route map: four stops starting in Istanbul and running through Delft, Oxford, Paris and Milan. The routes are drawn one by one as you scroll. Everything the map shows is also written out in the text beside it.",
+    originLabel: "Istanbul",
+    originNote: "Your starting point",
+    stopPrograms: "{count} programs in the catalogue",
+
+    stopsTitle: "What happens along the route?",
+    stops: [
+      {
+        tag: "Requirement by requirement",
+        title: "An honest match",
+        body: "No “78% chance of admission.” Instead: you meet 7 of 9 required conditions — and the two you miss are spelled out line by line, each with a link to its source.",
+      },
+      {
+        tag: "Gap plan",
+        title: "A plan to close the gaps",
+        body: "Which test, what score, by when. “You have IELTS 6.0 and need 6.5 — one retake closes it.”",
+      },
+      {
+        tag: "Timeline",
+        title: "One application calendar",
+        body: "Not UCAS, Studielink, uni-assist, Parcoursup and Campus France separately — one list built from your own programs.",
+      },
+      {
+        tag: "Freshness",
+        title: "Source tracking",
+        body: "When a university's requirements page changes, a badge appears on the card: “Catalogue says 11,400 → the page shows 14,000”. No AI — a fingerprint comparison.",
+      },
+    ],
+
+    statPrograms: "programs",
+    statCountries: "countries",
+    statSystems: "application systems",
+
+    closingTitle: "Give it a minute, then decide on evidence.",
+    closingBody:
+      "The profile wizard takes about sixty seconds. No account needed — without keys your profile simply stays in this browser.",
   },
 
   auth: {

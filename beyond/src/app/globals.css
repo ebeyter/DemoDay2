@@ -402,6 +402,98 @@ header .truncate {
   }
 }
 
+/* ===========================================================================
+   AKIŞ DÜĞMESİ (.flow-button)
+
+   Üzerine gelince ortadan büyüyen bir daire düğmeyi dolduruyor, köşeler
+   hapdan dikdörtgene dönüyor ve varsa ok sağa kayıyor.
+
+   OK EKLEMİYOR. Daire ve köşe animasyonu her düğmede çalışıyor ama ok
+   yalnızca JSX'te zaten varsa (`.flow-arrow`) kayıyor — oku olmayan bir
+   düğmeye CSS ile ok takmak, "Rotayı gör" gibi yön bildirmeyen bir eylemi
+   yönlü gösterirdi.
+
+   SABİT RENK YOK. Örnek uygulamada #111111/#333333 vardı; burada her şey
+   tema değişkeninden geliyor, o yüzden koyu temada ve dört aksanın hepsinde
+   doğru çalışıyor.
+   =========================================================================== */
+
+.flow-button {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  isolation: isolate;
+  transition:
+    border-radius 600ms cubic-bezier(0.23, 1, 0.32, 1),
+    color 400ms ease,
+    border-color 400ms ease;
+}
+
+.flow-button:hover {
+  border-radius: 12px;
+}
+
+/* Büyüyen daire. Ayrı bir eleman gerekmiyor — `::before` yetiyor, yani
+   düğmenin JSX'ine dokunmadan çalışıyor. */
+.flow-button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  background: var(--color-accent);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0);
+  transition:
+    transform 800ms cubic-bezier(0.19, 1, 0.22, 1),
+    opacity 800ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.flow-button:hover::before {
+  opacity: 1;
+  /* Daire düğmenin köşelerini de kapatacak kadar büyüyor. */
+  transform: translate(-50%, -50%) scale(30);
+}
+
+.flow-button:hover {
+  color: var(--color-on-fill);
+  border-color: transparent;
+}
+
+/* Dolu (primary) düğmede daire aksanın koyu tonuyla geliyor: zaten aksan
+   zemindeyken aynı rengi büyütmek görünmez bir animasyon olurdu. */
+.flow-button.bg-accent::before {
+  background: var(--color-accent-hover);
+}
+
+/* Ok — yalnızca varsa. */
+.flow-arrow {
+  display: inline-block;
+  transition: transform 800ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.flow-button:hover .flow-arrow {
+  transform: translateX(0.35rem);
+}
+
+.flow-button:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-button,
+  .flow-button::before,
+  .flow-arrow {
+    transition: none !important;
+  }
+  .flow-button:active {
+    transform: none;
+  }
+}
+
 body {
   background: var(--color-canvas);
   color: var(--color-ink);

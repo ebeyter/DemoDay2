@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { JourneyStops } from "@/components/landing/Journey";
 import { LandingNav } from "@/components/landing/LandingNav";
+import { CountUp } from "@/components/landing/CountUp";
 import { LandingStage } from "@/components/landing/LandingStage";
 import { LEG_COUNT } from "@/components/landing/route";
 import { usePrefersReducedMotion } from "@/components/landing/use-route-progress";
@@ -243,20 +244,40 @@ export default function LandingPage() {
                 {copy.body}
               </p>
 
+              {/* Üç söz, yan yana. Cümle zaten "üç şey verir" diyor; tek blokta
+                  verildiğinde üçü de kayboluyordu. Dar ekranda alt alta düşüyor. */}
+              <dl
+                className="animate-rise mt-6 grid gap-x-8 gap-y-5 sm:grid-cols-3"
+                style={{ animationDelay: "200ms" }}
+              >
+                {copy.heroPromises.map((promise) => (
+                  <div key={promise.title}>
+                    <dt className="text-[14px] font-semibold text-hero-ink">{promise.title}</dt>
+                    <dd className="mt-1 text-[13px] leading-relaxed text-hero-ink-soft">
+                      {promise.body}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+
               <div
                 className="animate-rise mt-9 flex flex-wrap items-center gap-3"
-                style={{ animationDelay: "240ms" }}
+                style={{ animationDelay: "280ms" }}
               >
                 <Link href={startHref}>
-                  <Button size="lg">
+                  <Button size="lg" className="flow-button">
                     {startLabel}
-                    <span aria-hidden>→</span>
+                    <span aria-hidden className="flow-arrow">
+                      →
+                    </span>
                   </Button>
                 </Link>
+                {/* Bu düğmede ok YOK ve eklenmiyor — akış efekti oku
+                    kendiliğinden getirmiyor, sadece olanı kaydırıyor. */}
                 <Button
                   variant="secondary"
                   size="lg"
-                  className="landing-ghost-button"
+                  className="landing-ghost-button flow-button"
                   onClick={() => goTo(ROUTE_SECTION)}
                 >
                   {copy.ctaSecondary}
@@ -267,10 +288,10 @@ export default function LandingPage() {
                 className="animate-fade mt-10 flex flex-wrap gap-x-10 gap-y-4"
                 style={{ animationDelay: "340ms" }}
               >
-                {stats.map((stat) => (
+                {stats.map((stat, index) => (
                   <div key={stat.label}>
                     <dt className="font-display text-[30px] font-bold leading-none tracking-[-0.03em] text-hero-ink tabular-nums">
-                      {stat.value}
+                      <CountUp value={stat.value} delayMs={420 + index * 130} />
                     </dt>
                     <dd className="mt-1.5 text-[13px] text-hero-ink-soft">{stat.label}</dd>
                   </div>
@@ -368,9 +389,11 @@ export default function LandingPage() {
               {copy.closingBody}
             </p>
             <Link href={startHref} className="mt-9 inline-block">
-              <Button size="lg">
+              <Button size="lg" className="flow-button">
                 {startLabel}
-                <span aria-hidden>→</span>
+                <span aria-hidden className="flow-arrow">
+                  →
+                </span>
               </Button>
             </Link>
           </div>

@@ -99,8 +99,18 @@ const tr = {
    */
   landingJourney: {
     eyebrow: "Türkiye'den Avrupa'ya",
-    title: "Nereden başladığın değil, nereye gidebileceğin önemli.",
-    body: "Beyond profilini alır, katalogdaki her programı şart şart değerlendirir ve üç şey verir: karşıladığın şartların dürüst dökümü, eksikler için somut bir plan ve hepsi tek takvimde toplanmış başvuru tarihleri.",
+    title: "Tahmin etmiyoruz. Şart şart gösteriyoruz.",
+    body: "Beyond profilini alır, katalogdaki her programı şart şart değerlendirir ve üç şey verir:",
+    /**
+     * Açılıştaki üç söz. Paragraf hâlindeyken "üç şey verir" diyip üçünü tek
+     * blokta veriyordu; ayrı ayrı durunca hem okunuyor hem sayılıyor.
+     * Alt satırlar kısa tutuldu — üç sütun dar ekranda alt alta düşüyor.
+     */
+    heroPromises: [
+      { title: "Dürüst döküm", body: "Hangi şartı karşılıyorsun, hangisini karşılamıyorsun" },
+      { title: "Eksik planı", body: "Hangi sınav, kaç puan, ne zamana kadar" },
+      { title: "Tek takvim", body: "Beş ayrı başvuru sistemi değil, tek liste" },
+    ],
     ctaPrimary: "Profilimi oluştur",
     ctaSecondary: "Rotayı gör",
 
@@ -779,8 +789,13 @@ const en: Dictionary = {
 
   landingJourney: {
     eyebrow: "From Türkiye to Europe",
-    title: "Where you start matters less than where you could go.",
-    body: "Beyond takes your profile, walks every program in the catalogue requirement by requirement, and gives you three things: an honest account of what you meet, a concrete plan for what you do not, and every application date in one calendar.",
+    title: "We don't guess. We show you every requirement.",
+    body: "Beyond takes your profile, evaluates every programme in the catalogue requirement by requirement, and gives you three things:",
+    heroPromises: [
+      { title: "An honest breakdown", body: "Which requirements you meet, and which you don't" },
+      { title: "A plan for the gaps", body: "Which test, what score, by when" },
+      { title: "One timeline", body: "Not five application systems — one list" },
+    ],
     ctaPrimary: "Build my profile",
     ctaSecondary: "See the route",
 

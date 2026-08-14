@@ -41,6 +41,10 @@
   --color-danger: #b91c1c;
   --color-danger-soft: #fdecec;
 
+  /* Diyalog perdesi — `text-ink`ten türetilemez, çünkü koyu temada mürekkep
+     açık renge dönüyor ve perde beyazlardı. Ayrı token olmak zorunda. */
+  --color-scrim: rgba(20, 20, 43, 0.45);
+
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
   /* Yumuşak ama abartısız köşeler */
@@ -48,8 +52,215 @@
   --radius-pill: 999px;
 }
 
-:root {
+/* ===========================================================================
+   TEMA — açık / koyu + dört aksan rengi
+   ===========================================================================
+
+   NASIL ÇALIŞIYOR
+   Yukarıdaki `@theme` bloğu Tailwind'in `bg-surface`, `text-ink`, `bg-accent`
+   gibi yardımcı sınıflarını üretiyor; hepsi `var(--color-…)` okuyor. Aşağıdaki
+   bloklar aynı değişkenleri `<html>` üzerindeki `data-theme` / `data-accent`
+   niteliklerine göre yeniden tanımlıyor. Yani tek bir nitelik değişince tüm
+   uygulama yeniden boyanıyor — hiçbir bileşeni değiştirmeye gerek kalmıyor.
+
+   `<html>` = `:root` olduğu için `:root[data-theme="dark"]` (0,2,0) sade
+   `:root` (0,1,0) seçicisini yenip değişkenleri eziyor.
+
+   İLK BOYAMADA FLASH YOK
+   Nitelikleri `src/lib/theme.tsx` içindeki satır içi script, HTML ayrıştırılırken
+   yani React yüklenmeden önce koyuyor. Sunucu `data-theme="light"` yazıyor,
+   script gerekirse ilk boyamadan önce düzeltiyor.
+
+   SABİT RENK YAZMA
+   Yeni bir renk gerekiyorsa buraya bir değişken ekle ve bileşende tokenı kullan.
+   Bileşene `#hex` yazmak, o rengin koyu temada kırılması demek.
+   --------------------------------------------------------------------------- */
+
+/* --- Açık tema: nötrler, bantlar, uyarı ---------------------------------- */
+:root,
+:root[data-theme="light"] {
   color-scheme: light;
+
+  --color-canvas: #fbfbfd;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f6f6f9;
+
+  --color-line: #e6e6ee;
+  --color-line-strong: #d3d3e0;
+
+  --color-ink: #14142b;
+  --color-ink-soft: #55556d;
+  --color-ink-faint: #8a8aa3;
+
+  --color-band-safety: #0e7490;
+  --color-band-safety-soft: #e7f5f8;
+  --color-band-match: #15803d;
+  --color-band-match-soft: #e8f6ec;
+  --color-band-reach: #b45309;
+  --color-band-reach-soft: #fdf3e3;
+  --color-band-far: #6b7280;
+  --color-band-far-soft: #f1f2f4;
+
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fdecec;
+
+  --color-scrim: rgba(20, 20, 43, 0.45);
+
+  /* Dolgu rengi üzerine gelen yazının rengi — bkz. aşağıdaki `.text-white` kuralı. */
+  --color-on-fill: #ffffff;
+}
+
+/* --- Koyu tema: nötrler, bantlar, uyarı ----------------------------------
+   Bantların koyu karşılıkları ayrıca seçildi: açık temadaki `-soft` tonlar
+   neredeyse beyaz, koyu zeminde okunmuyor. Her bant için hem koyu bir zemin
+   hem de üstünde okunan açık bir yazı rengi var.
+   ------------------------------------------------------------------------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-canvas: #0d0d14;
+  --color-surface: #16161f;
+  --color-surface-soft: #1f1f2b;
+
+  --color-line: #292936;
+  --color-line-strong: #3d3d4e;
+
+  --color-ink: #ececf4;
+  --color-ink-soft: #adadc1;
+  --color-ink-faint: #8b8ba4;
+
+  --color-band-safety: #67c8dd;
+  --color-band-safety-soft: #10303a;
+  --color-band-match: #5fd894;
+  --color-band-match-soft: #0f2e1e;
+  --color-band-reach: #f2b872;
+  --color-band-reach-soft: #3a2810;
+  --color-band-far: #a5a5b8;
+  --color-band-far-soft: #26262f;
+
+  --color-danger: #f79a9a;
+  --color-danger-soft: #3a1616;
+
+  --color-scrim: rgba(3, 3, 8, 0.66);
+
+  --color-on-fill: #12121c;
+}
+
+/* --- Aksan renkleri -------------------------------------------------------
+   Koyu temada aksan AÇIK bir ton: `text-accent` uygulamada otuzdan fazla yerde
+   koyu zemin üzerinde yazı olarak kullanılıyor, koyu bir aksan orada okunmazdı.
+   Bunun bedeli `bg-accent text-white` kalıbının ters dönmesi; onu da aşağıdaki
+   tek kural çözüyor.
+   ------------------------------------------------------------------------- */
+
+/* Aksanların ana tonu, aktif seçimden BAĞIMSIZ olarak da erişilebilir olmalı:
+   ayarlardaki renk seçicinin dört örneği aynı anda gösterebilmesi gerekiyor.
+   Bileşen bu değişkeni adıyla okuyor, sabit renk yazmıyor. */
+:root {
+  --accent-indigo: #3730a3;
+  --accent-teal: #0f766e;
+  --accent-violet: #7c3aed;
+  --accent-rose: #be185d;
+}
+:root[data-theme="dark"] {
+  --accent-indigo: #a5b4fc;
+  --accent-teal: #5eead4;
+  --accent-violet: #c4b5fd;
+  --accent-rose: #fda4c4;
+}
+
+/* indigo — varsayılan */
+:root[data-accent="indigo"] {
+  --color-accent: var(--accent-indigo);
+  --color-accent-hover: #2f2a8c;
+  --color-accent-soft: #eef0fd;
+  --color-accent-line: #c9caf5;
+}
+:root[data-theme="dark"][data-accent="indigo"] {
+  --color-accent: var(--accent-indigo);
+  --color-accent-hover: #c7d2fe;
+  --color-accent-soft: #1e1b3d;
+  --color-accent-line: #383066;
+}
+
+/* deniz yeşili */
+:root[data-accent="teal"] {
+  --color-accent: var(--accent-teal);
+  --color-accent-hover: #115e59;
+  --color-accent-soft: #e6f4f2;
+  --color-accent-line: #a5d6cf;
+}
+:root[data-theme="dark"][data-accent="teal"] {
+  --color-accent: var(--accent-teal);
+  --color-accent-hover: #99f6e4;
+  --color-accent-soft: #0d2f2c;
+  --color-accent-line: #1f5450;
+}
+
+/* mor */
+:root[data-accent="violet"] {
+  --color-accent: var(--accent-violet);
+  --color-accent-hover: #6d28d9;
+  --color-accent-soft: #f3ecfe;
+  --color-accent-line: #d5c2fb;
+}
+:root[data-theme="dark"][data-accent="violet"] {
+  --color-accent: var(--accent-violet);
+  --color-accent-hover: #ddd6fe;
+  --color-accent-soft: #251a45;
+  --color-accent-line: #443076;
+}
+
+/* gül */
+:root[data-accent="rose"] {
+  --color-accent: var(--accent-rose);
+  --color-accent-hover: #9f1239;
+  --color-accent-soft: #fdeaf2;
+  --color-accent-line: #f6c2d8;
+}
+:root[data-theme="dark"][data-accent="rose"] {
+  --color-accent: var(--accent-rose);
+  --color-accent-hover: #fecdd8;
+  --color-accent-soft: #3a1327;
+  --color-accent-line: #6b2647;
+}
+
+/* ---------------------------------------------------------------------------
+   Dolgu üzerindeki yazı — `bg-accent text-white` kalıbının onarımı
+
+   Uygulamada altı yerde `bg-accent text-white` var (buton, çip, numaralı
+   madde rozetleri) ve bir yerde `bg-band-safety text-white`. Koyu temada bu
+   dolgular AÇIK renge döndüğü için beyaz yazı okunmaz hale geliyor.
+
+   Bu kural, o elemanların yazı rengini `--color-on-fill`e bağlıyor: açık temada
+   değer zaten beyaz, yani hiçbir şey değişmiyor; koyu temada koyu lacivert olup
+   okunur hale geliyor. Böylece altı ayrı bileşen dosyasına dokunmak gerekmiyor.
+
+   `:not(:disabled)` neden var: devre dışı butonda `disabled:bg-line-strong`
+   dolguyu koyulaştırıyor ama `bg-accent` sınıfı listede kaldığı için bu kural
+   yine eşleşirdi; o durumda beyaz yazı doğru olan.
+   --------------------------------------------------------------------------- */
+.text-white.bg-accent:not(:disabled),
+.text-white.bg-band-safety,
+.text-white.bg-band-match,
+.text-white.bg-band-reach,
+.text-white.bg-band-far,
+.text-white.bg-danger {
+  color: var(--color-on-fill);
+}
+
+/* ---------------------------------------------------------------------------
+   Form denetimlerinin yerleşik rengi
+
+   Menzil (range) ve onay kutuları iki sayfada `accent-[#3730a3]` ile sabit
+   indigoya bağlanmıştı; aksan rengi değişince orada kalırlardı. `:root` ile
+   özgüllüğü bir tık yükseltip hepsini tokena bağlıyoruz — sabit renk
+   yazmama ilkesi form denetimleri için de geçerli.
+   --------------------------------------------------------------------------- */
+:root input[type="range"],
+:root input[type="checkbox"],
+:root input[type="radio"] {
+  accent-color: var(--color-accent);
 }
 
 body {

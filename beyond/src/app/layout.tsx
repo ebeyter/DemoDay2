@@ -45,10 +45,39 @@ const display = Bricolage_Grotesque({
   display: "swap",
 });
 
+/**
+ * BAĞLANTI ÖNİZLEMESİ — WhatsApp'a/Instagram'a atılınca ilk görünen şey bu.
+ *
+ * Önceki başlık "Yurtdışı üniversite tercihi"ydi: bir kategori adı, bir vaat
+ * değil. Sohbete düşen kartta kimseye ne işe yaradığını söylemiyordu. Başlık
+ * artık kullanıcının kazandığı şeyi söylüyor; açıklama da ürünün asıl
+ * ayrıştığı yeri, yani "tahmin değil, şart şart" duruşunu.
+ *
+ * `metadataBase` olmadan og:image göreli kalıyor ve WhatsApp görseli hiç
+ * çekmiyor — kart yalnızca metin olarak düşüyor.
+ */
+const SITE_URL = "https://demo-day2-tau.vercel.app";
+const TITLE = "Beyond — Kendine en uygun üniversiteyi bul";
+const DESCRIPTION =
+  "Profilini gir, Avrupa ve İngiltere'deki üniversite programlarını şart şart karşılaştır. Hangi şartı karşılıyorsun, hangisini karşılamıyorsun — tahmin değil, kaynağıyla.";
+
 export const metadata: Metadata = {
-  title: "Beyond — Yurtdışı üniversite tercihi",
-  description:
-    "Avrupa ve İngiltere'deki üniversite programlarını profiline göre eşleştir, eksiklerini kapat, başvuru takvimini tek yerden gör.",
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    siteName: "Beyond",
+    locale: "tr_TR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

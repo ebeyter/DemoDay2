@@ -99,7 +99,7 @@ const tr = {
    */
   landingJourney: {
     eyebrow: "Türkiye'den Avrupa'ya",
-    title: "Tahmin etmiyoruz. Şart şart gösteriyoruz.",
+    title: "Profiline en uygun üniversiteyi bul. Şart şart gösteriyoruz.",
     body: "Beyond profilini alır, katalogdaki her programı şart şart değerlendirir ve üç şey verir:",
     /**
      * Açılıştaki üç söz. Paragraf hâlindeyken "üç şey verir" diyip üçünü tek
@@ -805,7 +805,7 @@ const en: Dictionary = {
 
   landingJourney: {
     eyebrow: "From Türkiye to Europe",
-    title: "We don't guess. We show you every requirement.",
+    title: "Find the university that fits your profile. We show you every requirement.",
     body: "Beyond takes your profile, evaluates every programme in the catalogue requirement by requirement, and gives you three things:",
     heroPromises: [
       { title: "An honest breakdown", body: "Which requirements you meet, and which you don't" },

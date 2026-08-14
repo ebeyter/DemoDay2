@@ -58,14 +58,32 @@ export function reconcileLocalProfile(input: ReconcileInput): ReconcileAction {
 
   if (input.serverHasProfile) return "adopt-server";
 
-  // Sunucuda profil yok. Yereldeki damgasız profil bu kişiye ait OLABİLİR
-  // (yerel modda doldurulmuş) ama aynı tarayıcıyı başkası da kullanmış
-  // olabilir; ikisini ayırt etmenin yolu yok. Gizlilik tarafında hata
-  // yapmayı seçiyoruz.
+  // --- Sunucuda bu hesabın profili YOK ------------------------------------
+
+  // KENDİ damgasını taşıyan profil ASLA silinmez.
+  //
+  // BU KURAL BİR REGRESYONU DÜZELTİYOR (2026-08-14): ilk sürümde burada
+  // "clear" dönüyordu, gerekçe "kullanıcı hesabından profilini silmiş
+  // olabilir" idi. Pratikte olan şu oldu: kullanıcı sihirbazı doldurdu,
+  // `saveProfile` yerele yazdı ama sunucuya upsert TUTMADI (tablo/RLS/ağ).
+  // Sonraki oturum olayında bu kural profili sildi ve eşleşme ekranı boş
+  // kaldı — "formu doldurdum, eşleşme göstermedi".
+  //
+  // Doğru okuma: damga zaten "bu veri bu hesaba ait" kanıtıdır; sunucuda
+  // olmaması veri kaybını değil, SENKRON KAYBINI gösterir. Çözüm silmek
+  // değil, yeniden yüklemek (store bunu `keep` görünce yapıyor).
+  //
+  // Gizlilik tarafı bozulmuyor: başkasının damgalı profili yukarıda
+  // temizlendi, damgasız profil aşağıda temizleniyor.
+  if (input.localProfileUserId === input.currentUserId) return "keep";
+
+  // Damgasız profil bu kişiye ait OLABİLİR (yerel modda doldurulmuş) ama aynı
+  // tarayıcıyı başkası da kullanmış olabilir; ayırt etmenin yolu yok.
+  // Gizlilik tarafında hata yapmayı seçiyoruz.
   //
   // Yerel modda doldurulan profili hesaba taşımak isteyen akış bunu KAYIT
-  // ANINDA açık onayla yapmalı; giriş sonrası sessizce benimsemek tam olarak
-  // bu hataya geri döner.
+  // ANINDA açık onayla yapmalı; giriş sonrası sessizce benimsemek gizlilik
+  // hatasına geri döner.
   if (input.hasLocalProfile) return "clear";
 
   return "keep";

@@ -109,8 +109,17 @@ describe("Profil uzlaştırma — kullanıcının kendi verisi korunur", () => {
     ).toBe("adopt-server");
   });
 
-  it("kendi damgalı profili var ama sunucuda YOK: temizler", () => {
-    // Hesabından profilini silmiş olabilir; yerelde hayalet kopya kalmasın.
+  it("kendi damgalı profili var ama sunucuda YOK: KORUR (regresyon)", () => {
+    // BİLDİRİLEN HATA (2026-08-14): "formu doldurdum, eşleşme göstermedi".
+    //
+    // İlk sürümde bu vaka "clear" dönüyordu. Pratikte olan: kullanıcı
+    // sihirbazı doldurdu, saveProfile yerele yazdı ama sunucuya upsert
+    // tutmadı (tablo/RLS/ağ). Sonraki oturum olayında kural profili sildi
+    // ve eşleşme ekranı boşaldı.
+    //
+    // Damga zaten "bu veri bu hesaba ait" kanıtı; sunucuda olmaması veri
+    // kaybını değil senkron kaybını gösterir. Silmek değil, yeniden yüklemek
+    // gerekiyor.
     expect(
       reconcileLocalProfile({
         currentUserId: EDA,
@@ -119,6 +128,6 @@ describe("Profil uzlaştırma — kullanıcının kendi verisi korunur", () => {
         serverHasProfile: false,
         fetchFailed: false,
       })
-    ).toBe("clear");
+    ).toBe("keep");
   });
 });

@@ -206,6 +206,27 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         );
       } else if (action === "clear") {
         clearLocal();
+      } else if (!error && !data?.profile) {
+        // KORUNAN AMA SUNUCUDA OLMAYAN PROFİL = SENKRON KAYBI, VERİ KAYBI DEĞİL.
+        //
+        // Buraya yalnızca profil bu hesabın damgasını taşırken düşülüyor
+        // (bkz. reconcileLocalProfile). Sebep genelde şu: sihirbaz
+        // doldurulurken `saveProfile` yerele yazdı ama sunucuya upsert
+        // tutmadı. Sessizce beklemek profili tek cihaza mahkûm eder ve bir
+        // sonraki tarayıcıda yok olur; o yüzden burada yeniden yüklüyoruz.
+        const own = readPersistent<StudentProfile | null>(PROFILE_KEY, null);
+        if (own && own.userId === user.id) {
+          await supabase.from("beyond_profiles").upsert(
+            {
+              user_id: user.id,
+              profile: own,
+              shortlist: readPersistent<string[]>(SHORTLIST_KEY, EMPTY_STRING_ARRAY),
+              compare_list: readPersistent<string[]>(COMPARE_KEY, EMPTY_STRING_ARRAY),
+              updated_at: own.updatedAt ?? new Date().toISOString(),
+            },
+            { onConflict: "user_id" }
+          );
+        }
       }
 
       // Uzlaştırma bitti; sayfalar artık render edebilir. Bu satır olmadan

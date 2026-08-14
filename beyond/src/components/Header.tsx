@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useLocale } from "@/lib/i18n/context";
 import { useStore } from "@/lib/store";
 import { Button, cx } from "./ui";
+import { LogoMark } from "./Logo";
 
 export function Header() {
   const { t, locale, toggleLocale } = useLocale();
@@ -45,10 +46,13 @@ export function Header() {
       <div className="mx-auto max-w-6xl px-5 h-16 flex items-center gap-6">
         <Link
           href="/"
-          className="text-[17px] font-semibold tracking-[-0.03em] text-ink shrink-0"
+          className="flex items-center gap-2 text-[17px] font-semibold tracking-[-0.03em] text-ink shrink-0"
         >
-          {t.brand.name}
-          <span className="text-accent">.</span>
+          <LogoMark size={22} />
+          <span>
+            {t.brand.name}
+            <span className="text-accent">.</span>
+          </span>
         </Link>
 
         <nav className="hidden sm:flex items-center gap-1 flex-1">

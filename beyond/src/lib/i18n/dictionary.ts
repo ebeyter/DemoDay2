@@ -44,6 +44,9 @@ const tr = {
     timeline: "Takvim",
     profile: "Profilim",
     gapPlan: "Eksik planım",
+    discover: "Keşfet",
+    myList: "Listem",
+    settings: "Ayarlar",
   },
 
   landing: {
@@ -107,8 +110,13 @@ const tr = {
       "Şematik bir rota haritası: İstanbul'dan başlayıp Delft, Oxford, Paris ve Milano'ya uzanan dört durak. Sayfayı kaydırdıkça rotalar sırayla çiziliyor. Haritanın taşıdığı bilgilerin tamamı yanındaki metinde de yazıyor.",
     originLabel: "İstanbul",
     originNote: "Başlangıç noktan",
-    /** Durak etiketindeki alt satır — {count} katalogdan geliyor. */
-    stopPrograms: "katalogda {count} program",
+    /**
+     * Durak etiketindeki alt satır — {count} katalogdan geliyor.
+     * Kısa tutuluyor: harita üzerinde sola dayalı etiketlerin sığacağı yer dar,
+     * uzun metin çerçeveden taşıp kırpılıyordu. Ülke adı haritanın altındaki
+     * şeritte zaten yazıyor.
+     */
+    stopPrograms: "{count} program",
 
     stopsTitle: "Rotada ne oluyor?",
     stops: [
@@ -673,6 +681,9 @@ const en: Dictionary = {
     timeline: "Timeline",
     profile: "My profile",
     gapPlan: "My gap plan",
+    discover: "Discover",
+    myList: "My list",
+    settings: "Settings",
   },
 
   landing: {
@@ -728,7 +739,7 @@ const en: Dictionary = {
       "A schematic route map: four stops starting in Istanbul and running through Delft, Oxford, Paris and Milan. The routes are drawn one by one as you scroll. Everything the map shows is also written out in the text beside it.",
     originLabel: "Istanbul",
     originNote: "Your starting point",
-    stopPrograms: "{count} programs in the catalogue",
+    stopPrograms: "{count} programs",
 
     stopsTitle: "What happens along the route?",
     stops: [

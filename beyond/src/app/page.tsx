@@ -1,8 +1,13 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
-import { Journey } from "@/components/landing/Journey";
+import { JourneyStops } from "@/components/landing/Journey";
+import { LandingNav } from "@/components/landing/LandingNav";
+import { LandingStage } from "@/components/landing/LandingStage";
+import { LEG_COUNT } from "@/components/landing/route";
+import { usePrefersReducedMotion } from "@/components/landing/use-route-progress";
 import { Button, Card } from "@/components/ui";
 import { useLocale } from "@/lib/i18n/context";
 import { useStore } from "@/lib/store";
@@ -11,30 +16,37 @@ import { COUNTRIES } from "@/data/taxonomy";
 import "./landing.css";
 
 /**
- * Landing — "Türkiye'den Avrupa'ya" rotası üzerine kurulu.
+ * Landing — beş tam ekran bölüm, tek kalıcı görsel.
  *
- * TAM SAYFA BÖLÜMLER
- * Sayfa `main` içinde kendi kaydırma bağlamını kuruyor ve her bölüm bir
- * durak noktası (`snap-start`). Kaydırma `proximity`, `mandatory` DEĞİL:
- * zorunlu tutturma, bir bölüm ekrandan uzun olduğunda (küçük telefon, büyük
- * yazı tipi) alt kısmı erişilemez hale getiriyor. Yakınlık modu aynı "yerine
- * oturma" hissini veriyor ama içeriği kilitlemiyor.
+ * YAPI
+ * `main` kendi kaydırma bağlamını kuruyor ve her bölüm bir durak noktası
+ * (`scroll-snap`). Harita sayfayla birlikte akmıyor: sabit duruyor ve
+ * bölümden bölüme taşınıp ölçekleniyor (bkz. LandingStage). Böylece sayfa
+ * slayt gösterisi değil, tek bir nesnenin etrafında dönen bir anlatı oluyor.
  *
- * KOYU AÇILIŞ
- * İlk iki bölüm her iki temada da koyu (`--color-hero-*`). Bilinçli bir
- * sahne: ürün "sınırların ötesi" diyor, açılış gece göğü, rota orada
- * parlıyor. Sayfanın geri kalanı normal tema renklerinde.
+ * TUTTURMA `proximity`, `mandatory` DEĞİL — bir bölüm ekrandan uzun olduğunda
+ * (küçük telefon, büyük yazı tipi, uzun çeviri) zorunlu tutturma alt kısmı
+ * erişilemez hale getiriyor.
+ *
+ * KOYU AÇILIŞ. İlk iki bölüm her iki temada da koyu; ürün "sınırların ötesi"
+ * diyor, açılış gece göğü ve rota orada parlıyor.
  *
  * Sayfadaki hiçbir sayı elle yazılmadı: program, ülke ve başvuru sistemi
- * sayıları katalogdan türetiliyor. Katalog büyüyünce landing de büyür.
- *
- * Sayfada kabul olasılığı veya yüzde vaadi yok. Ürünün duruşu bu; landing
- * de aynı şeyi söylemek zorunda, yoksa ilk ekran ürünün kendisiyle çelişir.
+ * sayıları katalogdan türetiliyor. Kabul olasılığı veya yüzde vaadi yok —
+ * ürünün duruşu bu, landing de aynı şeyi söylemek zorunda.
  */
+
+/** Rota bölümünün indeksi — sahne duruşları ve adım animasyonu buna bakıyor. */
+const ROUTE_SECTION = 1;
+
+/** Rota duraklarının otomatik ilerleme aralığı. */
+const STEP_MS = 3200;
+
 export default function LandingPage() {
   const { t } = useLocale();
   const { profile } = useStore();
   const copy = t.landingJourney;
+  const reduced = usePrefersReducedMotion();
 
   const countryCount = Object.keys(COUNTRIES).length;
   // Başvuru sistemi sayısı da katalogdan: ülkelerin sistemlerinin birleşimi.
@@ -49,84 +61,187 @@ export default function LandingPage() {
   const startHref = profile ? "/results" : "/profile";
   const startLabel = profile ? t.nav.results : copy.ctaPrimary;
 
+  const navLabels = [
+    copy.navSections.hero,
+    copy.navSections.route,
+    copy.navSections.problem,
+    copy.navSections.honesty,
+    copy.navSections.close,
+  ];
+
+  // --- Aktif bölüm ---------------------------------------------------------
+  const scrollRef = useRef<HTMLElement>(null);
+  const sectionRefs = useRef<Array<HTMLElement | null>>([]);
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    const elements = sectionRefs.current.filter((element): element is HTMLElement =>
+      Boolean(element)
+    );
+    if (elements.length === 0) return;
+
+    // Ekranın ortasındaki bölüm aktif sayılıyor: eşik tabanlı bir ölçüm,
+    // ekrandan uzun bölümlerde hiç tetiklenmeyebiliyordu.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const index = elements.indexOf(entry.target as HTMLElement);
+          if (index >= 0) setActive(index);
+        }
+      },
+      { rootMargin: "-45% 0px -45% 0px", threshold: 0 }
+    );
+
+    elements.forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
+
+  /**
+   * Bölüme git.
+   *
+   * DOĞRUDAN ATAMA, YUMUŞAK KAYDIRMA DEĞİL. Bu kap bir `scroll-snap`
+   * konteyneri ve Chrome, yumuşak kaydırma animasyonu sürerken tutturmayı
+   * yeniden uygulayıp hareketi başladığı yere geri alıyor: `scrollIntoView`,
+   * `scrollTo({behavior:"smooth"})` ve CSS `scroll-behavior: smooth` — üçü de
+   * denendi, `scrollTop` 0'da kaldı. Kare kare `requestAnimationFrame` ile
+   * yumuşatmak da güvenilir değil; sekme ön planda değilken rAF kısıtlanıyor
+   * ve düğme hiç çalışmıyor.
+   *
+   * Anlık atlama her koşulda çalışıyor. Zaten bir "şu bölüme git" düğmesi;
+   * asıl gezinme tekerlekle ve orada tutturma kendi yumuşaklığını veriyor.
+   */
+  const goTo = useCallback((index: number) => {
+    const container = scrollRef.current;
+    const target = sectionRefs.current[index];
+    if (!container || !target) return;
+    container.scrollTop = target.offsetTop;
+  }, []);
+
+  // --- Rota adımları -------------------------------------------------------
+  const [step, setStep] = useState(0);
+  const [pinned, setPinned] = useState(false);
+
+  useEffect(() => {
+    if (reduced || pinned) return;
+    if (active !== ROUTE_SECTION) return;
+    if (step >= LEG_COUNT) return;
+
+    const timer = window.setTimeout(() => setStep((current) => current + 1), STEP_MS);
+    return () => window.clearTimeout(timer);
+  }, [active, step, pinned, reduced]);
+
+  const progress = reduced ? LEG_COUNT : step;
+
   return (
     <>
       <Header />
 
-      <main className="landing-scroll">
+      <main ref={scrollRef} className="landing-scroll">
+        {/* Kalıcı görsel: bölümden bölüme taşınan harita. */}
+        <LandingStage active={active} progress={progress} reduced={reduced} />
+
+        <LandingNav labels={navLabels} active={active} onSelect={goTo} />
+
         {/* =================================================================
-            1 — Açılış
+            0 — Açılış
             ================================================================= */}
-        <section className="landing-page landing-dark">
-          {/* Işık lekeleri. `aria-hidden` ve pointer-events yok: tamamen
-              dekoratif, ekran okuyucuya ve fareye görünmüyor. */}
+        <section ref={(element) => {
+            sectionRefs.current[0] = element;
+          }} className="landing-page landing-dark">
           <div className="landing-aurora" aria-hidden />
 
           <div className="landing-inner">
-            <p className="landing-eyebrow animate-fade">{copy.eyebrow}</p>
+            <div className="max-w-xl">
+              <p className="landing-eyebrow animate-fade">{copy.eyebrow}</p>
 
-            <h1
-              className="animate-rise mt-5 font-display text-[clamp(2.4rem,7vw,5.2rem)] font-bold leading-[0.98] tracking-[-0.035em] text-hero-ink"
-              style={{ animationDelay: "60ms" }}
-            >
-              {copy.title}
-            </h1>
+              <h1
+                className="animate-rise mt-5 font-display text-[clamp(2rem,4.2vw,3.5rem)] font-bold leading-[1] tracking-[-0.035em] text-hero-ink"
+                style={{ animationDelay: "60ms" }}
+              >
+                {copy.title}
+              </h1>
 
-            <p
-              className="animate-rise mt-7 max-w-2xl text-[17px] leading-relaxed text-hero-ink-soft sm:text-[19px]"
-              style={{ animationDelay: "150ms" }}
-            >
-              {copy.body}
-            </p>
+              <p
+                className="animate-rise mt-6 text-[16px] leading-relaxed text-hero-ink-soft sm:text-[17px]"
+                style={{ animationDelay: "150ms" }}
+              >
+                {copy.body}
+              </p>
 
-            <div
-              className="animate-rise mt-10 flex flex-wrap items-center gap-3"
-              style={{ animationDelay: "240ms" }}
-            >
-              <Link href={startHref}>
-                <Button size="lg">
-                  {startLabel}
-                  <span aria-hidden>→</span>
-                </Button>
-              </Link>
-              <a href="#how">
-                <Button variant="secondary" size="lg" className="landing-ghost-button">
+              <div
+                className="animate-rise mt-9 flex flex-wrap items-center gap-3"
+                style={{ animationDelay: "240ms" }}
+              >
+                <Link href={startHref}>
+                  <Button size="lg">
+                    {startLabel}
+                    <span aria-hidden>→</span>
+                  </Button>
+                </Link>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  className="landing-ghost-button"
+                  onClick={() => goTo(ROUTE_SECTION)}
+                >
                   {copy.ctaSecondary}
                 </Button>
-              </a>
-            </div>
+              </div>
 
-            <dl
-              className="animate-fade mt-14 flex flex-wrap gap-x-12 gap-y-5"
-              style={{ animationDelay: "340ms" }}
-            >
-              {stats.map((stat) => (
-                <div key={stat.label}>
-                  <dt className="font-display text-[38px] font-bold leading-none tracking-[-0.03em] text-hero-ink tabular-nums">
-                    {stat.value}
-                  </dt>
-                  <dd className="mt-1.5 text-[13px] text-hero-ink-soft">{stat.label}</dd>
-                </div>
-              ))}
-            </dl>
+              <dl
+                className="animate-fade mt-10 flex flex-wrap gap-x-10 gap-y-4"
+                style={{ animationDelay: "340ms" }}
+              >
+                {stats.map((stat) => (
+                  <div key={stat.label}>
+                    <dt className="font-display text-[30px] font-bold leading-none tracking-[-0.03em] text-hero-ink tabular-nums">
+                      {stat.value}
+                    </dt>
+                    <dd className="mt-1.5 text-[13px] text-hero-ink-soft">{stat.label}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
           </div>
 
-          <a href="#how" className="landing-scroll-cue" aria-label={copy.ctaSecondary}>
+          <button
+            type="button"
+            onClick={() => goTo(ROUTE_SECTION)}
+            className="landing-scroll-cue"
+            aria-label={copy.ctaSecondary}
+          >
             <span aria-hidden>↓</span>
-          </a>
+          </button>
         </section>
 
         {/* =================================================================
-            2 — Rota (koyu bölüm, sayfanın kalbi)
+            1 — Rota (sayfanın kalbi; harita bu bölümde tam görünür)
             ================================================================= */}
-        <Journey />
+        <section ref={(element) => {
+            sectionRefs.current[1] = element;
+          }} id="how" className="landing-page landing-dark">
+          <div className="landing-inner">
+            <div className="ml-auto w-full max-w-md lg:max-w-lg">
+              <JourneyStops
+                step={step}
+                onSelect={(next) => {
+                  setPinned(true);
+                  setStep(next);
+                }}
+              />
+            </div>
+          </div>
+        </section>
 
         {/* =================================================================
-            3 — Neden zor?
+            2 — Neden zor?
             ================================================================= */}
-        <section className="landing-page">
+        <section ref={(element) => {
+            sectionRefs.current[2] = element;
+          }} className="landing-page landing-tint">
           <div className="landing-inner">
-            <h2 className="font-display text-[clamp(1.9rem,4.4vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em] text-ink">
+            <h2 className="max-w-2xl font-display text-[clamp(1.9rem,4.4vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em] text-ink">
               {t.landing.problemTitle}
             </h2>
             <div className="mt-10 grid gap-4 sm:grid-cols-3">
@@ -148,9 +263,11 @@ export default function LandingPage() {
         </section>
 
         {/* =================================================================
-            4 — Dürüstlük notu: ürünün konumlandırması
+            3 — Dürüstlük notu: ürünün konumlandırması
             ================================================================= */}
-        <section className="landing-page">
+        <section ref={(element) => {
+            sectionRefs.current[3] = element;
+          }} className="landing-page landing-tint landing-tint-strong">
           <div className="landing-inner max-w-3xl">
             <h2 className="font-display text-[clamp(1.9rem,4.4vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em] text-ink">
               {t.landing.honestyTitle}
@@ -162,9 +279,12 @@ export default function LandingPage() {
         </section>
 
         {/* =================================================================
-            5 — Kapanış
+            4 — Kapanış
             ================================================================= */}
-        <section className="landing-page">
+        <section ref={(element) => {
+            sectionRefs.current[4] = element;
+          }} className="landing-page landing-dark">
+          <div className="landing-aurora" aria-hidden />
           <div className="landing-inner max-w-2xl text-center">
             <h2 className="font-display text-[clamp(1.9rem,4.4vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em] text-ink">
               {copy.closingTitle}

@@ -61,7 +61,9 @@ export const STOPS: RouteStop[] = [
     country: null,
     lon: ORIGIN_CENTROID[0],
     lat: ORIGIN_CENTROID[1],
-    label: { align: "end", dy: 34 },
+    // Etiket ülkenin ALTINA konuyor: üstünde durduğunda sınırın içini
+    // kapatıyor ve "başlangıç ülkesi" vurgusu kayboluyordu.
+    label: { align: "end", dy: 84 },
   },
   { city: "Delft", country: "NL", lon: 4.36, lat: 52.01, label: { align: "start", dy: -26 } },
   { city: "Oxford", country: "GB", lon: -1.26, lat: 51.75, label: { align: "end", dy: 0 } },

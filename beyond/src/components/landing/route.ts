@@ -65,9 +65,9 @@ export const STOPS: RouteStop[] = [
     // kapatıyor ve "başlangıç ülkesi" vurgusu kayboluyordu.
     label: { align: "end", dy: 84 },
   },
-  { city: "Delft", country: "NL", lon: 4.36, lat: 52.01, label: { align: "start", dy: -26 } },
-  { city: "Oxford", country: "GB", lon: -1.26, lat: 51.75, label: { align: "end", dy: 0 } },
-  { city: "Paris", country: "FR", lon: 2.35, lat: 48.86, label: { align: "end", dy: 16 } },
+  { city: "Amsterdam", country: "NL", lon: 4.9, lat: 52.37, label: { align: "start", dy: -24 } },
+  { city: "London", country: "GB", lon: -0.13, lat: 51.51, label: { align: "end", dy: -4 } },
+  { city: "Paris", country: "FR", lon: 2.35, lat: 48.86, label: { align: "end", dy: 20 } },
   { city: "Milano", country: "IT", lon: 9.19, lat: 45.46, label: { align: "start", dy: 12 } },
 ];
 

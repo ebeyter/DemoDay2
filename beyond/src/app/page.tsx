@@ -39,8 +39,12 @@ import "./landing.css";
 /** Rota bölümünün indeksi — sahne duruşları ve adım animasyonu buna bakıyor. */
 const ROUTE_SECTION = 1;
 
-/** Rota duraklarının otomatik ilerleme aralığı. */
-const STEP_MS = 3200;
+/**
+ * Rota duraklarının otomatik ilerleme aralığı. Yayın çizilme süresinden
+ * (bkz. landing.css `.route-leg`) biraz uzun: bir bacak bitmeden diğeri
+ * başlarsa rota tek bir bulanık hareket gibi görünüyor.
+ */
+const STEP_MS = 1250;
 
 export default function LandingPage() {
   const { t } = useLocale();
@@ -150,6 +154,7 @@ export default function LandingPage() {
             sectionRefs.current[0] = element;
           }} className="landing-page landing-dark">
           <div className="landing-aurora" aria-hidden />
+          <div className="landing-scrim" aria-hidden />
 
           <div className="landing-inner">
             <div className="max-w-xl">
@@ -285,6 +290,7 @@ export default function LandingPage() {
             sectionRefs.current[4] = element;
           }} className="landing-page landing-dark">
           <div className="landing-aurora" aria-hidden />
+          <div className="landing-scrim landing-scrim-center" aria-hidden />
           <div className="landing-inner max-w-2xl text-center">
             <h2 className="font-display text-[clamp(1.9rem,4.4vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em] text-ink">
               {copy.closingTitle}

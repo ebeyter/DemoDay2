@@ -44,7 +44,7 @@ export interface StagePose {
 export const STAGE_POSES: StagePose[] = [
   // Açılış — tam ekran arka plan. Ölçek taban genişliğin iki katı; ekranı
   // taşırıyor ki kenarlarda boşluk kalmasın.
-  { left: 50, top: 50, scale: 2, opacity: 0.3, tone: "dark" },
+  { left: 50, top: 50, scale: 2, opacity: 0.4, tone: "dark" },
   // Rota — solda, tam görünür, sayfanın kalbi.
   { left: 29, top: 50, scale: 0.78, opacity: 1, tone: "dark" },
   // Neden zor — köşeye çekiliyor, kartlara yer bırakıyor.

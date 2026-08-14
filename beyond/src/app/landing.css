@@ -181,6 +181,48 @@ body:has(.landing-scroll) header {
   }
 }
 
+/* --- Metin perdesi --------------------------------------------------------
+   Kalıcı sahne (harita) metnin arkasından geçiyor ve okunurluğu düşürüyordu.
+   Perde, metnin durduğu tarafı bölümün kendi zeminiyle dolduruyor; harita
+   yalnızca boş tarafta görünüyor.
+
+   Katman sırası: bölüm zemini (0) → harita (1) → PERDE (1, DOM'da sonra) →
+   metin (2). Bölümler yığılma bağlamı kurmadığı için perde ile harita aynı
+   düzlemde yarışıyor ve DOM sırası kazanıyor.
+
+   `mask` yerine düz gradyan: `mask` bazı tarayıcılarda tüm bölümü katman
+   olarak yükseltip metni bulanıklaştırıyordu. */
+.landing-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    var(--color-hero-bg) 0%,
+    var(--color-hero-bg) 34%,
+    color-mix(in oklab, var(--color-hero-bg) 72%, transparent) 54%,
+    transparent 76%
+  );
+}
+
+/* Ortalanmış metin için — perde metnin çevresinde toplanıyor. */
+.landing-scrim-center {
+  background: radial-gradient(
+    58% 62% at 50% 50%,
+    var(--color-hero-bg) 0%,
+    color-mix(in oklab, var(--color-hero-bg) 78%, transparent) 46%,
+    transparent 78%
+  );
+}
+
+@media (max-width: 1023px) {
+  /* Dar ekranda metin tam genişlikte; perde de tam kapatıyor. */
+  .landing-scrim {
+    background: color-mix(in oklab, var(--color-hero-bg) 88%, transparent);
+  }
+}
+
 /* Koyu zeminde ikincil buton: `secondary` varyantı açık yüzey varsayıyor. */
 .landing-ghost-button {
   background: transparent;
@@ -441,7 +483,7 @@ body:has(.landing-scroll) header {
    Geçiş süresi yayın çizilme süresi: kaydırmaya bağlıyken 120ms gerekiyordu,
    adım bazlı çizimde o kadar kısa süre yayı "birden belirmiş" gösteriyor. */
 .route-leg {
-  transition: stroke-dashoffset 900ms cubic-bezier(0.33, 0.85, 0.4, 1);
+  transition: stroke-dashoffset 620ms cubic-bezier(0.33, 0.85, 0.4, 1);
   will-change: stroke-dashoffset;
 }
 

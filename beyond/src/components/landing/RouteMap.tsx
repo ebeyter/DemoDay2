@@ -238,10 +238,10 @@ export function RouteMap({
                     isActive ? "text-accent" : reached ? "text-ink" : "text-ink-faint"
                   )}
                 >
-                  {/* Katalog şehirleri iki dilde de katalogdaki gibi yazılır
-                      (Delft, Milano). Başlangıç noktası katalogda yok, adı
-                      sözlükten geliyor: EN'de "Istanbul". */}
-                  {stop.country ? stop.city : copy.originLabel}
+                  {/* Şehir adı katalogdan geliyor; Türkçede farklı söylenenler
+                      sözlükteki `cityNames` ile çevriliyor (London → Londra).
+                      Başlangıç durağı bir şehir değil ülke, adı sözlükten. */}
+                  {stop.country ? (copy.cityNames[stop.city] ?? stop.city) : copy.originLabel}
                 </span>
                 <span className="mt-0.5 block text-[11px] text-ink-faint">
                   {stop.country ? fill(copy.stopPrograms, { count }) : copy.originNote}

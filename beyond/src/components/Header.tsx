@@ -13,15 +13,30 @@ export function Header() {
 
   const hasProfile = Boolean(profile);
 
+  /**
+   * SIRA KARARI: Keşfet, Eşleşmelerim'den SONRA geliyor. Eşleşmelerim
+   * öğrencinin kendi sonucu — varsayılan varış noktası o. Keşfet gezinme
+   * ekranı; ilk sıraya koymak öğrenciyi kendi sonucundan uzaklaştırırdı.
+   *
+   * Listem ve Takvim aynı listeyi (`shortlist`) gösteriyor. İkisi de her zaman
+   * görünmüyor: Listem liste doluysa çıkıyor, Takvim de öyle. Boş listeyle iki
+   * ayrı boş ekran sunmak navigasyonu şişiriyordu.
+   */
   const links = [
     { href: "/results", label: t.nav.results, show: hasProfile },
+    { href: "/discover", label: t.nav.discover, show: hasProfile },
     { href: "/gap-plan", label: t.nav.gapPlan, show: hasProfile },
     { href: "/compare", label: t.nav.compare, show: compare.length > 0, count: compare.length },
+    {
+      href: "/my-list",
+      label: t.nav.myList,
+      show: shortlist.length > 0,
+      count: shortlist.length,
+    },
     {
       href: "/timeline",
       label: t.nav.timeline,
       show: shortlist.length > 0,
-      count: shortlist.length,
     },
   ].filter((l) => l.show);
 

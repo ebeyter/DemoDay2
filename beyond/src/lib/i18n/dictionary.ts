@@ -109,6 +109,12 @@ const tr = {
     mapDesc:
       "Avrupa haritası: Türkiye vurgulanmış ve oradan Delft, Oxford, Paris ve Milano'ya dört rota uzanıyor. Rotalar sırayla çiziliyor. Haritanın taşıdığı bilgilerin tamamı yanındaki durak listesinde de yazıyor.",
     originLabel: "Türkiye",
+    /**
+     * Şehir adının yerelleşmiş hali. Katalogdaki `city` alanı kaynak dilinde
+     * yazılıyor (London, Milano); Türkçede farklı söylenenler burada
+     * karşılığını buluyor. Listede olmayan şehir katalogdaki adıyla gösterilir.
+     */
+    cityNames: { London: "Londra" } as Record<string, string>,
     originNote: "Türkiye'nin neresinde olursan ol",
     /**
      * Durak etiketindeki alt satır — {count} katalogdan geliyor.
@@ -747,6 +753,7 @@ const en: Dictionary = {
     mapDesc:
       "A map of Europe with Türkiye highlighted and four routes running from it to Delft, Oxford, Paris and Milan. The routes are drawn one after another. Everything the map shows is also written out in the stop list beside it.",
     originLabel: "Türkiye",
+    cityNames: { London: "London" },
     originNote: "Wherever in Türkiye you are",
     stopPrograms: "{count} programs",
 

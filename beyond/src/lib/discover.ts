@@ -104,10 +104,17 @@ export interface UniversityGroup {
   country: CountryCode;
   /** Bu üniversitenin katalogdaki programları, uyuma göre azalan. */
   results: MatchResult[];
-  /** Programların uyum ortalaması. */
-  averagePercent: number;
-  /** En iyi uyumlu programın yüzdesi — sıralama bunu kullanıyor. */
-  bestPercent: number;
+  /**
+   * Programların uyum ortalaması. null = hiçbir programın uyumu
+   * hesaplanamadı (hepsi `unknownOnly`) — "bilmiyoruz" ile "%0" AYNI ŞEY
+   * DEĞİL, o yüzden burada da 0'a düşmüyoruz. Arayüz null'u ayrı göstermeli.
+   */
+  averagePercent: number | null;
+  /**
+   * En iyi uyumlu programın yüzdesi — sıralama bunu kullanıyor. null = bu
+   * üniversitenin hiçbir programının uyumu hesaplanamadı.
+   */
+  bestPercent: number | null;
   /** Elimizdeki en iyi kurumsal bağlantı (bkz. dosya başlığı). */
   link?: string;
   verifiedCount: number;
@@ -119,8 +126,10 @@ export interface CountryGroup {
   country: CountryCode;
   universities: UniversityGroup[];
   programCount: number;
-  averagePercent: number;
-  bestPercent: number;
+  /** null = bu ülkedeki hiçbir programın uyumu hesaplanamadı. */
+  averagePercent: number | null;
+  /** null = bu ülkedeki hiçbir programın uyumu hesaplanamadı. */
+  bestPercent: number | null;
   verifiedCount: number;
 }
 
@@ -149,8 +158,11 @@ export function groupByCountry(results: MatchResult[]): CountryGroup[] {
     else universities.set(university, [result]);
   }
 
-  const average = (values: number[]) =>
-    values.length === 0 ? 0 : Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+  // null = hesaplanacak değer yok. 0 dönersek "hesapladık ve sıfır çıktı"
+  // ile "hiç hesaplayamadık" karışır — tam da bu dosyanın kaçınmaya
+  // çalıştığı hata, burada da yapmıyoruz.
+  const average = (values: number[]): number | null =>
+    values.length === 0 ? null : Math.round(values.reduce((a, b) => a + b, 0) / values.length);
 
   const countries: CountryGroup[] = [];
 
@@ -172,7 +184,7 @@ export function groupByCountry(results: MatchResult[]): CountryGroup[] {
         country,
         results: sorted,
         averagePercent: average(percents),
-        bestPercent: percents.length === 0 ? 0 : Math.max(...percents),
+        bestPercent: percents.length === 0 ? null : Math.max(...percents),
         // Programların içinde ilk bulunan fakülte bağlantısı.
         link: sorted.find((r) => r.program.facultyUrl)?.program.facultyUrl,
         verifiedCount: sorted.filter((r) => r.program.verification === "verified").length,
@@ -181,12 +193,17 @@ export function groupByCountry(results: MatchResult[]): CountryGroup[] {
     }
 
     // Aynı gerekçe program sıralamasındaki gibi: eşit uyumda hakkında daha çok
-    // şey bildiğimiz üniversite önce.
-    universities.sort((a, b) =>
-      b.bestPercent !== a.bestPercent
+    // şey bildiğimiz üniversite önce. bestPercent null olanlar (hiçbir programı
+    // hesaplanamayan üniversiteler) compareByFit'teki unknownOnly gibi en sona.
+    universities.sort((a, b) => {
+      if (a.bestPercent === null || b.bestPercent === null) {
+        if (a.bestPercent === b.bestPercent) return 0;
+        return a.bestPercent === null ? 1 : -1;
+      }
+      return b.bestPercent !== a.bestPercent
         ? b.bestPercent - a.bestPercent
-        : b.knownAtBest - a.knownAtBest
-    );
+        : b.knownAtBest - a.knownAtBest;
+    });
 
     const allResults = universities.flatMap((u) => u.results);
     const allPercents = allResults
@@ -201,11 +218,19 @@ export function groupByCountry(results: MatchResult[]): CountryGroup[] {
       // ve öğrenci onları da görmeli.
       programCount: allResults.length,
       averagePercent: average(allPercents),
-      bestPercent: allPercents.length === 0 ? 0 : Math.max(...allPercents),
+      bestPercent: allPercents.length === 0 ? null : Math.max(...allPercents),
       verifiedCount: universities.reduce((sum, u) => sum + u.verifiedCount, 0),
     });
   }
 
-  countries.sort((a, b) => b.bestPercent - a.bestPercent);
+  // bestPercent null olan ülkeler (hiçbir programı hesaplanamayan) en sona —
+  // universities.sort'taki null muamelesiyle aynı gerekçe.
+  countries.sort((a, b) => {
+    if (a.bestPercent === null || b.bestPercent === null) {
+      if (a.bestPercent === b.bestPercent) return 0;
+      return a.bestPercent === null ? 1 : -1;
+    }
+    return b.bestPercent - a.bestPercent;
+  });
   return countries;
 }

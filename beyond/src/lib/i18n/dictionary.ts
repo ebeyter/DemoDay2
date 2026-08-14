@@ -633,7 +633,8 @@ const tr = {
   discover: {
     title: "Keşfet",
     subtitle: "{count} program, {countries} ülke — profiline göre sıralandı",
-    countryHint: "Bir ülkeye gir, üniversiteleri ve bölümlerini uyum oranıyla gör.",
+    countryHint:
+      "Bir ülkeye gir, üniversiteleri ve bölümlerini uyum oranıyla gör. Burada KATALOĞUN TAMAMI var — \"Eşleşmelerim\" ise yalnızca seçtiğin alan ve ülkeleri gösterir, o yüzden buradaki liste daha uzun.",
     bestFit: "En iyi uyum",
     averageFit: "Ortalama",
     programCount: "{count} program",
@@ -656,6 +657,16 @@ const tr = {
     fitUncomputable: "Uyum hesaplanamıyor",
     fitUncomputableHint:
       "Bu programın zorunlu şartlarını kaynak sayfasından okuyamadık. Yüzde uydurmuyoruz.",
+    // Şartların çoğunu bilmediğimizde yüzde YERİNE bu çıkıyor. "1/1 → %100",
+    // altı şartın altısını bildiğimiz bir %100 ile aynı görünüyordu.
+    fitInsufficient: "Veri yetersiz",
+    fitInsufficientHint:
+      "Bu programın zorunlu şartlarının çok azını biliyoruz; bildiğimiz birkaç şarttan yüzde çıkarmak yanıltıcı olur. Bildiklerimizi aşağıda tek tek görebilirsin.",
+    fitKnownOf: "{mandatory} zorunlu şarttan {known}'i biliniyor",
+    bestFitLabel: "en iyi uyum",
+    outsideTargetCountry:
+      "Bu ülke hedeflerinde yok — programlar burada görünüyor ama \"Eşleşmelerim\" listesine girmiyor.",
+    outsideTargetField: "seçtiğin alanların dışında",
     descriptionNote: "Bu tanıtımı biz yazdık, üniversitenin kendi metni değil — kaynak için resmî siteye bak.",
     urlBlocked: "Bu site otomatik kontrollere kapalı, tarayıcıda açılıyor",
     addToList: "Listeme ekle",
@@ -1268,7 +1279,8 @@ const en: Dictionary = {
   discover: {
     title: "Discover",
     subtitle: "{count} programmes across {countries} countries — ranked for your profile",
-    countryHint: "Open a country to see its universities and their programmes with fit scores.",
+    countryHint:
+      "Open a country to see its universities and their programmes with fit scores. This is the WHOLE catalogue — \"My matches\" only shows the fields and countries you picked, which is why this list is longer.",
     bestFit: "Best fit",
     averageFit: "Average",
     programCount: "{count} programmes",
@@ -1290,6 +1302,14 @@ const en: Dictionary = {
     fitUncomputable: "Fit cannot be calculated",
     fitUncomputableHint:
       "We could not read this programme's mandatory requirements from its source page. We do not invent a percentage.",
+    fitInsufficient: "Not enough data",
+    fitInsufficientHint:
+      "We know too few of this programme's mandatory requirements; a percentage drawn from a couple of them would mislead. What we do know is listed below.",
+    fitKnownOf: "{known} of {mandatory} mandatory requirements known",
+    bestFitLabel: "best fit",
+    outsideTargetCountry:
+      "This country is not among your targets — its programmes show here but not in \"My matches\".",
+    outsideTargetField: "outside the fields you picked",
     descriptionNote: "We wrote this summary — it is not the university's own text. Follow the official site for their wording.",
     urlBlocked: "This site blocks automated checks but opens in a browser",
     addToList: "Add to my list",

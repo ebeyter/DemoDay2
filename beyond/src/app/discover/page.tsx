@@ -98,28 +98,36 @@ export default function DiscoverPage() {
                       </div>
 
                       <div className="text-right shrink-0">
+                        {/* Güvenilir yüzde yoksa SAYI YOK. Önce burada
+                            "%0 en iyi uyum" yazıyordu ve bu, şartlarını
+                            bilmediğimiz bir ülkeyi "hiçbir şeye uymuyorsun"
+                            gibi gösteriyordu. */}
                         <div
                           className={cx(
                             "text-[22px] font-bold tabular-nums leading-none",
-                            group.bestPercent >= 80
-                              ? "text-band-match"
-                              : group.bestPercent >= 50
-                                ? "text-band-reach"
-                                : "text-ink-faint"
+                            !group.hasReliableFit
+                              ? "text-ink-faint"
+                              : group.bestPercent >= 80
+                                ? "text-band-match"
+                                : group.bestPercent >= 50
+                                  ? "text-band-reach"
+                                  : "text-ink-faint"
                           )}
                         >
-                          %{group.bestPercent}
+                          {group.hasReliableFit ? `%${group.bestPercent}` : "—"}
                         </div>
                         <div className="text-[11px] text-ink-faint mt-1">
-                          {t.discover.bestFit}
+                          {group.hasReliableFit ? t.discover.bestFit : t.discover.fitInsufficient}
                         </div>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3 text-[12px] text-ink-faint pt-3 border-t border-line">
-                      <span className="tabular-nums">
-                        {t.discover.averageFit} %{group.averagePercent}
-                      </span>
+                      {group.hasReliableFit && (
+                        <span className="tabular-nums">
+                          {t.discover.averageFit} %{group.averagePercent}
+                        </span>
+                      )}
                       {group.verifiedCount > 0 && (
                         <span>
                           ✓ {fill(t.discover.verifiedCount, { count: group.verifiedCount })}

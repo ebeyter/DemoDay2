@@ -4,7 +4,15 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
-import { BandPill, Button, Card, EmptyState, SectionTitle, VerificationBadge, cx } from "@/components/ui";
+import {
+  BandPill,
+  Button,
+  Card,
+  EmptyState,
+  SectionTitle,
+  VerificationBadge,
+  cx,
+} from "@/components/ui";
 import { FitBadge, FitDetail } from "@/components/FitBadge";
 import { useLocale } from "@/lib/i18n/context";
 import { fill } from "@/lib/i18n/dictionary";
@@ -41,7 +49,9 @@ export default function DiscoverCountryPage() {
    * yapmak gerekiyordu; React 19 lint kuralı da haklı olarak buna itiraz ediyor.
    * Türetmek hem kuralı sağlıyor hem bir render turu kazandırıyor.
    */
-  const [openUniversity, setOpenUniversity] = useState<string | null | undefined>(undefined);
+  const [openUniversity, setOpenUniversity] = useState<
+    string | null | undefined
+  >(undefined);
 
   useEffect(() => {
     if (status === "loading" || profile) return;
@@ -56,13 +66,15 @@ export default function DiscoverCountryPage() {
         fields: [],
         countries: [code],
         includeOutOfReach: true,
-      })
+      }),
     )[0];
   }, [profile, code]);
 
   // En iyi uyumlu üniversite açık başlasın — öğrencinin aradığı şey orada.
   const effectiveOpen =
-    openUniversity === undefined ? (group?.universities[0]?.university ?? null) : openUniversity;
+    openUniversity === undefined
+      ? (group?.universities[0]?.university ?? null)
+      : openUniversity;
 
   if (status === "loading" || !profile) return null;
 
@@ -97,14 +109,32 @@ export default function DiscoverCountryPage() {
         <SectionTitle
           title={`${meta.flag} ${pick(meta.name)}`}
           subtitle={
-            fill(t.discover.universityCount, { count: group.universities.length }) +
+            fill(t.discover.universityCount, {
+              count: group.universities.length,
+            }) +
             " · " +
             fill(t.discover.programCount, { count: group.programCount })
           }
         />
 
+        {/* HEDEF DIŞI ÜLKE UYARISI. Alp'in profilinde hedef yalnızca İngiltere
+            olduğu için "Eşleşmelerim" bir program gösteriyordu, Keşfet ise
+            Hollanda'da %100'ler sıralıyordu — aynı motor, farklı filtre. Fark
+            bir hata değil ama söylenmezse çelişki gibi okunuyor. */}
+        {code !== undefined &&
+          profile.targetCountries.length > 0 &&
+          !profile.targetCountries.includes(code) && (
+            <Card className="p-4 mb-4 border-band-reach/30 bg-band-reach-soft">
+              <p className="text-[13px] text-band-reach leading-relaxed">
+                {t.discover.outsideTargetCountry}
+              </p>
+            </Card>
+          )}
+
         <Card className="p-4 mb-6">
-          <p className="text-[13px] text-ink-soft leading-relaxed">{pick(meta.nonEuNote)}</p>
+          <p className="text-[13px] text-ink-soft leading-relaxed">
+            {pick(meta.nonEuNote)}
+          </p>
         </Card>
 
         <div className="space-y-3">
@@ -113,36 +143,63 @@ export default function DiscoverCountryPage() {
             return (
               <Card key={uni.university} className="overflow-hidden">
                 <button
-                  onClick={() => setOpenUniversity(open ? null : uni.university)}
+                  onClick={() =>
+                    setOpenUniversity(open ? null : uni.university)
+                  }
                   aria-expanded={open}
                   className="w-full text-left p-5 hover:bg-surface-soft transition-colors"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h2 className="text-[16px] font-semibold text-ink">{uni.university}</h2>
-                      {uni.meta?.nameLocal && uni.meta.nameLocal !== uni.university && (
-                        <p className="text-[12px] text-ink-faint">{uni.meta.nameLocal}</p>
-                      )}
+                      <h2 className="text-[16px] font-semibold text-ink">
+                        {uni.university}
+                      </h2>
+                      {uni.meta?.nameLocal &&
+                        uni.meta.nameLocal !== uni.university && (
+                          <p className="text-[12px] text-ink-faint">
+                            {uni.meta.nameLocal}
+                          </p>
+                        )}
                       <p className="text-[13px] text-ink-faint mt-1">
                         {uni.city}
                         {" · "}
-                        {fill(t.discover.programCount, { count: uni.results.length })}
+                        {fill(t.discover.programCount, {
+                          count: uni.results.length,
+                        })}
                         {uni.verifiedCount > 0 &&
-                          " · ✓ " + fill(t.discover.verifiedCount, { count: uni.verifiedCount })}
+                          " · ✓ " +
+                            fill(t.discover.verifiedCount, {
+                              count: uni.verifiedCount,
+                            })}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <span
-                        className={cx(
-                          "text-[18px] font-bold tabular-nums",
-                          uni.bestPercent >= 80
-                            ? "text-band-match"
-                            : uni.bestPercent >= 50
-                              ? "text-band-reach"
-                              : "text-ink-faint"
-                        )}
-                      >
-                        %{uni.bestPercent}
+                      {/* PAYDASIZ DEV YÜZDE KALKTI. Burada tek başına duran
+                          "%100", altındaki programın "4/4 zorunlu şart"
+                          sayacından kopuktu ve en büyük punto olduğu için
+                          ekranın ana iddiası hâline geliyordu. Artık yanında
+                          "en iyi uyum" etiketi var ve güvenilir veri yoksa
+                          sayı hiç yazılmıyor. */}
+                      <span className="flex items-baseline gap-1.5">
+                        <span
+                          className={cx(
+                            "text-[18px] font-bold tabular-nums",
+                            !uni.hasReliableFit
+                              ? "text-ink-faint"
+                              : uni.bestPercent >= 80
+                                ? "text-band-match"
+                                : uni.bestPercent >= 50
+                                  ? "text-band-reach"
+                                  : "text-ink-faint",
+                          )}
+                        >
+                          {uni.hasReliableFit ? `%${uni.bestPercent}` : "—"}
+                        </span>
+                        <span className="text-[11px] text-ink-faint">
+                          {uni.hasReliableFit
+                            ? t.discover.bestFitLabel
+                            : t.discover.fitInsufficient}
+                        </span>
                       </span>
                       <span aria-hidden className="text-ink-faint text-[12px]">
                         {open ? "▲" : "▼"}
@@ -207,7 +264,20 @@ export default function DiscoverCountryPage() {
                                   {result.program.name}
                                 </Link>
                                 <p className="text-[12px] text-ink-faint mt-0.5">
-                                  {pick(FIELDS[result.program.field].name)} · {result.program.degree}
+                                  {pick(FIELDS[result.program.field].name)} ·{" "}
+                                  {result.program.degree}
+                                  {/* "Neden burada %100 ama eşleşmelerimde yok?"
+                                      sorusunun cevabı: bu program seçtiği
+                                      alanların dışında. Uyum oranı yine doğru,
+                                      sadece kendi filtresine takılmıyor. */}
+                                  {profile.fields.length > 0 &&
+                                    !profile.fields.includes(
+                                      result.program.field,
+                                    ) && (
+                                      <span className="ml-2 text-ink-faint opacity-80">
+                                        · {t.discover.outsideTargetField}
+                                      </span>
+                                    )}
                                 </p>
                                 <FitDetail fit={fit} className="mt-2" />
                               </div>
@@ -218,13 +288,19 @@ export default function DiscoverCountryPage() {
                                   <BandPill band={result.band} />
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <VerificationBadge status={result.program.verification} />
+                                  <VerificationBadge
+                                    status={result.program.verification}
+                                  />
                                   <Button
                                     size="sm"
                                     variant={inList ? "primary" : "secondary"}
-                                    onClick={() => toggleShortlist(result.program.id)}
+                                    onClick={() =>
+                                      toggleShortlist(result.program.id)
+                                    }
                                   >
-                                    {inList ? `★ ${t.discover.inList}` : `☆ ${t.discover.addToList}`}
+                                    {inList
+                                      ? `★ ${t.discover.inList}`
+                                      : `☆ ${t.discover.addToList}`}
                                   </Button>
                                 </div>
                               </div>

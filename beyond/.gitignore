@@ -41,3 +41,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Dosya senkronu (iCloud/Dropbox) yinelenmis kopya uretiyor: "programs 2.ts" gibi.
+# Bunlar eski anlik goruntuler; depoya girmemeli ve arac zincirini karistirmamali.
+* 2.*
+* [0-9].*

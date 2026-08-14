@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLocale } from "@/lib/i18n/context";
 import { useStore } from "@/lib/store";
+import { Logo } from "./Logo";
 import { Button, cx } from "./ui";
 
 export function Header() {
@@ -43,12 +44,8 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 bg-surface/85 backdrop-blur-md border-b border-line">
       <div className="mx-auto max-w-6xl px-5 h-16 flex items-center gap-6">
-        <Link
-          href="/"
-          className="text-[17px] font-semibold tracking-[-0.03em] text-ink shrink-0"
-        >
-          {t.brand.name}
-          <span className="text-accent">.</span>
+        <Link href="/" className="shrink-0" aria-label={t.brand.name}>
+          <Logo />
         </Link>
 
         <nav className="hidden sm:flex items-center gap-1 flex-1">

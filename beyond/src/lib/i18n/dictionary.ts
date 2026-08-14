@@ -322,6 +322,8 @@ const tr = {
     system: "Başvuru sistemi",
     deadline: "Son başvuru",
     teachingLanguage: "Eğitim dili",
+    /** Programın çalışma alanı (Mühendislik, İşletme…) — kart ve detay etiketi. */
+    field: "Alan",
     duration: "Süre",
     durationYears: "yıl",
     facultyLink: "Fakülte sayfası",
@@ -977,6 +979,7 @@ const en: Dictionary = {
     system: "Application system",
     deadline: "Deadline",
     teachingLanguage: "Teaching language",
+    field: "Field",
     duration: "Duration",
     durationYears: "years",
     facultyLink: "Faculty page",

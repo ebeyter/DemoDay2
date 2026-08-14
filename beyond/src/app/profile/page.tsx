@@ -5,30 +5,24 @@ import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Button, Card, cx } from "@/components/ui";
 import {
-  BasicsFields,
-  GradeFields,
-  InterestFields,
-  LanguageFields,
-  TargetFields,
-  TestFields,
+  PROFILE_STEPS,
+  ProfileStep,
   emptyProfile,
+  type ProfileStepId,
 } from "@/components/ProfileFields";
 import { useLocale } from "@/lib/i18n/context";
 import { fill } from "@/lib/i18n/dictionary";
 import { useStore } from "@/lib/store";
-import type { StudentProfile } from "@/lib/types";
+import { overallAverage, type StudentProfile } from "@/lib/types";
 
 /**
- * Kayıt sihirbazı — altı adım.
+ * Kayıt sihirbazı — yedi adım.
  *
  * Soruların kendisi `src/components/ProfileFields.tsx` içinde; bu dosya
  * yalnızca adım yönetimi, ilerleme çubuğu ve kaydetmeyi yapıyor. Aynı sorular
  * ayarlardaki "Profilim" sekmesinde de kullanılıyor — tek kaynak olduğu için
  * yeni bir alan eklendiğinde iki ekranda birden görünüyor.
  */
-
-const STEPS = ["basics", "fields", "grades", "language", "tests", "targets"] as const;
-type StepId = (typeof STEPS)[number];
 
 export default function ProfilePage() {
   const { t } = useLocale();
@@ -39,20 +33,37 @@ export default function ProfilePage() {
   const [stepIndex, setStepIndex] = useState(0);
   const [saving, setSaving] = useState(false);
 
-  const step: StepId = STEPS[stepIndex];
-  const progress = ((stepIndex + 1) / STEPS.length) * 100;
+  const step: ProfileStepId = PROFILE_STEPS[stepIndex];
+  const progress = ((stepIndex + 1) / PROFILE_STEPS.length) * 100;
 
   const update = (patch: Partial<StudentProfile>) =>
     setDraft((prev) => ({ ...prev, ...patch }));
 
-  const canContinue = useMemo(() => {
-    if (step === "basics") return draft.fullName.trim().length > 0;
-    if (step === "fields") return draft.fields.length > 0;
-    if (step === "grades") return draft.gpa > 0;
-    return true;
-  }, [step, draft]);
+  /**
+   * Sınıf ortalamalarından türetilen genel ortalama. Hiç sınıf girilmemişse
+   * `undefined` — o zaman öğrencinin elle yazdığı `gpa` kullanılıyor.
+   */
+  const derivedAverage = useMemo(() => overallAverage(draft.gradeYears), [draft.gradeYears]);
 
-  const isLast = stepIndex === STEPS.length - 1;
+  const canContinue = useMemo(() => {
+    if (step === "basics") {
+      // Lise adı ve diploma da isteniyor: diploma olmadan hangi şart
+      // sistemine göre değerlendirileceği belirsiz kalıyor.
+      return (
+        draft.fullName.trim().length > 0 &&
+        draft.highSchoolName.trim().length > 0 &&
+        draft.diplomas.length > 0
+      );
+    }
+    if (step === "fields") return draft.fields.length > 0;
+    // Sınıf ortalaması ya da elle girilmiş genel ortalama — biri yeterli.
+    if (step === "grades") return (derivedAverage ?? draft.gpa) > 0;
+    // "subjects" adımı tamamen isteğe bağlı: ders almamış ya da AP'si olmayan
+    // öğrenciyi burada tutmak anlamsız.
+    return true;
+  }, [step, draft, derivedAverage]);
+
+  const isLast = stepIndex === PROFILE_STEPS.length - 1;
 
   async function handleNext() {
     if (!isLast) {
@@ -60,7 +71,11 @@ export default function ProfilePage() {
       return;
     }
     setSaving(true);
-    await saveProfile(draft);
+    // Türetilmiş ortalamayı KAYIT ANINDA yazıyoruz, state'te yansıtmıyoruz.
+    // Motor tek bir sayıyla çalışıyor ve profilde iki farklı "ortalama"
+    // tutmak hangisinin doğru olduğu belirsiz bir kayıt üretirdi. Effect
+    // içinde setState ile aynaya yazmak da gereksiz bir render turuydu.
+    await saveProfile(derivedAverage !== undefined ? { ...draft, gpa: derivedAverage } : draft);
     router.push("/results");
   }
 
@@ -74,7 +89,7 @@ export default function ProfilePage() {
           <div className="flex items-baseline justify-between mb-3">
             <h1 className="text-[24px] text-ink">{t.wizard.title}</h1>
             <span className="text-[13px] text-ink-faint tabular-nums">
-              {fill(t.wizard.stepOf, { current: stepIndex + 1, total: STEPS.length })}
+              {fill(t.wizard.stepOf, { current: stepIndex + 1, total: PROFILE_STEPS.length })}
             </span>
           </div>
           <div className="h-1.5 rounded-full bg-surface-soft overflow-hidden">
@@ -84,7 +99,7 @@ export default function ProfilePage() {
             />
           </div>
           <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
-            {STEPS.map((id, index) => (
+            {PROFILE_STEPS.map((id, index) => (
               <button
                 key={id}
                 type="button"
@@ -106,14 +121,7 @@ export default function ProfilePage() {
         </div>
 
         <Card key={step} className="p-6 sm:p-8 animate-rise">
-          {step === "basics" && (
-            <BasicsFields draft={draft} update={update} autoFocusFirst />
-          )}
-          {step === "fields" && <InterestFields draft={draft} update={update} />}
-          {step === "grades" && <GradeFields draft={draft} update={update} />}
-          {step === "language" && <LanguageFields draft={draft} update={update} />}
-          {step === "tests" && <TestFields draft={draft} update={update} />}
-          {step === "targets" && <TargetFields draft={draft} update={update} />}
+          <ProfileStep step={step} draft={draft} update={update} />
         </Card>
 
         {/* Gezinme */}
@@ -135,3 +143,4 @@ export default function ProfilePage() {
     </>
   );
 }
+

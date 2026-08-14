@@ -5,15 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/Header";
 import { Button, Card, Chip, Field, Input, cx } from "@/components/ui";
-import {
-  BasicsFields,
-  GradeFields,
-  InterestFields,
-  LanguageFields,
-  TargetFields,
-  TestFields,
-  emptyProfile,
-} from "@/components/ProfileFields";
+import { PROFILE_STEPS, ProfileStep, emptyProfile } from "@/components/ProfileFields";
 import { useLocale } from "@/lib/i18n/context";
 import { fill } from "@/lib/i18n/dictionary";
 import { useStore } from "@/lib/store";
@@ -199,24 +191,14 @@ function ProfileTab() {
         </Card>
       </div>
 
-      <Section label={t.wizard.steps.basics}>
-        <BasicsFields draft={draft} update={update} />
-      </Section>
-      <Section label={t.wizard.steps.fields}>
-        <InterestFields draft={draft} update={update} />
-      </Section>
-      <Section label={t.wizard.steps.grades}>
-        <GradeFields draft={draft} update={update} />
-      </Section>
-      <Section label={t.wizard.steps.language}>
-        <LanguageFields draft={draft} update={update} />
-      </Section>
-      <Section label={t.wizard.steps.tests}>
-        <TestFields draft={draft} update={update} />
-      </Section>
-      <Section label={t.wizard.steps.targets}>
-        <TargetFields draft={draft} update={update} />
-      </Section>
+      {/* Sihirbazın adımlarının TAMAMI, sırasıyla. Liste sihirbazdan geldiği
+          için oraya yeni bir adım eklendiğinde burası kendiliğinden büyüyor —
+          "ayarlarda o soru yok" durumu imkânsız. */}
+      {PROFILE_STEPS.map((id) => (
+        <Section key={id} label={t.wizard.steps[id]}>
+          <ProfileStep step={id} draft={draft} update={update} />
+        </Section>
+      ))}
     </div>
   );
 }

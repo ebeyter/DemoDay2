@@ -274,6 +274,14 @@ const tr = {
 
   program: {
     requirements: "Şartlar",
+    /**
+     * Şart listesi zorunlu/zorunlu olmayan diye ikiye ayrılıyor (sıralamayı
+     * matching.ts yapıyor). Başlıklar ayrımı görünür kılıyor: sırf sıralamak,
+     * "bu satır neden aşağıda?" sorusunu cevapsız bırakıyordu.
+     */
+    mandatoryGroup: "Zorunlu şartlar",
+    optionalGroup: "Zorunlu olmayanlar",
+    optionalGroupNote: "Karşılamazsan elenmezsin; karşılarsan başvurunu güçlendirir.",
     costs: "Maliyet",
     application: "Başvuru",
     tuitionNonEu: "Harç (AB-dışı)",
@@ -897,6 +905,9 @@ const en: Dictionary = {
 
   program: {
     requirements: "Requirements",
+    mandatoryGroup: "Required",
+    optionalGroup: "Not required",
+    optionalGroupNote: "Missing these will not rule you out; meeting them strengthens your application.",
     costs: "Costs",
     application: "Application",
     tuitionNonEu: "Tuition (non-EU)",

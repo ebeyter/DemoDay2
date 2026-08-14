@@ -592,6 +592,20 @@ export function evaluateProgram(program: Program, profile: StudentProfile): Matc
   checks.push(...checkSubjects(program, profile));
   checks.push(...checkExtras(program, profile));
 
+  // Zorunlu şartlar üstte, zorunlu olmayanlar altta.
+  //
+  // Sıralama burada yapılıyor, ekranlarda değil: aynı listeyi program detayı,
+  // karşılaştırma tahtası ve keşfet ekranları basıyor. Her birinde ayrı ayrı
+  // sıralamak, birinde unutulduğunda sessizce farklı bir sıra demek olurdu.
+  //
+  // Sıralama KARARLI: `sort` eşit anahtarlarda girdi sırasını koruyor
+  // (ES2019'dan beri garanti), yani her iki grubun içinde yukarıdaki mantıksal
+  // sıra — not, dil, sınavlar, dersler, ekler — aynen duruyor.
+  //
+  // Bant kararı ve `metMandatory` sayımı `mandatory` alanına bakıyor, diziyi
+  // baştan sona okumuyor; sıra onları etkilemiyor.
+  checks.sort((a, b) => Number(b.mandatory) - Number(a.mandatory));
+
   const band = decideBand(checks, program, profile);
   const mandatory = checks.filter((c) => c.mandatory);
 

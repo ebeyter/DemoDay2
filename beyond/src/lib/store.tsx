@@ -18,6 +18,7 @@ import {
   writePersistent,
 } from "./persistent-state";
 import type { CountryCode, FieldId, StudentProfile } from "./types";
+import { reconcileLocalProfile } from "./profile-reconcile";
 
 /**
  * Beyond — tek veri katmanı.
@@ -108,15 +109,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
     // setState burada eşzamanlı değil — söz (promise) ve abonelik geri
     // çağrılarının içinde çalışıyor, yani dış sistemden gelen bildirimler.
+    // GİRİŞ VARSA "signed-in" DEĞİL "loading" KALIYOR.
+    //
+    // Sebep gizlilik: effect'ler boyamadan sonra çalışıyor, yani kullanıcı
+    // ayarlandığı anda "signed-in" desek, aşağıdaki uzlaştırma effect'i
+    // çalışana kadar bir kare boyunca ekranda ÖNCEKİ kullanıcının profili
+    // durur. Sayfaların hepsi `status === "loading"` iken hiçbir şey render
+    // etmiyor; durumu uzlaştırma bitene kadar orada tutarak tek noktadan
+    // kapatıyoruz.
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
       setUser(data.session?.user ?? null);
-      setStatus(data.session?.user ? "signed-in" : "signed-out");
+      if (!data.session?.user) setStatus("signed-out");
     });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      setStatus(session?.user ? "signed-in" : "signed-out");
+      if (!session?.user) setStatus("signed-out");
+      else setStatus("loading");
     });
 
     return () => {
@@ -125,11 +135,49 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
   }, [supabase]);
 
-  // --- Giriş yapılınca sunucudaki profili çek ----------------------------
+  // --- Giriş yapılınca yerel durumu HESAPLA UZLAŞTIR ----------------------
+  //
+  // GİZLİLİK HATASI BURADAYDI (2026-08-14). Eski hâli şöyleydi:
+  //
+  //     if (!active || error || !data) return;
+  //
+  // Yeni açılan bir hesabın `beyond_profiles`'ta satırı olmadığı için `data`
+  // null geliyor ve effect ERKEN DÖNÜYORDU — localStorage'daki profile hiç
+  // dokunmadan. O profil de aynı tarayıcıda daha önce giriş yapmış BAŞKA
+  // kullanıcıya aitti. Sonuç: Alp yeni hesap açıyor, sihirbaz hiç sorulmuyor
+  // ve karşısında Eda'nın profili, eşleşmeleri ve listesi çıkıyor.
+  //
+  // Doğru davranış: giriş yapıldığında yerel durum sunucudaki hesapla
+  // UZLAŞTIRILIR. Sunucuda profil yoksa, yereldeki profil bu hesaba ait
+  // değildir ve temizlenir; kullanıcı sihirbaza gider.
   useEffect(() => {
     if (!supabase || !user) return;
 
     let active = true;
+
+    const clearLocal = () => {
+      writePersistent<StudentProfile | null>(PROFILE_KEY, null);
+      writePersistent(SHORTLIST_KEY, []);
+      writePersistent(COMPARE_KEY, []);
+    };
+
+    const local = readPersistent<StudentProfile | null>(PROFILE_KEY, null);
+
+    // Ağ turunu BEKLEMEDEN yapılan kontrol: profil başka bir kullanıcının
+    // damgasını taşıyorsa hemen temizle. Beklersek fetch sürerken ekranda bir
+    // an başkasının verisi görünür.
+    if (
+      reconcileLocalProfile({
+        currentUserId: user.id,
+        hasLocalProfile: Boolean(local),
+        localProfileUserId: local?.userId,
+        serverHasProfile: false,
+        fetchFailed: true, // "henüz bilmiyoruz" — yalnızca damga kontrolü çalışsın
+      }) === "clear"
+    ) {
+      clearLocal();
+    }
+
     (async () => {
       const { data, error } = await supabase
         .from("beyond_profiles")
@@ -137,12 +185,32 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         .eq("user_id", user.id)
         .maybeSingle();
 
-      if (!active || error || !data) return;
+      if (!active) return;
 
-      // Dış kaynağa yazıyoruz; abone bileşenler kendiliğinden güncellenir.
-      if (data.profile) writePersistent(PROFILE_KEY, data.profile as StudentProfile);
-      if (Array.isArray(data.shortlist)) writePersistent(SHORTLIST_KEY, data.shortlist);
-      if (Array.isArray(data.compare_list)) writePersistent(COMPARE_KEY, data.compare_list);
+      const action = reconcileLocalProfile({
+        currentUserId: user.id,
+        hasLocalProfile: Boolean(readPersistent<StudentProfile | null>(PROFILE_KEY, null)),
+        localProfileUserId:
+          readPersistent<StudentProfile | null>(PROFILE_KEY, null)?.userId,
+        serverHasProfile: Boolean(data?.profile),
+        fetchFailed: Boolean(error),
+      });
+
+      if (action === "adopt-server" && data?.profile) {
+        // Dış kaynağa yazıyoruz; abone bileşenler kendiliğinden güncellenir.
+        writePersistent(PROFILE_KEY, data.profile as StudentProfile);
+        writePersistent(SHORTLIST_KEY, Array.isArray(data.shortlist) ? data.shortlist : []);
+        writePersistent(
+          COMPARE_KEY,
+          Array.isArray(data.compare_list) ? data.compare_list : []
+        );
+      } else if (action === "clear") {
+        clearLocal();
+      }
+
+      // Uzlaştırma bitti; sayfalar artık render edebilir. Bu satır olmadan
+      // durum "loading"de kalır ve uygulama hiç açılmaz.
+      setStatus("signed-in");
     })();
 
     return () => {

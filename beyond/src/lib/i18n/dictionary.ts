@@ -287,6 +287,9 @@ const tr = {
     scenarioReset: "Senaryoyu sıfırla",
     scenarioActive: "Senaryo aktif — bunlar kayıtlı profilin sonuçları değil",
     showOutOfReach: "Uzak olanları da göster",
+    // Gizlenen program sayısını söylüyoruz: sayı olmadan liste tam görünüyor.
+    hiddenOutOfReach: "{count} program ulaşılamaz sayıldı — onları da göster",
+    editTargets: "Hedefimi düzenle",
     addToCompare: "Karşılaştırmaya ekle",
     inCompare: "Karşılaştırmada",
     overBudget: "Bütçeni aşıyor",
@@ -945,6 +948,8 @@ const en: Dictionary = {
     scenarioReset: "Reset scenario",
     scenarioActive: "Scenario active — these are not your saved profile's results",
     showOutOfReach: "Also show out-of-reach",
+    hiddenOutOfReach: "{count} programs were classed out of reach — show them too",
+    editTargets: "Edit my targets",
     addToCompare: "Add to compare",
     inCompare: "In comparison",
     overBudget: "Over your budget",

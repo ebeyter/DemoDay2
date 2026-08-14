@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore, type RefObject } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore, type RefObject } from "react";
 import { clamp } from "./route";
 
 /**
@@ -80,18 +80,35 @@ export function useRouteProgress(
  * Tercih açıkken rota TAMAMEN ÇİZİLİ geliyor — bilgi kaybolmuyor, sadece
  * hareket gidiyor.
  */
-const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+function useMediaQuery(query: string): boolean {
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      const list = window.matchMedia(query);
+      list.addEventListener("change", onChange);
+      return () => list.removeEventListener("change", onChange);
+    },
+    [query]
+  );
 
-function subscribeToReducedMotion(onChange: () => void): () => void {
-  const query = window.matchMedia(REDUCED_MOTION_QUERY);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
+  return useSyncExternalStore(
+    subscribe,
+    () => window.matchMedia(query).matches,
+    () => false
+  );
 }
 
 export function usePrefersReducedMotion(): boolean {
-  return useSyncExternalStore(
-    subscribeToReducedMotion,
-    () => window.matchMedia(REDUCED_MOTION_QUERY).matches,
-    () => false
-  );
+  return useMediaQuery("(prefers-reduced-motion: reduce)");
+}
+
+/**
+ * Dar ekran mı — Tailwind'in `sm` eşiğinin altı.
+ *
+ * Harita bu eşikte sadece küçülmüyor, DEĞİŞİYOR: şehir etiketleri gidiyor ve
+ * çerçeve rotanın sınırlarına kırpılıyor. Bunu CSS ile yapamıyoruz, `viewBox`
+ * bir öznitelik. Sunucuda `false` dönüyor, yani ilk render geniş çerçeve —
+ * dar ekranda istemci ilk okumada düzeltiyor.
+ */
+export function useCompactMap(): boolean {
+  return useMediaQuery("(max-width: 639px)");
 }

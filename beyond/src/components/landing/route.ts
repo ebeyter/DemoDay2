@@ -217,6 +217,44 @@ export const LEGS: RouteLeg[] = STOP_POINTS.slice(0, -1).map((point, index) =>
   buildLeg(point, STOP_POINTS[index + 1])
 );
 
+/**
+ * Dar ekran için kırpılmış çerçeve.
+ *
+ * Etiketler `sm` altında gizleniyor, dolayısıyla onlar için ayrılan geniş pay
+ * da gereksiz kalıyor: tam çerçeve 375px'e sığdırıldığında düğümler 2-3
+ * piksele iniyor ve rota okunmuyor. Rotanın kendi sınırlarına kırpınca aynı
+ * genişlikte ~1.8 kat büyük çiziliyor.
+ *
+ * Sınırlar veriden hesaplanıyor: bir Bézier, uç noktaları ile kontrol
+ * noktasının oluşturduğu üçgenin dışına çıkamaz, o yüzden bu üç nokta
+ * kümesinin kutusu yayların tamamını kapsıyor.
+ */
+export interface ViewBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/** Etiketler yüzdeyle konumlanıyor; hangi çerçeve çiziliyorsa ona göre. */
+export function viewBoxAttr(box: ViewBox): string {
+  return `${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`;
+}
+
+export const FULL_BOX: ViewBox = { x: 0, y: 0, width: VIEW_W, height: VIEW_H };
+
+export const COMPACT_BOX: ViewBox = (() => {
+  const margin = 34;
+  const points = [...STOP_POINTS, ...LEGS.map((leg) => leg.control)];
+  const xs = points.map((point) => point.x);
+  const ys = points.map((point) => point.y);
+
+  const x = Math.min(...xs) - margin;
+  const y = Math.min(...ys) - margin;
+
+  return { x, y, width: Math.max(...xs) + margin - x, height: Math.max(...ys) + margin - y };
+})();
+
 /** Karesel Bézier üzerindeki nokta — ilerleme işaretçisi buraya konuyor. */
 export function bezierPoint(leg: RouteLeg, t: number): Point {
   const inv = 1 - t;

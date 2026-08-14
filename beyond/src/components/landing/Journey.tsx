@@ -40,6 +40,14 @@ export function Journey() {
             reduced={reduced}
             className="mx-auto max-w-[560px] lg:max-w-none"
           />
+
+          {/* Yığılmış düzende metin haritanın altından akıp geçiyor ve
+              yapışkan bloğun kenarı satırı ortadan kesiyor. İnce bir geçiş
+              şeridi kesiği yumuşatıyor. Geniş ekranda harita yanda, gerek yok. */}
+          <div
+            className="pointer-events-none absolute inset-x-0 top-full h-5 bg-gradient-to-b from-canvas to-transparent lg:hidden"
+            aria-hidden
+          />
         </div>
 
         <ol className="mt-8 lg:mt-0">
@@ -56,7 +64,12 @@ export function Journey() {
                   sections.current[index] = element;
                 }}
                 className={cx(
-                  "flex min-h-[58vh] flex-col justify-center py-6 lg:min-h-[78vh] lg:py-0",
+                  // Dar ekranda metin yapışkan haritanın hemen altına
+                  // yaslanıyor. Ortalasaydı kısa metinler haritayla arasında
+                  // yarım ekranlık boşluk bırakıyordu. Geniş ekranda harita
+                  // yanda olduğu için ortalamak doğru.
+                  "flex min-h-[34vh] flex-col justify-start pt-2 pb-8",
+                  "lg:min-h-[78vh] lg:justify-center lg:py-0",
                   "route-stop",
                   isActive ? "route-stop-active" : undefined
                 )}

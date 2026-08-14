@@ -73,18 +73,15 @@ export function fitPercentTone(percent: number | null): FitTone {
 }
 
 export function fitSummary(result: MatchResult): FitSummary {
-  const mandatory = result.checks.filter((c) => c.mandatory);
+  // Payda ve karşılanan sayısı MOTORDAN geliyor, burada yeniden sayılmıyor:
+  // aynı kural iki yerde ayrı ayrı yazıldığı sürece bir gün birbirinden
+  // sapıyor — nitekim saptı da (bkz. matching.ts'teki `totalMandatory`
+  // açıklaması). Tek tanım motorda; burası onu okuyor.
+  const { metMandatory: met, totalMandatory: total, unknownFromSource } = result;
 
-  const unknownFromSource = mandatory.filter(
-    (c) => c.status === "unknown" && c.unknownReason === "source"
+  const unknownFromStudent = result.checks.filter(
+    (c) => c.mandatory && c.status === "unknown" && c.unknownReason !== "source"
   ).length;
-  const unknownFromStudent = mandatory.filter(
-    (c) => c.status === "unknown" && c.unknownReason !== "source"
-  ).length;
-
-  // Payda: bildiğimiz şartlar. Kaynak boşlukları dışarıda.
-  const total = mandatory.length - unknownFromSource;
-  const met = mandatory.filter((c) => c.status === "met").length;
 
   return {
     // Bildiğimiz hiç zorunlu şart kalmadıysa yüzde uydurmuyoruz; arayüz

@@ -487,6 +487,69 @@ describe("Bant kararı — kaynak veri boşluğu (unknownReason: source)", () =>
 });
 
 // ---------------------------------------------------------------------------
+// Şart sayacı — payda ile bant birbirini yalanlamamalı
+// ---------------------------------------------------------------------------
+
+describe("metMandatory / totalMandatory — kaynak boşluğu paydaya girmez", () => {
+  it("üniversitenin yayınlamadığı şart paydadan düşer ve unknownFromSource'ta görünür", () => {
+    const result = evaluateProgram(
+      makeProgram({ requirements: { minGpa: undefined, language: [{ test: "ielts", min: 6.0 }] } }),
+      makeProfile({ gpa: 90, languageTests: [{ test: "ielts", score: 7.5 }] })
+    );
+
+    // İki zorunlu şart var (not, dil) ama not eşiğini kaynak yayınlamıyor.
+    expect(result.metMandatory).toBe(1);
+    expect(result.totalMandatory).toBe(1);
+    expect(result.unknownFromSource).toBe(1);
+  });
+
+  it("öğrenci kaynaklı bilinmeyen paydada KALIR — kapatılabilir bir açık", () => {
+    const result = evaluateProgram(
+      makeProgram({ requirements: { minGpa: 60, language: [{ test: "ielts", min: 6.0 }] } }),
+      makeProfile({ gpa: 90, languageTests: [] }) // dil belgesi girilmemiş
+    );
+
+    expect(result.metMandatory).toBe(1);
+    expect(result.totalMandatory).toBe(2);
+    expect(result.unknownFromSource).toBe(0);
+  });
+
+  /**
+   * ASIL KORUNAN ŞEY BU: sayaç ile bant rozeti aynı kartın üstünde duruyor.
+   * "Tüm zorunlu şartları karşılıyorsun" yazan bir rozetin altında "3/4"
+   * görünmesi, ürünün tek iddiasını — dürüst değerlendirme — ekranda
+   * çürütüyordu. Katalog her değiştiğinde bu sessizce geri gelebilir.
+   */
+  it("katalog genelinde: match/safety bandındaki hiçbir program eksik sayaç göstermez", () => {
+    for (const ielts of [DEMO_IELTS_BEFORE, DEMO_IELTS_AFTER]) {
+      const profile = { ...DEMO_PROFILE, languageTests: [{ test: "ielts" as const, score: ielts }] };
+
+      for (const result of matchAll(PROGRAMS, profile)) {
+        if (result.band !== "match" && result.band !== "safety") continue;
+        expect(
+          result.metMandatory,
+          `${result.program.id} (IELTS ${ielts}) "${result.band}" bandında ama sayaç ${result.metMandatory}/${result.totalMandatory}`
+        ).toBe(result.totalMandatory);
+      }
+    }
+  });
+
+  /**
+   * 0/0 tuzağı: payda sıfıra düşerse sayacı basan ekranlar yüzdeyi
+   * hesaplayamaz ve biri "%100" gösterir — hakkında hiçbir şey bilmediğimiz
+   * bir program için verilebilecek en yanlış cevap. Bugün katalogda böyle
+   * bir kayıt yok; bu test, olduğu gün haber vermek için var.
+   */
+  it("katalogdaki her programın en az bir bildiğimiz zorunlu şartı var", () => {
+    const blind = matchAll(PROGRAMS, DEMO_PROFILE)
+      .filter((r) => r.totalMandatory === 0)
+      .map((r) => r.program.id);
+
+    expect(blind, `payda 0 olan kayıtlar: ${blind.join(", ")}`).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // fitScore — unknown, close, unmet farklı ağırlıklandırılır
 // ---------------------------------------------------------------------------
 

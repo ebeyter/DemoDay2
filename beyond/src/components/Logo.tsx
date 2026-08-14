@@ -4,79 +4,79 @@ import { useId } from "react";
 import { cx } from "./ui";
 
 /**
- * Beyond — marka işareti.
+ * Beyond — marka işareti: kep takmış bir öğrenci.
  *
- * FİKİR: markanın kendi cümlesi "Sınırların ötesinde bir üniversite var."
- * İşaret de bunu çiziyor — bir sınır çizgisi, ondan kalkıp üstünden aşan bir
- * yay ve varış noktası. Landing'deki rota haritasıyla aynı dil: aynı bombeli
- * yay, aynı dolu varış düğümü.
+ * Rozet dikdörtgen (yuvarlatılmış kare), figür ince beyaz çizgi, kep dolu.
+ * Kepi dolu bırakmak bilinçli: tamamen outline denendiğinde küçük boyutta
+ * kep bir baklava dilimine dönüşüp okunmuyordu; dolu haliyle silueti
+ * ilk bakışta tanınıyor.
  *
- * NEDEN BURADA SABİT RENK VAR: uygulamanın geri kalanında sabit hex yasak,
- * renkler tema tokenlarından geliyor. Logo istisna ve bilinçli — marka rengi
- * temayla değişmemeli, koyu temada da açık temada da aynı mavi olmalı, yoksa
- * "logo" olmaktan çıkar. Kelime kısmı yine tokendan (`text-ink`) geliyor ki
- * iki temada da okunsun.
+ * NEDEN SABİT HEX: uygulamanın geri kalanında renkler tema tokenlarından
+ * geliyor. Logo bilinçli istisna — marka rengi temayla değişmemeli, yoksa
+ * logo olmaktan çıkar.
  *
- * TAMAMEN SVG: dış dosya, CDN, raster yok — demoda internet gitse de durur ve
+ * TAMAMEN SVG: dış dosya, CDN, raster yok. Demoda internet gitse de durur,
  * her ölçekte keskin.
  */
 
-/** İşaretin tek başına hali — favicon, dar başlık, yükleme ekranı. */
+/** Marka mavisi — indigo ailesi, landing'in mücevher tonlarıyla uyumlu. */
+const BADGE_FROM = "#6366F1";
+const BADGE_TO = "#3730A3";
+
+/** İşaretin tek başına hali — dar başlık, yükleme ekranı, boş durumlar. */
 export function LogoMark({ className }: { className?: string }) {
   // Aynı sayfada birden fazla logo olabilir; gradyan id'leri çakışmasın.
   const id = useId();
-  const stroke = `${id}-stroke`;
+  const bg = `${id}-bg`;
 
   return (
-    <svg
-      viewBox="0 0 32 32"
-      className={cx("block", className)}
-      role="img"
-      aria-label="Beyond"
-    >
+    <svg viewBox="0 0 32 32" className={cx("block", className)} role="img" aria-label="Beyond">
       <defs>
-        {/* İki uç da açık mavi. Daha soluk bir uç denendi, varış noktası
-            beyaz zeminde kayboluyordu. */}
-        <linearGradient id={stroke} x1="6" y1="25" x2="24" y2="8" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#0EA5E9" />
-          <stop offset="1" stopColor="#38BDF8" />
+        <linearGradient id={bg} x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor={BADGE_FROM} />
+          <stop offset="1" stopColor={BADGE_TO} />
         </linearGradient>
       </defs>
 
-      {/* Sınır — aşılan şey. Yaydan silik ama görünür: daha soluk olduğunda
-          işaret "sınırı aşmak" gibi değil, tek başına bir kanca gibi
-          okunuyordu. */}
-      <path
-        d="M 4.5 25 H 19"
-        stroke="#38BDF8"
-        strokeOpacity="0.4"
-        strokeWidth="2.6"
-        strokeLinecap="round"
-        fill="none"
-      />
+      <rect width="32" height="32" rx="7.5" fill={`url(#${bg})`} />
 
-      {/* Sınırdan kalkıp ötesine giden yol. Tepesi yatık: dik bir yay
-          "kanca", yatık yay "yolculuk" okunuyor. */}
-      <path
-        d="M 5.8 25 Q 11 9.6 23 8.6"
-        stroke={`url(#${stroke})`}
-        strokeWidth="3.6"
+      <g
+        stroke="#FFFFFF"
+        strokeWidth="1.3"
         strokeLinecap="round"
+        strokeLinejoin="round"
         fill="none"
-      />
+      >
+        {/* Kep — dolu, işaretin tanınmasını sağlayan parça. */}
+        <path d="M 16 7.6 L 23.6 11 L 16 14.4 L 8.4 11 Z" fill="#FFFFFF" />
+        {/* Püskül. Kısa tutuldu: uzunken omuz çizgisine değip kol gibi
+            okunuyordu. */}
+        <path d="M 22.4 11.6 V 15.1" />
+        <circle cx="16" cy="18.4" r="3.2" />
+        <path d="M 9.8 28.4 a 6.2 6.2 0 0 1 12.4 0" />
+      </g>
 
-      {/* Varış — sınırın bittiği yerin ötesinde. */}
-      <circle cx="23.3" cy="8.6" r="3.9" fill="#38BDF8" />
+      <circle cx="22.4" cy="16.2" r="1.1" fill="#FFFFFF" />
     </svg>
   );
 }
 
-/** İşaret + kelime — başlıkta kullanılan hali. */
+/**
+ * İşaret + kelime — başlıkta kullanılan hali.
+ *
+ * Kelime beyaz DEĞİL, mavi-mor arası. Tek bir açık ton yetmiyor: koyu temada
+ * güzel duran açık lila (#A5B4FC) açık zeminde okunmuyor. O yüzden aynı
+ * hue ailesinin iki ucu var ve `data-theme` ile değişiyor. Koyu tema
+ * tanımlı olmayan bir dalda `data-theme` hiç yazılmıyor, orada da koyu ton
+ * geçerli kalıyor — yani her iki durumda da okunur.
+ */
 export function Logo({ className }: { className?: string }) {
   return (
-    <span className={cx("inline-flex items-center gap-2", className)}>
+    <span className={cx("inline-flex items-center gap-2.5", className)}>
       <LogoMark className="h-8 w-8 shrink-0" />
-      <span className="text-[17px] font-semibold tracking-[-0.03em] text-ink">Beyond</span>
+      <span className="text-[19px] font-semibold tracking-[-0.03em] text-[#4338CA] [[data-theme=dark]_&]:text-[#A5B4FC]">
+        Beyond
+      </span>
     </span>
   );
 }

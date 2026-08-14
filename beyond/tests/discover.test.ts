@@ -108,14 +108,35 @@ describe("groupByCountry — güvenilmez yüzde ortalamayı ve 'en iyi'yi kirlet
     return [barely];
   }
 
-  it("tek programı da güvenilmezse üniversite yüzdesi gösterilmiyor (hasReliableFit false)", () => {
+  it("tek programı da güvenilmezse üniversite yüzdesi gösterilmiyor (null)", () => {
     const [country] = groupByCountry(resultsFor());
     const uni = country.universities[0];
-    expect(uni.hasReliableFit).toBe(false);
-    // Sayı 0 kalıyor ama arayüz "—" basıyor: 0 ile "bilmiyoruz" karışmasın.
-    expect(uni.bestPercent).toBe(0);
-    expect(country.hasReliableFit).toBe(false);
+
+    // AYRI BİR `hasReliableFit` BAYRAĞI YOK: güvenilmezlik `null` ile ifade
+    // ediliyor. İki ayrı gösterge (bayrak + sayı) tutmak, bir gün birinin
+    // diğerini yalanlaması demekti — 0 ile "bilmiyoruz"un karışması zaten
+    // tam olarak bu dosyanın önlediği hata.
+    expect(uni.bestPercent).toBeNull();
+    expect(uni.averagePercent).toBeNull();
+    expect(country.bestPercent).toBeNull();
+
     // Program yine listede — gizlemiyoruz, yalnızca yüzde iddia etmiyoruz.
     expect(country.programCount).toBe(1);
+  });
+
+  it("gerçekten %0 karşılayan program null DEĞİL, sayısal 0 döner", () => {
+    // Ayrımın kendisi: "hiçbir şartı karşılamıyor" ölçülmüş bir sonuç,
+    // "bilmiyoruz" ise bizim boşluğumuz. İkisi aynı sayıya düşerse ürün
+    // katalog eksiğini öğrencinin başarısızlığı gibi gösterir.
+    const zero = evaluateProgram(
+      makeProgram({
+        requirements: { minGpa: 95, language: [{ test: "ielts", min: 8 }] },
+      }),
+      makeProfile({ gpa: 10, languageTests: [{ test: "ielts", score: 1 }] })
+    );
+    const [country] = groupByCountry([zero]);
+
+    expect(fitSummary(zero).reliable).toBe(true);
+    expect(country.universities[0].bestPercent).toBe(0);
   });
 });

@@ -641,6 +641,9 @@ export function evaluateProgram(program: Program, profile: StudentProfile): Matc
 
   const band = decideBand(checks, program, profile);
   const mandatory = checks.filter((c) => c.mandatory);
+  const unknownFromSource = mandatory.filter(
+    (c) => c.status === "unknown" && c.unknownReason === "source"
+  ).length;
 
   return {
     program,
@@ -648,7 +651,22 @@ export function evaluateProgram(program: Program, profile: StudentProfile): Matc
     fitScore: computeFitScore(checks, band),
     checks,
     metMandatory: mandatory.filter((c) => c.status === "met").length,
-    totalMandatory: mandatory.length,
+    // PAYDA = BİLDİĞİMİZ ZORUNLU ŞARTLAR. Üniversitenin yayınlamadığı şart
+    // (`unknownReason: "source"`) buradan düşüyor.
+    //
+    // Bu kural ürünün her yerinde geçerli (bant kararı, eksik planı, bütçe
+    // kıyası, keşfet yüzdeleri — bkz. discover.ts) ama sayaç bir süre bunun
+    // dışında kaldı: aynı program Eşleşmelerim'de "3/4 · %75", Listem'de
+    // "3/3 · %100" gösteriyordu ve "Uyumlu — tüm zorunlu şartları
+    // karşılıyorsun" rozetinin altında "3/4" yazıyordu. Demo profilinde
+    // 49 programın 23'ü iki ekranda iki farklı sayı veriyordu.
+    //
+    // Kural motorda uygulanıyor, ekranlarda değil: sayacı basan dört ayrı
+    // yer var (kart, karşılaştırma tahtası, program detayı, asistan özeti)
+    // ve her birinde ayrı ayrı düzeltmek, birinde unutulduğunda aynı
+    // tutarsızlığın geri gelmesi demekti.
+    totalMandatory: mandatory.length - unknownFromSource,
+    unknownFromSource,
     // Harç bilinmiyorsa bütçe aşımı İDDİA EDİLMEZ. Bilinmeyeni "aşıyor" saymak
     // programı haksız yere eler; "aşmıyor" saymak öğrenciye yanlış güven verir.
     // İkisi de yapılmıyor: false kalır, eksik bilgi arayüzde harç satırında

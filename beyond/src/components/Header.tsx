@@ -48,27 +48,10 @@ export function Header() {
           <Logo />
         </Link>
 
-        <nav className="hidden sm:flex items-center gap-1 flex-1">
-          {links.map((link) => {
-            const active = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cx(
-                  "px-3 py-1.5 rounded-lg text-sm transition-colors",
-                  active
-                    ? "text-accent bg-accent-soft font-medium"
-                    : "text-ink-soft hover:text-ink hover:bg-surface-soft"
-                )}
-              >
-                {link.label}
-                {link.count ? (
-                  <span className="ml-1.5 text-[11px] text-ink-faint">{link.count}</span>
-                ) : null}
-              </Link>
-            );
-          })}
+        <nav aria-label={t.brand.name} className="hidden sm:flex items-center gap-1 flex-1">
+          {links.map((link) => (
+            <NavLink key={link.href} link={link} active={pathname === link.href} />
+          ))}
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
@@ -141,6 +124,57 @@ export function Header() {
           ) : null}
         </div>
       </div>
+
+      {/* MOBİL NAVİGASYON — ikinci satır, yatay kaydırmalı.
+          640px altında yukarıdaki `sm:flex` çubuğu gizleniyordu ve yerine
+          hiçbir şey gelmiyordu: telefonda giriş yapmış bir öğrenci
+          Eşleşmelerim, Keşfet, plan, liste ve takvime hiç ulaşamıyordu.
+
+          Açılır menü yerine kayan şerit: bağlantı sayısı en fazla altı,
+          menü ise açma/kapama durumu, odak tuzağı ve dışarı tıklama
+          gerektirirdi — hepsi bu ölçekte gereksiz. Şerit ayrıca aktif
+          sayfayı sürekli görünür tutuyor. Yatay kaydırma kalıbı
+          karşılaştırma tablosuyla aynı (`thin-scroll` + `w-max`). */}
+      {links.length > 0 && (
+        <nav aria-label={t.brand.name} className="sm:hidden border-t border-line">
+          <div className="overflow-x-auto thin-scroll">
+            <div className="flex items-center gap-1 w-max px-5 py-2">
+              {links.map((link) => (
+                <NavLink key={link.href} link={link} active={pathname === link.href} />
+              ))}
+            </div>
+          </div>
+        </nav>
+      )}
     </header>
+  );
+}
+
+/** Tek bir gezinme bağlantısı — masaüstü çubuğu ve mobil şerit aynı görünümü
+    paylaşsın diye ayrıldı. `whitespace-nowrap`: mobil şeritte etiketler
+    ("Eksik planım") iki satıra bölünmemeli. */
+function NavLink({
+  link,
+  active,
+}: {
+  link: { href: string; label: string; count?: number };
+  active: boolean;
+}) {
+  return (
+    <Link
+      href={link.href}
+      aria-current={active ? "page" : undefined}
+      className={cx(
+        "shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-sm transition-colors",
+        active
+          ? "text-accent bg-accent-soft font-medium"
+          : "text-ink-soft hover:text-ink hover:bg-surface-soft"
+      )}
+    >
+      {link.label}
+      {link.count ? (
+        <span className="ml-1.5 text-[11px] text-ink-faint">{link.count}</span>
+      ) : null}
+    </Link>
   );
 }

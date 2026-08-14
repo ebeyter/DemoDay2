@@ -464,8 +464,24 @@ export interface MatchResult {
   /** 0-100. Sıralama için; kullanıcıya "kabul olasılığı" olarak SUNULMAZ. */
   fitScore: number;
   checks: RequirementCheck[];
+  /** Karşılanan zorunlu şart sayısı. */
   metMandatory: number;
+  /**
+   * Sayacın paydası: BİLDİĞİMİZ zorunlu şart sayısı.
+   *
+   * Üniversitenin yayınlamadığı şartlar (`unknownReason: "source"`) paydaya
+   * GİRMEZ — bkz. discover.ts'teki "iki tür bilinmeyen" kuralı. Aksi hâlde
+   * kendi katalog boşluğumuz öğrenciye eksiklik olarak yazılır ve ekranda
+   * "tüm zorunlu şartları karşılıyorsun" rozetinin yanında "3/4" gibi
+   * kendini yalanlayan bir sayaç çıkar.
+   */
   totalMandatory: number;
+  /**
+   * Kaynak yayınlamadığı için paydadan düşülen zorunlu şart sayısı.
+   * Arayüz bunu "N şart bilinmiyor" olarak ayrıca söyleyebilir; sayacın
+   * neden `totalMandatory` kadar olduğu böylece görünür kalıyor.
+   */
+  unknownFromSource: number;
   /** Harç + yaşam maliyeti, öğrencinin bütçesini aşıyorsa true. */
   overBudget: boolean;
 }

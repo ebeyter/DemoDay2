@@ -102,7 +102,7 @@ export function ProgramCard({ result, index = 0 }: { result: MatchResult; index?
           </dd>
         </div>
         <div>
-          <dt className="text-ink-faint">{t.nav.results}</dt>
+          <dt className="text-ink-faint">{t.program.field}</dt>
           <dd className="font-medium text-ink">{pick(FIELDS[program.field].name)}</dd>
         </div>
       </dl>

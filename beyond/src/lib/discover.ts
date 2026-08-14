@@ -80,19 +80,42 @@ export interface FitSummary {
   reliable: boolean;
 }
 
+/**
+ * null-aware yüzde gösterimi — bestPercent/averagePercent hem ülke hem
+ * üniversite kartlarında aynı iki kuralla gösteriliyor (metin: "—" ya da
+ * "%N"; renk: null/< 50 soluk, >= 50 "reach", >= 80 "match"). İki sayfa da
+ * bu ikisini tekrar tekrar yazmak yerine buradan alıyor.
+ */
+export function formatFitPercent(percent: number | null): string {
+  return percent === null ? "—" : `%${percent}`;
+}
+
+export type FitTone = "match" | "reach" | "faint";
+
+export function fitPercentTone(percent: number | null): FitTone {
+  if (percent === null) return "faint";
+  if (percent >= 80) return "match";
+  if (percent >= 50) return "reach";
+  return "faint";
+}
+
 export function fitSummary(result: MatchResult): FitSummary {
-  const mandatory = result.checks.filter((c) => c.mandatory);
+  // Payda ve karşılanan sayısı MOTORDAN geliyor, burada yeniden sayılmıyor:
+  // aynı kural iki yerde ayrı ayrı yazıldığı sürece bir gün birbirinden
+  // sapıyor — nitekim saptı da (bkz. matching.ts'teki `totalMandatory`
+  // açıklaması). Tek tanım motorda; burası onu okuyor.
+  const { metMandatory: met, totalMandatory: total, unknownFromSource } = result;
 
-  const unknownFromSource = mandatory.filter(
-    (c) => c.status === "unknown" && c.unknownReason === "source"
-  ).length;
-  const unknownFromStudent = mandatory.filter(
-    (c) => c.status === "unknown" && c.unknownReason !== "source"
+  const unknownFromStudent = result.checks.filter(
+    (c) => c.mandatory && c.status === "unknown" && c.unknownReason !== "source"
   ).length;
 
-  // Payda: bildiğimiz şartlar. Kaynak boşlukları dışarıda.
-  const total = mandatory.length - unknownFromSource;
-  const met = mandatory.filter((c) => c.status === "met").length;
+  // Programın TÜM zorunlu şartları. Motor paydadan kaynak boşluklarını zaten
+  // düşürdüğü için (`totalMandatory = mandatory.length - unknownFromSource`),
+  // ikisini toplamak diziyi yeniden saymadan aynı sayıyı veriyor. Şartları
+  // burada tekrar filtrelemek, yukarıdaki "tek tanım motorda" kuralını
+  // bozardı — sayım iki yere yazıldığı anda bir gün birbirinden sapıyor.
+  const mandatoryTotal = total + unknownFromSource;
 
   return {
     // Bildiğimiz hiç zorunlu şart kalmadıysa yüzde uydurmuyoruz; arayüz
@@ -100,11 +123,11 @@ export function fitSummary(result: MatchResult): FitSummary {
     percent: total === 0 ? 0 : Math.round((met / total) * 100),
     met,
     total,
-    mandatoryTotal: mandatory.length,
+    mandatoryTotal,
     unknownFromSource,
     unknownFromStudent,
     unknownOnly: total === 0,
-    reliable: total >= MIN_KNOWN_CHECKS && total * 2 >= mandatory.length,
+    reliable: total >= MIN_KNOWN_CHECKS && total * 2 >= mandatoryTotal,
   };
 }
 
@@ -139,17 +162,23 @@ export interface UniversityGroup {
   country: CountryCode;
   /** Bu üniversitenin katalogdaki programları, uyuma göre azalan. */
   results: MatchResult[];
-  /** Programların uyum ortalaması. */
-  averagePercent: number;
-  /** En iyi uyumlu programın yüzdesi — sıralama bunu kullanıyor. */
-  bestPercent: number;
   /**
-   * Yüzdeyi GÖSTEREBİLİR MİYİZ? Hiçbir programın şartlarını yeterince
-   * bilmiyorsak false ve arayüz sayı yerine "—" koyuyor. `bestPercent === 0`
-   * ile ayırt etmek gerekiyordu: sıfır, "hiçbir şartı karşılamıyor" da
-   * olabilir ve ikisini aynı göstermek öğrenci hakkında yanlış bir iddia.
+   * Programların uyum ortalaması. null = hiçbir programın uyumu
+   * hesaplanamadı (hepsi `unknownOnly`) — "bilmiyoruz" ile "%0" AYNI ŞEY
+   * DEĞİL, o yüzden burada da 0'a düşmüyoruz. Arayüz null'u ayrı göstermeli.
    */
-  hasReliableFit: boolean;
+  averagePercent: number | null;
+  /**
+   * En iyi uyumlu programın yüzdesi — sıralama bunu kullanıyor.
+   *
+   * null = bu üniversitenin hiçbir programının şartlarını yüzde gösterecek
+   * kadar bilmiyoruz. Ayrı bir `hasReliableFit` bayrağı YOK: bilgi zaten
+   * null'un içinde ve iki alanın birbiriyle çelişebildiği bir durum
+   * bırakmıyoruz. `bestPercent === 0` ile karıştırılamaz — sıfır "hiçbir
+   * şartı karşılamıyor" demek ve ikisini aynı göstermek öğrenci hakkında
+   * yanlış bir iddia olurdu.
+   */
+  bestPercent: number | null;
   /**
    * Üniversite kaydı: resmî site adresi ve kısa tanıtım (`universities.ts`).
    * Adı katalogda olup burada karşılığı olmayan bir üniversite kalırsa
@@ -167,10 +196,10 @@ export interface CountryGroup {
   country: CountryCode;
   universities: UniversityGroup[];
   programCount: number;
-  averagePercent: number;
-  bestPercent: number;
-  /** bkz. UniversityGroup.hasReliableFit */
-  hasReliableFit: boolean;
+  /** null = bu ülkedeki hiçbir programın uyumu güvenilir şekilde hesaplanamadı. */
+  averagePercent: number | null;
+  /** null = bu ülkedeki hiçbir programın uyumu güvenilir şekilde hesaplanamadı. */
+  bestPercent: number | null;
   verifiedCount: number;
 }
 
@@ -199,8 +228,26 @@ export function groupByCountry(results: MatchResult[]): CountryGroup[] {
     else universities.set(university, [result]);
   }
 
-  const average = (values: number[]) =>
-    values.length === 0 ? 0 : Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+  // null = hesaplanacak değer yok. 0 dönersek "hesapladık ve sıfır çıktı"
+  // ile "hiç hesaplayamadık" karışır — tam da bu dosyanın kaçınmaya
+  // çalıştığı hata, burada da yapmıyoruz.
+  const average = (values: number[]): number | null =>
+    values.length === 0 ? null : Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+
+  // bestPercent null olanlar (hiçbir programı hesaplanamayan üniversite/ülke)
+  // her zaman en sona — hem üniversite hem ülke sıralaması bunu paylaşıyor,
+  // tek yerde tutuyoruz ki ikisi ileride birbirinden sapmasın.
+  const compareByBestPercent = <T extends { bestPercent: number | null }>(
+    a: T,
+    b: T,
+    tiebreak: (a: T, b: T) => number = () => 0
+  ): number => {
+    if (a.bestPercent === null || b.bestPercent === null) {
+      if (a.bestPercent === b.bestPercent) return 0;
+      return a.bestPercent === null ? 1 : -1;
+    }
+    return b.bestPercent !== a.bestPercent ? b.bestPercent - a.bestPercent : tiebreak(a, b);
+  };
 
   const countries: CountryGroup[] = [];
 
@@ -225,8 +272,7 @@ export function groupByCountry(results: MatchResult[]): CountryGroup[] {
         country,
         results: sorted,
         averagePercent: average(percents),
-        bestPercent: percents.length === 0 ? 0 : Math.max(...percents),
-        hasReliableFit: percents.length > 0,
+        bestPercent: percents.length === 0 ? null : Math.max(...percents),
         meta: getUniversity(university),
         // Programların içinde ilk bulunan fakülte bağlantısı. Resmî kurum
         // adresi `meta.officialUrl`'de; bu ikisi farklı şeyler.
@@ -237,11 +283,10 @@ export function groupByCountry(results: MatchResult[]): CountryGroup[] {
     }
 
     // Aynı gerekçe program sıralamasındaki gibi: eşit uyumda hakkında daha çok
-    // şey bildiğimiz üniversite önce.
+    // şey bildiğimiz üniversite önce. bestPercent null olanlar (hiçbir programı
+    // hesaplanamayan üniversiteler) compareByFit'teki unknownOnly gibi en sona.
     universities.sort((a, b) =>
-      b.bestPercent !== a.bestPercent
-        ? b.bestPercent - a.bestPercent
-        : b.knownAtBest - a.knownAtBest
+      compareByBestPercent(a, b, (a, b) => b.knownAtBest - a.knownAtBest)
     );
 
     const allResults = universities.flatMap((u) => u.results);
@@ -257,12 +302,13 @@ export function groupByCountry(results: MatchResult[]): CountryGroup[] {
       // ve öğrenci onları da görmeli.
       programCount: allResults.length,
       averagePercent: average(allPercents),
-      bestPercent: allPercents.length === 0 ? 0 : Math.max(...allPercents),
-      hasReliableFit: allPercents.length > 0,
+      bestPercent: allPercents.length === 0 ? null : Math.max(...allPercents),
       verifiedCount: universities.reduce((sum, u) => sum + u.verifiedCount, 0),
     });
   }
 
-  countries.sort((a, b) => b.bestPercent - a.bestPercent);
+  // bestPercent null olan ülkeler (hiçbir programı hesaplanamayan) en sona —
+  // universities.sort'taki null muamelesiyle aynı gerekçe.
+  countries.sort((a, b) => compareByBestPercent(a, b));
   return countries;
 }
